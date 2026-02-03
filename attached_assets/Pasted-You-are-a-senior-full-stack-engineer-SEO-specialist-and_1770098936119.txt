@@ -1,0 +1,458 @@
+You are a senior full-stack engineer, SEO specialist, and accessibility-focused front-end architect. Build a complete, deployable Next.js (App Router) project for the official website of the Healthcare Reforms Doctors Association (HRDA). The final deliverable must be production-ready, SEO-optimized, accessible (WCAG AA), secure, and include a small admin panel.
+
+Deliverables (minimum):
+
+Full Next.js project (App Router) with components, pages, API routes
+
+Admin UI for content management (Announcements, Panels, Achievements, Departments)
+
+Google Sheets integration as the primary database
+
+Razorpay reconciliation logic (webhook + polling fallback)
+
+TGMC ID search & edit workflow against Google Sheets
+
+Structured data (JSON-LD), sitemap.xml, robots.txt, and meta templates
+
+README with setup and deployment steps (Vercel recommended)
+
+Automated tests (very basic integration tests) and SEO audit checklist
+
+1. Tech Stack & Rationales (must use)
+
+Framework: Next.js (latest App Router) — use Server Components by default; SSG for public pages; SSR or ISR where dynamic content is required.
+
+Styling: Tailwind CSS + base design system (component-friendly, responsive).
+
+Image handling: next/image for responsive images and LCP improvements.
+
+Forms / Client auth: NextAuth (Google OAuth for Admin) or secure credentials provider.
+
+Email: SendGrid (or Mailgun) for transactional emails on payment success.
+
+Sheets DB: Google Sheets API (service account) as primary datastore.
+
+Task scheduling / polling: use serverless cron in Vercel (or Replit scheduler) for payment reconciliation fallback.
+
+Testing: Jest + React Testing Library for components; integration tests for API routes.
+
+Monitoring: Sentry (optional) and basic logs.
+
+CI: GitHub Actions or Replit CI for tests on push.
+
+Deployment: Vercel preferred; include environment variables list.
+
+2. High-level Architecture & Flow
+
+Public site pages (SSG where possible).
+
+/membership page — DOES NOT create a new registration form. Instead, present official copy and CTA linking to https://www.hrda-india.org/index.php/new-registration-2/ with clear instructions and post-payment email address hrda4people@gmail.com.
+
+Google Sheets primary DB — All site admin-managed content (panels, achievements, departments) and user-submitted forms (contact, membership lookup edits) will create rows in Sheets.
+
+Payment reconciliation:
+
+Preferred: configure the existing registration system’s Razorpay integration to call our webhook endpoint (we’ll provide /api/webhook/razorpay) on successful payment (signature-verified). Use Razorpay secret to verify.
+
+Fallback: scheduled polling to Razorpay Payments API (using provided Razorpay keys) to fetch recent successful transactions and reconcile with sheet rows created by our system (or mark external registrations as paid when matching criteria).
+
+TGMC ID search & edit flow:
+
+Public /search page with a TGMC ID field.
+
+Backend API /api/sheets/get?tgmc_id=... reads Google Sheet, returns record.
+
+If record exists, show editable form (client-side) then call /api/sheets/update to update (overwrite) or mark previous row as updated=true and append new row (configurable).
+
+Admin UI: protected with NextAuth (Google / Credentials). Admins manage announcements, state/district panels (image uploads), achievements, and view Sheet entries and payment reconciliations.
+
+3. Routes & Pages (explicit)
+
+/ — Home. H1: “Healthcare Reforms Doctors Association (HRDA)”
+
+Load hero, mission summary, latest announcements (SSG + revalidate), featured achievements, panels teaser, membership CTA.
+
+SEO: dynamic metadata via Next.js Metadata API.
+
+/about — About: founder bios, history (timeline), agenda (mission/vision/objectives). Use JSON-LD Organization data.
+
+/achievements — achievements list (cards) with detail route:
+
+/achievements/[slug] — article schema and OG images.
+
+/panels/state — grid of state members with searchable filters.
+
+/panels/district/[district] — district page.
+
+/departments/academics, /departments/sports, /departments/culture — content pages.
+
+/membership — Membership information and direct CTA button (link must be EXACTLY https://www.hrda-india.org/index.php/new-registration-2/). Include details:
+
+Lifetime Membership Fee: ₹1015
+
+After payment contact: hrda4people@gmail.com
+
+Contact numbers for queries (render prominently)
+
+Note that verification is manual and may take time
+
+/contact — Contact page and forms (contact form writes to Google Sheet).
+
+/search — TGMC ID lookup and edit workflow.
+
+/admin/* — Admin panel (protected):
+
+/admin/dashboard — stats: recent submissions, pending verifications, counts
+
+/admin/announcements — CRUD announcements
+
+/admin/panels — manage state/district panels (bulk photo upload, names)
+
+/admin/achievements — CRUD achievements
+
+/admin/forms — view Google Sheets entries (searchable)
+
+/admin/payments — reconciliation logs
+
+4. Google Sheets Schema (exact columns)
+
+Create a single master sheet named HRDA_Registrations with the following columns:
+
+row_id (UUID)
+
+tgmc_id (string) — can be blank for external registrations
+
+first_name
+
+last_name
+
+email
+
+phone
+
+address
+
+membership_type (single|couple|other)
+
+payment_status (pending|success|failed)
+
+payment_txn_id (razorpay_payment_id)
+
+registration_source (site_contact | external_registration_link)
+
+created_at (ISO timestamp)
+
+updated_at (ISO timestamp)
+
+updated_flag (boolean or text: original|updated)
+
+notes
+
+Admin-only sheet tabs:
+
+PENDING_VERIFICATIONS
+
+PAYMENT_LOGS
+
+PANEL_MEMBERS (state|district entries with photo URLs)
+
+5. API Endpoints (detailed)
+
+Implement serverless API routes:
+
+POST /api/sheets/create
+
+Body: form payload or content entry
+
+Auth: public for contact and TGMC edits (rate limited)
+
+Action: Append row to HRDA_Registrations with payment_status=pending or registration_source=site_contact. Return row_id.
+
+GET /api/sheets/get?tgmc_id=XXX
+
+Action: Query sheet rows for tgmc_id (exact). Return latest active row or 404.
+
+POST /api/sheets/update
+
+Body: { tgmc_id, updates: {...}, mode: "overwrite"|"new_entry" }
+
+Security: ReCAPTCHA + rate limiting + optional authentication if updating sensitive fields.
+
+POST /api/webhook/razorpay
+
+Action: Verify signature using Razorpay secret. On payment.captured:
+
+Find matching row by phone/email/txn id or by manual reconciliation rules.
+
+Set payment_status=success, set payment_txn_id, move to PENDING_VERIFICATIONS → Admins verify and add to groups.
+
+Trigger transactional email (/api/email/registration-confirm) with Unique ID (the system-generated row_id) and other details.
+
+Respond 200 only after signature verification.
+
+POST /api/razorpay/reconcile (protected)
+
+Action: Poll Razorpay Payments API for recent payments if webhooks are not available; match and reconcile.
+
+POST /api/email/registration-confirm
+
+Protected: called by webhook once payment is confirmed. Uses SendGrid templates. Body should include row_id, email, name, tgmc_id (if available). Template must include dynamic replacement for the Unique ID.
+
+GET /api/sitemap.xml (or use Next’s auto generation)
+
+Generate sitemap from current pages and dynamic routes.
+
+6. Razorpay Integration (constraints & options)
+
+Constraint: Registration URL must remain https://www.hrda-india.org/index.php/new-registration-2/. We cannot move this. Therefore:
+
+Preferred plan (recommended):
+
+Ask the HRDA admin to add a Razorpay webhook from their existing registration system to your endpoint /api/webhook/razorpay. Provide explicit webhook URL and instructions for signature verification. This allows us to automatically mark external registrations as paid and add them to the Google Sheet or reconcile with an existing row.
+
+Fallback plan (if webhook cannot be configured):
+
+Use Razorpay API polling to fetch recent payments and attempt to match them (email/phone/payment amount). Implement reconciliation UI to confirm matches manually in admin panel.
+
+Security: Verify Razorpay signature using HMAC SHA256 and the webhook secret. Reject requests without valid signature.
+
+7. TGMC ID Search & Edit Workflow (UX + backend rules)
+
+Flow:
+
+User visits /search, inputs TGMC ID.
+
+API /api/sheets/get?tgmc_id=... returns the record if exists.
+
+Show the record in a read-mode and an “Edit” button (show only editable fields: phone, address, etc).
+
+On submit, call /api/sheets/update with mode=new_entry (recommended). This will:
+
+Mark the old row updated_flag=original (or updated_flag=updated) and append a new row with updated values together with a reference to original_row_id.
+
+Admin sees edits in /admin/forms and can accept or reject updates (optionally mark verified_by_admin).
+
+Edge cases:
+
+If TGMC ID not found, return helpful message: “If you registered via the external registration form, please use the membership link or contact hrda4people@gmail.com
+.”
+
+Rate limit and CAPTCHA on API to prevent enumeration.
+
+8. Admin Panel — Detailed Components & Behavior
+
+Authentication
+
+NextAuth with Google SSO (recommended). For redundancy, add a credentials provider with strong password policy.
+
+Role-based access: super_admin, editor.
+
+Dashboard
+
+Recent registrations with payment_status
+
+Pending verifications
+
+Quick link to add announcement, upload state/district photos
+
+Announcements CRUD
+
+WYSIWYG simple editor (rich text minimal)
+
+Publish / Unpublish / Schedule
+
+Panels Manager
+
+Bulk upload CSV + images
+
+Auto-generate thumbnails (use next/image and a storage provider – Vercel Blob or Supabase Storage)
+
+Ensure photos stored with hashed filenames and alt text metadata
+
+Achievements
+
+Image + description + date
+
+Article schema metadata fields (author, publishedDate, description)
+
+Forms View
+
+Paginated sheet viewing (mirror of Google Sheet)
+
+Manual reconciliation buttons: “Mark as Verified”, “Send Verification Email”, “Export CSV”
+
+9. SEO & Structured Data — exact tasks
+
+Per page requirements (must be implemented programmatically):
+
+<title> tag pattern: {Page Title} | HRDA – Healthcare Reforms Doctors Association
+
+Meta description: unique for each page, 140–160 chars, include primary keyword.
+
+Canonical tag on all pages pointing to preferred URL.
+
+Open Graph tags (og:title, og:description, og:image, og:type, og:url).
+
+Twitter Card tags (summary_large_image).
+
+JSON-LD:
+
+Organization schema (with sameAs links to social profiles).
+
+BreadcrumbList for nested pages (e.g., Home > Panels > District).
+
+Article schema on achievements or press items.
+
+Generate sitemap.xml automatically (include images).
+
+Generate/serve robots.txt.
+
+Performance & Core Web Vitals (must be measured):
+
+Keep Largest Contentful Paint (LCP) < 2.5s by:
+
+Prioritizing hero image (preload key image)
+
+Using next/image with appropriate width/priority
+
+Avoid heavy client-side JS on landing pages
+
+Use rel=preconnect and rel=preload for fonts and critical resources
+
+Minimize render-blocking CSS (Tailwind + JIT)
+
+Use HTTP caching headers on assets
+
+Indexing & Search Console:
+
+Add /api/seo/verify route for dynamic HTML meta verification if needed
+
+Provide instructions to add Google Search Console verification (DNS or meta tag)
+
+Content / Keyword Guidelines:
+
+Use target keywords: “Healthcare Reforms Doctors Association”, “HRDA India”, “doctors association Telangana”, and long-tail queries like “medical association membership Telangana 2026”.
+
+Implement semantic headings (H1 once, H2 for sections).
+
+Add descriptive alt text to every image (auto-generate from panel member name + role).
+
+10. Accessibility & Internationalization
+
+ARIA labels for forms and dialogs.
+
+Keyboard navigable menus.
+
+Use semantic HTML (nav, main, header, footer, article).
+
+Contrast ratio >= 4.5:1 for body text.
+
+Provide visible focus styles.
+
+Prepare site for English + Indian regional languages in future (i18n support in Next.js), but not required in V1.
+
+11. Security, Privacy & Data Handling
+
+Use environment variables for all secrets:
+
+GOOGLE_SERVICE_ACCOUNT_KEY
+
+GOOGLE_SHEET_ID
+
+SENDGRID_API_KEY
+
+RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
+
+RAZORPAY_WEBHOOK_SECRET
+
+NEXTAUTH_SECRET
+
+STORAGE_PROVIDER_*
+
+Sanitize all inputs (no direct injection to Sheets without validation).
+
+Rate limit public API endpoints.
+
+Use HTTPS only and set secure cookies.
+
+GDPR-like privacy notice and explicit statement about data usage on forms.
+
+12. Deployment & Setup Instructions (explicit)
+
+In README, include these steps:
+
+Create Google Cloud service account with Sheets API access. Store JSON key in GOOGLE_SERVICE_ACCOUNT_KEY.
+
+Create Google Sheet with the schema above; store GOOGLE_SHEET_ID.
+
+Set up SendGrid and email templates; add SENDGRID_API_KEY.
+
+Add Razorpay keys and configure webhook pointing to https://<your-domain>/api/webhook/razorpay. If HRDA manages external registration, request them to configure this webhook. If they cannot, provide steps to set up polling.
+
+Add social profile URLs to environment for structured data.
+
+Deploy to Vercel: Add env vars in Vercel dashboard. Enable serverless functions.
+
+Test webhooks with Razorpay test events.
+
+13. QA & Acceptance Criteria
+
+Before marking done:
+
+Public pages render via SSG and have correct metadata.
+
+/membership page shows CTA linking to https://www.hrda-india.org/index.php/new-registration-2/ (exact; no redirects).
+
+Admin can create announcement and it appears on home.
+
+TGMC search returns matching Sheet row.
+
+Razorpay webhook correctly updates payment_status=success and triggers a confirmation email with row_id.
+
+Sitemap is accessible at /sitemap.xml.
+
+Lighthouse score: Performance >= 90, Accessibility >= 90, SEO >= 90 (aim; provide audit in README).
+
+14. Edge Cases & Implementation Notes (explicit instructions to the agent)
+
+Do not try to migrate or replace new-registration-2. Link only. If reconciliation required, request HRDA to enable webhooks or provide Razorpay keys.
+
+When matching external payments, use a robust set of matching rules: payment_txn_id, email, phone, amount, created_at window.
+
+Admin uploads of images: store images with privacy in mind; do not expose raw signed URLs without admin auth.
+
+Google Sheets rate limits: batch writes and exponential backoff; implement retry logic.
+
+Testing webhooks: provide a Postman collection or curl examples for webhook verification.
+
+15. Output format required from Replit
+
+When you finish, produce:
+
+A runnable Next.js project repository (zip or repo link).
+
+A README.md with environment variables, setup, deployment, and admin onboarding.
+
+A short SEO-Audit.md describing all SEO tasks completed and suggestions for ongoing optimization (Search Console, backlink strategy).
+
+A TESTING.md with instructions to run tests and simulate webhook events.
+
+A case-study folder with screenshots (or placeholder images) and a 1-page copyable case study describing the site and the HRDA constraint (registration link copy).
+
+Final notes (must be honored)
+
+This prompt is authoritative. The agent must not change the provided registration link.
+
+Use next-sitemap or programmatic sitemap generation.
+
+Use JSON-LD for Organization data, with sameAs pointing to X, Facebook, YouTube, Instagram.
+
+Use robots.txt to allow indexing; block staging environments.
+
+Cite the original requirements file in the README: See initial requirements: uploaded PDF (include the file reference in your developer notes).
+
+Reference used for requirements: 
+
+web site requirements
+
+.
