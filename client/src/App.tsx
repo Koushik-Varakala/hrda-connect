@@ -5,12 +5,45 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
+// Public Pages
+import Home from "@/pages/Home";
+import About from "@/pages/About";
+import Achievements from "@/pages/Achievements";
+import Panels from "@/pages/Panels";
+import Departments from "@/pages/Departments";
+import Membership from "@/pages/Membership";
+import Contact from "@/pages/Contact";
+import Search from "@/pages/Search";
+
+// Admin Pages
+import Dashboard from "@/pages/admin/Dashboard";
+import ManageAnnouncements from "@/pages/admin/ManageAnnouncements";
+import ManagePanels from "@/pages/admin/ManagePanels";
+import ManageAchievements from "@/pages/admin/ManageAchievements";
+import ManageDepartments from "@/pages/admin/ManageDepartments";
+import ManageRegistrations from "@/pages/admin/ManageRegistrations";
+
 function Router() {
   return (
     <Switch>
-      {/* Add pages below */}
-      {/* <Route path="/" component={Home}/> */}
-      {/* Fallback to 404 */}
+      {/* Public Routes */}
+      <Route path="/" component={Home} />
+      <Route path="/about" component={About} />
+      <Route path="/achievements" component={Achievements} />
+      <Route path="/panels" component={Panels} />
+      <Route path="/departments" component={Departments} />
+      <Route path="/membership" component={Membership} />
+      <Route path="/contact" component={Contact} />
+      <Route path="/search" component={Search} />
+
+      {/* Admin Routes */}
+      <Route path="/admin/dashboard" component={Dashboard} />
+      <Route path="/admin/announcements" component={ManageAnnouncements} />
+      <Route path="/admin/panels" component={ManagePanels} />
+      <Route path="/admin/achievements" component={ManageAchievements} />
+      <Route path="/admin/departments" component={ManageDepartments} />
+      <Route path="/admin/registrations" component={ManageRegistrations} />
+
       <Route component={NotFound} />
     </Switch>
   );
