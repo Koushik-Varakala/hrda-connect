@@ -5,6 +5,7 @@ import { serveStatic } from "./static";
 import { createServer } from "http";
 
 const app = express();
+app.set("trust proxy", 1); // Enable for Render/Vercel (required for secure cookies)
 const httpServer = createServer(app);
 
 declare module "http" {

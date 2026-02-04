@@ -228,6 +228,12 @@ export async function registerRoutes(
     res.json(data);
   });
 
+  // Alias for client-side admin dashboard which might be using this path
+  app.get("/api/admin/registrations", isAuthenticated, async (req, res) => {
+    const data = await storage.getRegistrations();
+    res.json(data);
+  });
+
   // Payment & Registration
   app.post("/api/registrations/order", async (req, res) => {
     try {
