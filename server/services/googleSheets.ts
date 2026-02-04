@@ -1,6 +1,6 @@
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
-import { log } from "../index";
+import { log } from "../app";
 
 // Update SheetRegistration interface to match new schema roughly
 // Note: We'll construct the specific row array manually to match the order

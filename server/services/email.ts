@@ -1,4 +1,4 @@
-import { log } from "../index";
+import { log } from "../app";
 
 export interface EmailOptions {
     to: string;
