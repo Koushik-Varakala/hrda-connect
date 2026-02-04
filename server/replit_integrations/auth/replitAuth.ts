@@ -2,12 +2,36 @@ import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import passport from "passport";
 
+import { pool } from "../../db";
+import pgSession from "connect-pg-simple";
+
+const PgSession = pgSession(session);
+
 export function getSession() {
+  const secret = process.env.SESSION_SECRET || "dev_secret";
+
+  if (!process.env.DATABASE_URL) {
+    return session({
+      secret,
+      resave: false,
+      saveUninitialized: false,
+      cookie: { secure: false } // memory store for local dev without DB
+    });
+  }
+
   return session({
-    secret: process.env.SESSION_SECRET || "dev_secret",
+    store: new PgSession({
+      pool,
+      tableName: 'session',
+      createTableIfMissing: true
+    }),
+    secret,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // default memory store
+    cookie: {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      secure: process.env.NODE_ENV === "production"
+    }
   });
 }
 
