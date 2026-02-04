@@ -13,7 +13,7 @@
   --foreground: 222 47% 11%;
 
   /* Primary Blue */
-  --primary: 215 90% 45%; 
+  --primary: 215 90% 45%;
   --primary-foreground: 210 40% 98%;
 
   /* Secondary / Slate */
@@ -69,7 +69,12 @@
     font-family: var(--font-sans);
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-serif);
     @apply font-bold tracking-tight text-slate-900 dark:text-slate-100;
   }

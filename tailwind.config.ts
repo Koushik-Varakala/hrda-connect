@@ -11,6 +11,7 @@ export default {
         sm: ".1875rem", /* 3px */
       },
       colors: {
+        headline: 'oklch(70.4% 0.04 256.788)',
         // Flat / base colors (regular buttons)
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",

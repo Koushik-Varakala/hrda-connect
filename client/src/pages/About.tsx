@@ -34,9 +34,9 @@ export default function About() {
             </div>
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl">
               {/* Unsplash: Medical team meeting */}
-              <img 
-                src="https://images.unsplash.com/photo-1576091160550-217358c7e618?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" 
-                alt="HRDA History" 
+              <img
+                src="https://images.unsplash.com/photo-1576091160550-217358c7e618?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"
+                alt="HRDA History"
                 className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
@@ -53,7 +53,7 @@ export default function About() {
               We are committed to a comprehensive roadmap for healthcare reform.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { title: "Medical Education", desc: "Ensuring quality standards, fair admission processes, and adequate infrastructure in medical colleges." },
@@ -76,13 +76,45 @@ export default function About() {
         <Separator />
 
         {/* Founders Note - can be dynamic later */}
-        <section className="bg-primary/5 rounded-3xl p-8 md:p-12">
-          <h2 className="text-3xl font-bold mb-8 text-center">Founding Vision</h2>
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-xl italic text-slate-700 leading-relaxed mb-6">
-              "We believe that a healthy society is built on the foundation of a robust healthcare system where doctors can practice with dignity and patients can receive care with trust. HRDA is the bridge between these two ideals."
+        {/* Founders Section */}
+        <section>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4 text-primary">Our Founders</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              The visionaries who established HRDA to fight for the rights of the medical fraternity.
             </p>
-            <div className="font-bold text-primary">— Founders of HRDA</div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {[
+              {
+                name: "Dr. K. Mahesh Kumar",
+                role: "Founder & President",
+                image: "https://placehold.co/400x400?text=Mahesh+Kumar",
+                bio: "A dedicated advocate for medical reforms, Dr. Mahesh Kumar led the charge in establishing HRDA to address systemic issues in healthcare administration."
+              },
+              {
+                name: "Dr. G. Srinivas",
+                role: "Co-Founder",
+                image: "https://placehold.co/400x400?text=G.+Srinivas",
+                bio: "With a passion for policy transparency, Dr. Srinivas has been instrumental in shaping the organizational structure and strategic goals of HRDA."
+              }
+            ].map((founder, i) => (
+              <div key={i} className="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-xl shadow-lg border border-slate-100 items-center">
+                <img
+                  src={founder.image}
+                  alt={founder.name}
+                  className="w-32 h-32 rounded-full object-cover border-4 border-slate-100 shadow-md"
+                />
+                <div className="text-center md:text-left">
+                  <h3 className="text-xl font-bold text-slate-800">{founder.name}</h3>
+                  <div className="text-primary font-medium mb-2">{founder.role}</div>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    {founder.bio}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </div>

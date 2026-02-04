@@ -1,9 +1,12 @@
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, ExternalLink } from "lucide-react";
+import { CheckCircle } from "lucide-react";
+import { RegistrationForm } from "@/components/RegistrationForm";
+import { useState } from "react";
 
 export default function Membership() {
+  const [isSuccess, setIsSuccess] = useState(false);
   return (
     <Layout>
       <div className="bg-primary py-20 text-white text-center">
@@ -17,7 +20,7 @@ export default function Membership() {
 
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-start">
-          
+
           <div>
             <h2 className="text-2xl font-bold mb-6 text-slate-900">Why Join HRDA?</h2>
             <div className="space-y-4">
@@ -42,32 +45,25 @@ export default function Membership() {
             </div>
           </div>
 
-          <Card className="shadow-xl border-t-8 border-t-primary">
-            <CardContent className="p-8 text-center">
-              <h3 className="text-2xl font-bold mb-2">Lifetime Membership</h3>
-              <div className="text-4xl font-bold text-primary mb-2">₹1015</div>
-              <p className="text-muted-foreground mb-8">One-time payment</p>
-
-              <div className="space-y-4">
-                <p className="text-sm text-slate-500">
-                  You will be redirected to our secure registration partner portal.
+          {isSuccess ? (
+            <Card className="shadow-xl border-t-8 border-t-green-500">
+              <CardContent className="p-8 text-center bg-green-50">
+                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <CheckCircle className="w-8 h-8 text-green-600" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2 text-green-800">Registration Successful!</h3>
+                <p className="text-muted-foreground mb-6">
+                  Thank you for joining HRDA. Your membership details have been recorded.
+                  A confirmation email has been sent to your registered address.
                 </p>
-                <a 
-                  href="https://www.hrda-india.org/index.php/new-registration-2/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="block"
-                >
-                  <Button size="lg" className="w-full font-bold h-12 text-base shadow-lg hover:shadow-xl transition-all">
-                    Register Now <ExternalLink className="ml-2 w-4 h-4" />
-                  </Button>
-                </a>
-                <p className="text-xs text-slate-400 mt-4">
-                  *By clicking above, you agree to the terms and conditions of HRDA membership.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+                <Button onClick={() => setIsSuccess(false)} variant="outline">
+                  Register Another Member
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <RegistrationForm onSuccess={() => setIsSuccess(true)} />
+          )}
 
         </div>
       </div>

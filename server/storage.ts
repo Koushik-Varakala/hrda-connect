@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { 
+import {
   announcements, panels, achievements, departments, registrations,
   type Announcement, type InsertAnnouncement, type UpdateAnnouncementRequest,
   type Panel, type InsertPanel, type UpdatePanelRequest,
@@ -70,7 +70,7 @@ export class DatabaseStorage implements IStorage {
       // @ts-ignore
       query.where(eq(panels.isStateLevel, false));
       if (district) {
-         // @ts-ignore
+        // @ts-ignore
         query.where(and(eq(panels.isStateLevel, false), eq(panels.district, district)));
       }
     }
@@ -137,10 +137,185 @@ export class DatabaseStorage implements IStorage {
     const [result] = await db.update(registrations).set(updates).where(eq(registrations.id, id)).returning();
     return result;
   }
-  
+
   async getRegistrations(): Promise<Registration[]> {
     return await db.select().from(registrations).orderBy(desc(registrations.createdAt));
   }
 }
 
-export const storage = new DatabaseStorage();
+export class MemStorage implements IStorage {
+  private announcements: Map<number, Announcement>;
+  private panels: Map<number, Panel>;
+  private achievements: Map<number, Achievement>;
+  private departments: Map<number, Department>;
+  private registrations: Map<number, Registration>;
+  private currentIds: { [key: string]: number };
+
+  constructor() {
+    this.announcements = new Map();
+    this.panels = new Map();
+    this.achievements = new Map();
+    this.departments = new Map();
+    this.registrations = new Map();
+    this.currentIds = { announcements: 1, panels: 1, achievements: 1, departments: 1, registrations: 1 };
+  }
+
+  // Announcements
+  async getAnnouncements(): Promise<Announcement[]> {
+    return Array.from(this.announcements.values()).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }
+
+  async createAnnouncement(insert: InsertAnnouncement): Promise<Announcement> {
+    const id = this.currentIds.announcements++;
+    const announcement: Announcement = { ...insert, id, createdAt: new Date(), active: insert.active ?? true };
+    this.announcements.set(id, announcement);
+    return announcement;
+  }
+
+  async updateAnnouncement(id: number, updates: UpdateAnnouncementRequest): Promise<Announcement | undefined> {
+    if (!this.announcements.has(id)) return undefined;
+    const existing = this.announcements.get(id)!;
+    const updated = { ...existing, ...updates };
+    this.announcements.set(id, updated);
+    return updated;
+  }
+
+  async deleteAnnouncement(id: number): Promise<void> {
+    this.announcements.delete(id);
+  }
+
+  // Panels
+  async getPanels(type?: 'state' | 'district', district?: string): Promise<Panel[]> {
+    let results = Array.from(this.panels.values());
+    if (type === 'state') {
+      results = results.filter(p => p.isStateLevel);
+    } else if (type === 'district') {
+      results = results.filter(p => !p.isStateLevel);
+      if (district) {
+        results = results.filter(p => p.district === district);
+      }
+    }
+    return results.sort((a, b) => (a.priority || 0) - (b.priority || 0));
+  }
+
+  async createPanel(insert: InsertPanel): Promise<Panel> {
+    const id = this.currentIds.panels++;
+    const panel: Panel = {
+      ...insert,
+      id,
+      priority: id,
+      district: insert.district ?? null,
+      imageUrl: insert.imageUrl ?? null,
+      phone: insert.phone ?? null,
+      isStateLevel: insert.isStateLevel ?? false,
+      active: insert.active ?? true
+    };
+    this.panels.set(id, panel);
+    return panel;
+  }
+
+  async updatePanel(id: number, updates: UpdatePanelRequest): Promise<Panel | undefined> {
+    if (!this.panels.has(id)) return undefined;
+    const existing = this.panels.get(id)!;
+    const updated = { ...existing, ...updates };
+    this.panels.set(id, updated);
+    return updated;
+  }
+
+  async deletePanel(id: number): Promise<void> {
+    this.panels.delete(id);
+  }
+
+  // Achievements
+  async getAchievements(): Promise<Achievement[]> {
+    return Array.from(this.achievements.values()).sort((a, b) => {
+      if (!a.date || !b.date) return 0;
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+  }
+
+  async createAchievement(insert: InsertAchievement): Promise<Achievement> {
+    const id = this.currentIds.achievements++;
+    const achievement: Achievement = {
+      ...insert,
+      id,
+      date: insert.date ?? null,
+      imageUrl: insert.imageUrl ?? null,
+      active: insert.active ?? true
+    };
+    this.achievements.set(id, achievement);
+    return achievement;
+  }
+
+  async updateAchievement(id: number, updates: UpdateAchievementRequest): Promise<Achievement | undefined> {
+    if (!this.achievements.has(id)) return undefined;
+    const existing = this.achievements.get(id)!;
+    const updated = { ...existing, ...updates };
+    this.achievements.set(id, updated);
+    return updated;
+  }
+
+  async deleteAchievement(id: number): Promise<void> {
+    this.achievements.delete(id);
+  }
+
+  // Departments
+  async getDepartments(): Promise<Department[]> {
+    return Array.from(this.departments.values());
+  }
+
+  async updateDepartment(id: number, updates: UpdateDepartmentRequest): Promise<Department | undefined> {
+    if (!this.departments.has(id)) return undefined;
+    const existing = this.departments.get(id)!;
+    const updated = { ...existing, ...updates, updatedAt: new Date() };
+    this.departments.set(id, updated);
+    return updated;
+  }
+
+  // Registrations
+  async searchRegistrations(params: SearchRegistrationParams): Promise<Registration[]> {
+    if (params.tgmcId) {
+      return Array.from(this.registrations.values()).filter(r => r.tgmcId === params.tgmcId);
+    }
+    return [];
+  }
+
+  async createRegistration(insert: InsertRegistration): Promise<Registration> {
+    const id = this.currentIds.registrations++;
+    const registration: Registration = {
+      ...insert,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      tgmcId: insert.tgmcId ?? null,
+      email: insert.email ?? null,
+      address: insert.address ?? null,
+      razorpayTxnId: insert.razorpayTxnId ?? null,
+      membershipType: insert.membershipType ?? 'single',
+      paymentStatus: insert.paymentStatus ?? 'pending',
+      registrationSource: insert.registrationSource ?? 'site_contact',
+      status: insert.status ?? 'pending_verification',
+      notes: insert.notes ?? null,
+      phone: insert.phone
+    };
+    this.registrations.set(id, registration);
+    return registration;
+  }
+
+  async updateRegistration(id: number, updates: UpdateRegistrationRequest): Promise<Registration | undefined> {
+    if (!this.registrations.has(id)) return undefined;
+    const existing = this.registrations.get(id)!;
+    const updated = { ...existing, ...updates, updatedAt: new Date() };
+    this.registrations.set(id, updated);
+    return updated;
+  }
+
+  async getRegistrations(): Promise<Registration[]> {
+    return Array.from(this.registrations.values()).sort((a, b) => {
+      if (!a.createdAt || !b.createdAt) return 0;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }
+}
+
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();

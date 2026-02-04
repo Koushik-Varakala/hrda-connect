@@ -14,6 +14,7 @@ import Departments from "@/pages/Departments";
 import Membership from "@/pages/Membership";
 import Contact from "@/pages/Contact";
 import Search from "@/pages/Search";
+import ThankYou from "@/pages/ThankYou";
 
 // Admin Pages
 import Dashboard from "@/pages/admin/Dashboard";
@@ -22,6 +23,7 @@ import ManagePanels from "@/pages/admin/ManagePanels";
 import ManageAchievements from "@/pages/admin/ManageAchievements";
 import ManageDepartments from "@/pages/admin/ManageDepartments";
 import ManageRegistrations from "@/pages/admin/ManageRegistrations";
+import Login from "@/pages/Login";
 
 function Router() {
   return (
@@ -33,8 +35,10 @@ function Router() {
       <Route path="/panels" component={Panels} />
       <Route path="/departments" component={Departments} />
       <Route path="/membership" component={Membership} />
+      <Route path="/index.php/new-registration-2/" component={Membership} />
       <Route path="/contact" component={Contact} />
       <Route path="/search" component={Search} />
+      <Route path="/thank-you" component={ThankYou} />
 
       {/* Admin Routes */}
       <Route path="/admin/dashboard" component={Dashboard} />
@@ -43,6 +47,9 @@ function Router() {
       <Route path="/admin/achievements" component={ManageAchievements} />
       <Route path="/admin/departments" component={ManageDepartments} />
       <Route path="/admin/registrations" component={ManageRegistrations} />
+
+      {/* Login Route */}
+      <Route path="/login" component={Login} />
 
       <Route component={NotFound} />
     </Switch>

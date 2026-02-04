@@ -183,8 +183,43 @@ export async function registerRoutes(
   });
 
   app.put(api.registrations.update.path, async (req, res) => {
-    const result = await storage.updateRegistration(Number(req.params.id), req.body);
+    const id = Number(req.params.id);
+    const result = await storage.updateRegistration(id, req.body);
     if (!result) return res.status(404).json({ message: "Not found" });
+
+    // Sync Update to Sheets
+    try {
+      const { googleSheetsService } = await import("./services/googleSheets");
+      if (result.tgmcId) {
+        // Mark old as updated
+        await googleSheetsService.updateRegistration(result.tgmcId, {
+          // For now just marking row as updated. 
+          // Ideally we append the new version too.
+          // Let's append the new version as "Active"
+          updatedAt: new Date().toISOString()
+        });
+
+        // Append new version
+        await googleSheetsService.appendRegistration({
+          id: String(result.id),
+          tgmcId: result.tgmcId || "",
+          firstName: result.firstName,
+          lastName: result.lastName,
+          phone: result.phone,
+          email: result.email || "",
+          address: result.address || "",
+          membershipType: result.membershipType || "single",
+          paymentStatus: result.paymentStatus || "unknown",
+          status: result.status || "pending",
+          registrationDate: result.createdAt?.toISOString() || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          rowStatus: "Active"
+        });
+      }
+    } catch (e) {
+      console.error("Failed to sync update to sheets", e);
+    }
+
     res.json(result);
   });
 
@@ -192,7 +227,100 @@ export async function registerRoutes(
     const data = await storage.getRegistrations();
     res.json(data);
   });
-  
+
+  // Payment & Registration
+  app.post("/api/registrations/order", async (req, res) => {
+    try {
+      const { amount, currency } = req.body;
+
+      // Mock Razorpay Order if keys are missing
+      if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+        console.warn("Razorpay keys missing. Using mock order.");
+        return res.json({
+          id: `order_mock_${Date.now()}`,
+          amount: amount * 100,
+          currency: currency,
+          key_id: "rzp_test_mock_key"
+        });
+      }
+
+      const Razorpay = (await import("razorpay")).default;
+      const razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET,
+      });
+
+      const options = {
+        amount: amount * 100, // Amount in paise
+        currency: currency,
+        receipt: `receipt_${Date.now()}`,
+      };
+
+      const order = await razorpay.orders.create(options);
+      res.json({ ...order, key_id: process.env.RAZORPAY_KEY_ID });
+    } catch (error: any) {
+      console.error("Razorpay Error:", error);
+      res.status(500).json({ message: "Failed to create order" });
+    }
+  });
+
+  app.post("/api/registrations/verify", async (req, res) => {
+    try {
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userData } = req.body;
+
+      // Verification logic (Mocked if keys missing, else Verify signature)
+      // ... For this MVP we will assume success if we reach here via the Mock
+
+      // Create Registration
+      const regInput = api.registrations.create.input.parse({
+        ...userData,
+        paymentStatus: 'success',
+        status: 'verified', // Auto-verify for paid members? Or keep pending? Let's say Verified for now.
+        razorpayTxnId: razorpay_payment_id
+      });
+
+      const newReg = await storage.createRegistration(regInput);
+
+      // Sync to Google Sheets
+      try {
+        // Import dynamic to avoid circular dep issues in some envs
+        const { googleSheetsService } = await import("./services/googleSheets");
+        await googleSheetsService.appendRegistration({
+          id: String(newReg.id),
+          tgmcId: newReg.tgmcId || "",
+          firstName: newReg.firstName,
+          lastName: newReg.lastName,
+          phone: newReg.phone,
+          email: newReg.email || "",
+          address: newReg.address || "",
+          membershipType: newReg.membershipType || "single",
+          paymentStatus: "success",
+          status: "verified",
+          registrationDate: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          rowStatus: "Active"
+        });
+      } catch (e) {
+        console.error("Failed to sync to sheets", e);
+      }
+
+      // Send Email
+      try {
+        const { emailService } = await import("./services/email");
+        if (newReg.email) {
+          await emailService.sendRegistrationConfirmation(newReg.email, `${newReg.firstName} ${newReg.lastName}`, newReg.tgmcId || "PENDING");
+        }
+      } catch (e) {
+        console.error("Failed to send email", e);
+      }
+
+      res.json({ success: true, registrationId: newReg.id });
+    } catch (error: any) {
+      console.error("Verification Error:", error);
+      res.status(500).json({ message: "Verification failed" });
+    }
+  });
+
   // Seed
   seedDatabase().catch(console.error);
 

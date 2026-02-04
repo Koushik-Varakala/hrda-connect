@@ -18,9 +18,9 @@ export default function Home() {
         {/* Abstract Background */}
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-10"></div>
         {/* Unsplash: Doctor abstract background */}
-        
+
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -29,18 +29,16 @@ export default function Home() {
             <Badge className="mb-4 bg-primary text-white border-none px-3 py-1">
               Voice of Telangana Doctors
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-serif font-bold leading-tight mb-6">
-              Advocating for <span className="text-primary-foreground text-blue-400">Healthcare Reform</span> & Professional Rights
+            <h1 className="text-4xl text-headline md:text-6xl font-serif font-bold leading-tight mb-6">
+              Advocating for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Healthcare Reform</span> & Professional Rights
             </h1>
             <p className="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed max-w-2xl">
-              HRDA works tirelessly with governments and regulators to improve medical education, 
+              HRDA works tirelessly with governments and regulators to improve medical education,
               strengthen primary healthcare, and protect the interests of doctors across Telangana.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/membership">
-                <Button size="lg" className="bg-primary hover:bg-blue-600 text-white font-semibold px-8 h-12 text-base">
-                  Join Association
-                </Button>
+              <Link href="/index.php/new-registration-2/">
+                <Button size="lg" className="rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-semibold">Join HRDA Today</Button>
               </Link>
               <Link href="/search">
                 <Button size="lg" variant="outline" className="bg-transparent border-white/20 text-white hover:bg-white/10 h-12 text-base">
@@ -120,7 +118,7 @@ export default function Home() {
               <div className="text-center py-10 text-muted-foreground bg-white rounded-xl shadow-sm border">No active announcements</div>
             ) : (
               announcements?.filter(a => a.active).slice(0, 3).map((announcement) => (
-                <motion.div 
+                <motion.div
                   key={announcement.id}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -156,7 +154,7 @@ export default function Home() {
           <p className="text-blue-100 text-lg max-w-2xl mx-auto mb-10">
             Become a member of HRDA today and contribute to the future of the medical profession in Telangana.
           </p>
-          <Link href="/membership">
+          <Link href="/index.php/new-registration-2/">
             <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-slate-100 font-bold px-10 h-14 rounded-full shadow-xl">
               Become a Member <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
