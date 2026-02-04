@@ -5,19 +5,17 @@ import app, { httpServer, log } from "./app";
 // this serves both the API and the client.
 // It is the only port that is not firewalled.
 // For Vercel, we don't start the listener here (api/index.ts handles it)
-if (!process.env.VERCEL) {
-  (async () => {
-    const port = parseInt(process.env.PORT || "3001", 10);
-    httpServer.listen(
-      {
-        port,
-        host: "0.0.0.0",
-      },
-      () => {
-        log(`serving on port ${port}`);
-      },
-    );
-  })();
-}
+(async () => {
+  const port = parseInt(process.env.PORT || "3001", 10);
+  httpServer.listen(
+    {
+      port,
+      host: "0.0.0.0",
+    },
+    () => {
+      log(`serving on port ${port}`);
+    },
+  );
+})();
 
 export default app;
