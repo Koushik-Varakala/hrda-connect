@@ -60,7 +60,7 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
+const setupPromise = (async () => {
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
@@ -80,6 +80,7 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (process.env.NODE_ENV === "production") {
+    // In Vercel, static files are handled by Vercel routing, but we keep this for consistency
     serveStatic(app);
   } else {
     const { setupVite } = await import("./vite");
@@ -103,5 +104,7 @@ app.use((req, res, next) => {
     );
   }
 })();
+
+export { setupPromise };
 
 export default app;
