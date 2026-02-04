@@ -1,8 +1,10 @@
-// Note: We use .js extension because Vercel ESM resolution requires it in the compiled output
+// Use the bundled CommonJS file to avoid ESM resolution issues (missing .js extensions)
 // @ts-ignore
-import app, { setupPromise } from '../server/app.js';
+import builtServer from '../dist/index.cjs';
 
 export default async function handler(req: any, res: any) {
-    await setupPromise;
-    return app(req, res);
+    // Wait for the server setup (DB, routes) to finish
+    await builtServer.setupPromise;
+    // Handle the request
+    return builtServer.default(req, res);
 }
