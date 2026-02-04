@@ -23,7 +23,8 @@ export function getSession() {
     store: new PgSession({
       pool,
       tableName: 'session',
-      createTableIfMissing: true
+      createTableIfMissing: false, // We manually created it to avoid race conditions
+      pruneSessionInterval: false  // Disable auto-pruning in serverless to prevent hangs
     }),
     secret,
     resave: false,
