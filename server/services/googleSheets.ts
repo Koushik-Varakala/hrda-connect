@@ -68,12 +68,13 @@ export class GoogleSheetsService {
         }
     }
 
-    async appendRegistration(data: SheetRegistration): Promise<boolean> {
+    async appendRegistration(data: SheetRegistration): Promise<string | null> {
         await this.initPromise;
 
         if (!this.isConnected || !this.doc) {
-            log(`[Mock] Appending registration to sheet: ${data.firstName} ${data.lastName} (${data.tgmcId})`);
-            return true;
+            const hrdaId = `HRDA-MOCK-${data.id}`;
+            log(`[Mock] Appending registration to sheet: ${data.firstName} ${data.lastName} (${data.tgmcId}) - Generated ID: ${hrdaId}`);
+            return hrdaId;
         }
 
         try {
@@ -123,13 +124,13 @@ export class GoogleSheetsService {
             });
             log(`Successfully appended row for ${data.firstName} with ID ${hrdaId}`);
 
-            return true;
+            return hrdaId;
         } catch (error: any) {
             console.error("Failed to append row to Google Sheet DETAILS:", error);
             if (error.response) {
                 console.error("API Error Response:", error.response.data);
             }
-            return false;
+            return null;
         }
     }
 

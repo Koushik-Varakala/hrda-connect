@@ -8,7 +8,7 @@ import { useState } from "react";
 
 export default function Panels() {
   const [district, setDistrict] = useState<string>("all");
-  
+
   // Fetch all for client-side filtering (simpler for this scale) or use multiple queries
   const { data: panels, isLoading } = usePanels();
 
@@ -91,7 +91,7 @@ function PanelCard({ member }: { member: any }) {
     <Card className="text-center card-hover border-t-2 border-t-primary/20">
       <CardContent className="pt-8">
         <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-white shadow-md">
-          <AvatarImage src={member.imageUrl || ""} objectFit="cover" />
+          <AvatarImage src={member.imageUrl || ""} className="object-cover" />
           <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">
             {member.name[0]}
           </AvatarFallback>

@@ -40,6 +40,66 @@ declare global {
 export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
     const [isProcessing, setIsProcessing] = useState(false);
     const { toast } = useToast();
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+
+    // Auto-fill handler
+    const handleAutoFill = (doc: any) => {
+        const fullName = doc.fullname || "";
+        const nameParts = fullName.trim().split(" ");
+        let firstName = fullName;
+        let lastName = ".";
+
+        if (nameParts.length > 1) {
+            firstName = nameParts[0];
+            lastName = nameParts.slice(1).join(" ");
+        }
+
+        form.setValue("firstName", firstName);
+        form.setValue("lastName", lastName);
+
+        const address = [doc.address1, doc.address2].filter(Boolean).join(", ");
+        form.setValue("address", address);
+
+        if (doc.mobileno) {
+            form.setValue("phone", doc.mobileno);
+        }
+
+        setSearchResults([]); // clear selection
+        toast({ title: "Details Auto-filled", description: "Please verify the information." });
+    };
+
+    const searchDetails = async () => {
+        const id = form.getValues("tgmcId");
+        if (!id || id.length < 4) {
+            toast({ title: "Invalid ID", description: "Please enter a valid TGMC ID", variant: "destructive" });
+            return;
+        }
+
+        setIsSearching(true);
+        setSearchResults([]);
+        try {
+            const res = await fetch(`/api/external/tsmc-doctor/${id}`);
+            if (!res.ok) throw new Error("Failed to fetch");
+            const responseData = await res.json();
+            const data = responseData.data || [];
+
+            if (Array.isArray(data) && data.length > 0) {
+                if (data.length === 1) {
+                    handleAutoFill(data[0]);
+                } else {
+                    setSearchResults(data);
+                    toast({ title: "Multiple Records Found", description: "Please select your profile from the list." });
+                }
+            } else {
+                toast({ title: "Details Not Found", description: "You can proceed by filling the form manually.", variant: "default" });
+            }
+        } catch (e) {
+            toast({ title: "Fetch Failed", description: "Could not fetch details. Please fill the form manually.", variant: "destructive" });
+        } finally {
+            setIsSearching(false);
+        }
+    };
 
     const form = useForm<RegistrationFormValues>({
         resolver: zodResolver(registrationSchema),
@@ -151,6 +211,56 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
 
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+
+                            {/* TGMC Search Section */}
+                            <div className="space-y-4 mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                <div className="flex gap-4 items-end">
+                                    <FormField
+                                        control={form.control}
+                                        name="tgmcId"
+                                        render={({ field }) => (
+                                            <FormItem className="flex-1">
+                                                <FormLabel>TGMC Registration Number</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Enter TGMC ID (e.g. 17599)" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        className="mb-2"
+                                        onClick={searchDetails}
+                                        disabled={isSearching}
+                                    >
+                                        {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : "Fetch Details"}
+                                    </Button>
+                                </div>
+                                <p className="text-xs text-muted-foreground -mt-3 mb-2">
+                                    If details are not found, you can still register by filling the form manually.
+                                </p>
+
+                                {searchResults.length > 0 && (
+                                    <div className="space-y-2 mt-2 border-t pt-2">
+                                        <p className="text-sm font-medium text-slate-700">Select your profile:</p>
+                                        <div className="max-h-60 overflow-y-auto space-y-2">
+                                            {searchResults.map((doc, idx) => (
+                                                <div key={idx} className="p-3 bg-white border rounded cursor-pointer hover:border-primary flex justify-between items-center" onClick={() => handleAutoFill(doc)}>
+                                                    <div className="text-sm">
+                                                        <p className="font-bold">{doc.fullname}</p>
+                                                        <p className="text-xs text-muted-foreground">{[doc.address1, doc.address2].filter(Boolean).join(", ")}</p>
+                                                        <p className="text-xs text-muted-foreground">FMR: {doc.original_fmr_no || doc.fmr_no}</p>
+                                                    </div>
+                                                    <Button size="sm" variant="ghost" type="button">Select</Button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
@@ -179,17 +289,6 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
-                                    name="tgmcId"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>TGMC ID</FormLabel>
-                                            <FormControl><Input placeholder="12345" {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
                                     name="phone"
                                     render={({ field }) => (
                                         <FormItem>
@@ -199,19 +298,20 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                                         </FormItem>
                                     )}
                                 />
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Email Address</FormLabel>
+                                            <FormControl><Input placeholder="doctor@example.com" type="email" {...field} /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
 
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Email Address</FormLabel>
-                                        <FormControl><Input placeholder="doctor@example.com" type="email" {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+
 
                             <FormField
                                 control={form.control}

@@ -228,10 +228,29 @@ export async function registerRoutes(
     res.json(data);
   });
 
+
   // Alias for client-side admin dashboard which might be using this path
   app.get("/api/admin/registrations", isAuthenticated, async (req, res) => {
     const data = await storage.getRegistrations();
     res.json(data);
+  });
+
+  // External API Proxy for TSMC
+  app.get("/api/external/tsmc-doctor/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const response = await fetch(`https://api.regonlinetsmc.in/tsmc/api/v1/common/getDoctorInfoByNameGender?fmrNo=${id}&docName=&gender=&fatherName=`);
+
+      if (!response.ok) {
+        throw new Error(`External API responded with ${response.status}`);
+      }
+
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error("TSMC API Proxy Error:", error);
+      res.status(500).json({ message: "Failed to fetch doctor details" });
+    }
   });
 
   // Payment & Registration
@@ -287,11 +306,13 @@ export async function registerRoutes(
 
       const newReg = await storage.createRegistration(regInput);
 
+      let formattedHrdaId: string | number = newReg.id;
+
       // Sync to Google Sheets
       try {
         // Import dynamic to avoid circular dep issues in some envs
         const { googleSheetsService } = await import("./services/googleSheets");
-        await googleSheetsService.appendRegistration({
+        const sheetId = await googleSheetsService.appendRegistration({
           id: String(newReg.id),
           tgmcId: newReg.tgmcId || "",
           firstName: newReg.firstName,
@@ -306,6 +327,11 @@ export async function registerRoutes(
           updatedAt: new Date().toISOString(),
           rowStatus: "Active"
         });
+
+        if (sheetId) {
+          formattedHrdaId = sheetId;
+        }
+
       } catch (e) {
         console.error("Failed to sync to sheets", e);
       }
@@ -314,13 +340,30 @@ export async function registerRoutes(
       try {
         const { emailService } = await import("./services/email");
         if (newReg.email) {
-          await emailService.sendRegistrationConfirmation(newReg.email, `${newReg.firstName} ${newReg.lastName}`, newReg.tgmcId || "PENDING");
+          await emailService.sendRegistrationConfirmation(
+            newReg.email,
+            `${newReg.firstName} ${newReg.lastName}`,
+            newReg.tgmcId || "N/A",
+            formattedHrdaId,
+            newReg.phone,
+            newReg.address || ""
+          );
         }
       } catch (e) {
         console.error("Failed to send email", e);
       }
 
-      res.json({ success: true, registrationId: newReg.id });
+      // Send SMS
+      try {
+        const { smsService } = await import("./services/sms");
+        if (newReg.phone) {
+          await smsService.sendRegistrationSuccess(newReg.phone, newReg.firstName, formattedHrdaId);
+        }
+      } catch (e) {
+        console.error("Failed to send SMS", e);
+      }
+
+      res.json({ success: true, registrationId: newReg.id, hrdaId: formattedHrdaId });
     } catch (error: any) {
       console.error("Verification Error:", error);
       res.status(500).json({ message: "Verification failed" });
