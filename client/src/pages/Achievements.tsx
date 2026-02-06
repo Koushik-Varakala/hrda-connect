@@ -274,7 +274,7 @@ export default function Achievements() {
               onClick={() => setSelectedMedia({
                 image: "/press/tsmc-online-facility.png",
                 title: "TSMC Grants Online Facility",
-                description="Victory for doctors: TSMC allowed online renewal of registration certificates after doctors threatened protest, saving them from traveling to Hyderabad."
+                description: "Victory for doctors: TSMC allowed online renewal of registration certificates after doctors threatened protest, saving them from traveling to Hyderabad."
               })}
             />
             <MediaCard
@@ -314,7 +314,7 @@ export default function Achievements() {
               onClick={() => setSelectedMedia({
                 image: "/press/toothless-panels.jpg",
                 title: "Anti-Quackery Panels Toothless",
-                description="HRDA criticized the new district anti-quackery committees as ineffective, demanding an officer-cum-online grievance redressal system instead."
+                description: "HRDA criticized the new district anti-quackery committees as ineffective, demanding an officer-cum-online grievance redressal system instead."
               })}
             />
             <MediaCard
