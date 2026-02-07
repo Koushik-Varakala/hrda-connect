@@ -12,6 +12,10 @@
   --background: 210 40% 98%;
   --foreground: 222 47% 11%;
 
+  /* Popover */
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+
   /* Primary Blue */
   --primary: 215 90% 45%;
   --primary-foreground: 210 40% 98%;
@@ -42,6 +46,9 @@
 .dark {
   --background: 222 47% 11%;
   --foreground: 210 40% 98%;
+
+  --popover: 222 47% 11%;
+  --popover-foreground: 210 40% 98%;
 
   --primary: 215 90% 50%;
   --primary-foreground: 222 47% 11%;

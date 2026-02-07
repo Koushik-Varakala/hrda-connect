@@ -1,8 +1,16 @@
 import { Layout } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import { Panel } from "@shared/schema";
-import { Vote, FileText } from "lucide-react";
+import { Vote, FileText, Eye, FileDown } from "lucide-react";
 
 export default function ElectionPanel() {
     const { data: panels } = useQuery<Panel[]>({
@@ -87,6 +95,148 @@ export default function ElectionPanel() {
                     </div>
                 </div>
             </div>
+            {/* Election Documents */}
+            <div className="py-16 bg-white border-t border-slate-100">
+                <div className="container mx-auto px-4">
+                    <h3 className="text-2xl font-serif font-bold mb-8 flex items-center gap-2 text-slate-900">
+                        <FileText className="w-6 h-6 text-primary" />
+                        Election Documents & Notices
+                    </h3>
+
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {documents.map((doc, i) => (
+                            <Dialog key={i}>
+                                <div className="group border border-slate-200 rounded-xl p-5 hover:shadow-md transition-all bg-slate-50 hover:bg-white hover:border-primary/50">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <Badge variant="secondary" className="text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20">
+                                            {doc.category}
+                                        </Badge>
+                                        <span className="text-xs text-slate-400 font-medium">{doc.date}</span>
+                                    </div>
+                                    <h4 className="font-bold text-slate-800 mb-2 group-hover:text-primary transition-colors line-clamp-2" title={doc.title}>
+                                        {doc.title}
+                                    </h4>
+                                    <p className="text-sm text-slate-500 mb-4 line-clamp-3">
+                                        {doc.description}
+                                    </p>
+
+                                    <div className="flex gap-2 mt-auto">
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline" size="sm" className="w-full gap-2 hover:bg-primary hover:text-white transition-colors">
+                                                <Eye className="w-4 h-4" /> View
+                                            </Button>
+                                        </DialogTrigger>
+                                        <a href={`/documents/${doc.filename}`} download target="_blank" rel="noopener noreferrer">
+                                            <Button variant="ghost" size="sm" className="px-2 text-slate-400 hover:text-primary">
+                                                <FileDown className="w-4 h-4" />
+                                            </Button>
+                                        </a>
+                                    </div>
+                                </div>
+                                <DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0 gap-0">
+                                    <DialogHeader className="p-4 border-b">
+                                        <DialogTitle>{doc.title}</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="flex-1 w-full bg-slate-100 overflow-hidden">
+                                        <iframe
+                                            src={`/documents/${doc.filename}`}
+                                            className="w-full h-full border-none"
+                                            title={doc.title}
+                                        />
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        ))}
+                    </div>
+                </div>
+            </div>
         </Layout>
     );
 }
+
+const documents = [
+    {
+        category: "Foundational",
+        title: "Election Notification",
+        filename: "HRDA-Election-Notification..pdf",
+        date: "Nov 25, 2025",
+        description: "Official announcement of state committee elections for 2025–2026."
+    },
+    {
+        category: "Foundational",
+        title: "Voting Manual (Instructions)",
+        filename: "HRDA LETTER HEAD Instructions .pdf",
+        date: "Jan 11, 2026",
+        description: "Instructions for polling venue and ballot marking."
+    },
+    {
+        category: "Candidates",
+        title: "Initial Candidate List",
+        filename: "HRDA Election Nominations -2025.pdf",
+        date: "Dec 23, 2025",
+        description: "Initial list of candidates (Approved/Rejected) for various posts."
+    },
+    {
+        category: "Candidates",
+        title: "Unanimous Winners List",
+        filename: "Unanimous List - HRDA Election Nominations -2025.pdf",
+        date: "Dec 28, 2025",
+        description: "Candidates elected without contest as sole nominees."
+    },
+    {
+        category: "Candidates",
+        title: "Final List (After Withdrawals)",
+        filename: "Final List After withdrawals- HRDA State Elections-2025.pdf",
+        date: "Jan 2025",
+        description: "Final slate of candidates contesting for posts."
+    },
+    {
+        category: "Notices",
+        title: "Nomination Deadline Extension",
+        filename: "HRDA LETTER HEAD-Notice.pdf",
+        date: "Dec 2025",
+        description: "Notice regarding extension of nomination filing deadline."
+    },
+    {
+        category: "Notices",
+        title: "Withdrawal Deadline Notice",
+        filename: "5_6206319448861711732.pdf",
+        date: "Dec 2025",
+        description: "Notice regarding extension of withdrawal deadline."
+    },
+    {
+        category: "Ballots",
+        title: "Model Ballot (ECM)",
+        filename: " ECM Model ballot .pdf",
+        date: "Jan 2026",
+        description: "Sample ballot paper for Executive Committee Members."
+    },
+    {
+        category: "Ballots",
+        title: "Model Ballot (SCCA)",
+        filename: "HRDA 2025-SCCA.pdf",
+        date: "Jan 2026",
+        description: "Sample ballot paper for Special Committee Chairman Academic."
+    },
+    {
+        category: "Results",
+        title: "Vote Counts (Tally Sheet)",
+        filename: "EC and scca Elected Candidates list-2025.pdf",
+        date: "Jan 11, 2026",
+        description: "Total vote counts for contested posts."
+    },
+    {
+        category: "Results",
+        title: "Final Winners List",
+        filename: "Elected Candidates list--2025.pdf",
+        date: "Jan 11, 2026",
+        description: "Final summary of all winnings candidates for 2025-2026."
+    },
+    {
+        category: "Records",
+        title: "Membership Registry",
+        filename: "HRDA FINAL MEMBERSHIP LIST 10-12-25.pdf",
+        date: "Dec 10, 2025",
+        description: "Registry of over 2,100 registered doctors."
+    }
+];

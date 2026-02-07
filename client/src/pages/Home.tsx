@@ -20,34 +20,55 @@ export default function Home() {
         {/* Unsplash: Doctor abstract background */}
 
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-3xl"
-          >
-            <Badge className="mb-4 bg-primary text-white border-none px-3 py-1">
-              Voice of Telangana Doctors
-            </Badge>
-            <h1 className="text-4xl text-headline md:text-6xl font-serif font-bold leading-tight mb-6">
-              Advocating for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Healthcare Reform</span> & Professional Rights
-            </h1>
-            <p className="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed max-w-2xl">
-              HRDA works tirelessly with governments and regulators to improve medical education,
-              strengthen primary healthcare, and protect the interests of doctors across Telangana.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/index.php/new-registration-2/">
-                <Button size="lg" className="rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-semibold">Join HRDA Today</Button>
-              </Link>
-              <Link href="/search">
-                <Button size="lg" variant="outline" className="bg-transparent border-white/20 text-white hover:bg-white/10 h-12 text-base">
-                  <Search className="mr-2 h-4 w-4" />
-                  Verify TGMC ID
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="flex-1 max-w-3xl lg:max-w-none"
+            >
+              <Badge className="mb-4 bg-primary text-white border-none px-3 py-1">
+                Voice of Telangana Doctors
+              </Badge>
+              <h1 className="text-4xl text-headline md:text-6xl font-serif font-bold leading-tight mb-6">
+                Advocating for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Healthcare Reform</span> & Professional Rights
+              </h1>
+              <p className="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed max-w-2xl">
+                HRDA works tirelessly with governments and regulators to improve medical education,
+                strengthen primary healthcare, and protect the interests of doctors across Telangana.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/index.php/new-registration-2/">
+                  <Button size="lg" className="rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-semibold">Join HRDA Today</Button>
+                </Link>
+                <Link href="/search">
+                  <Button size="lg" variant="outline" className="bg-transparent border-white/20 text-white hover:bg-white/10 h-12 text-base">
+                    <Search className="mr-2 h-4 w-4" />
+                    Verify TGMC ID
+                  </Button>
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Right Side Logo */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="flex-1 flex justify-center lg:justify-end"
+            >
+              <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-[450px] lg:h-[450px] flex items-center justify-center">
+                <div className="absolute inset-0 bg-blue-500/20 blur-[100px] rounded-full"></div>
+                <div className="relative w-full h-full rounded-full border-4 border-white/20 shadow-2xl overflow-hidden bg-white p-4 flex items-center justify-center ring-4 ring-white/10">
+                  <img
+                    src="/hrda_logo.png"
+                    alt="HRDA Emblem"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 

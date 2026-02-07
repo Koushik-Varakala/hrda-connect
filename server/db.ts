@@ -20,8 +20,7 @@ export const pool = new Pool({
   max: 4, // Reduce pool size to minimize connection overhead
   connectionTimeoutMillis: 5000, // Fail fast if connection cannot be established
   idleTimeoutMillis: 5000, // Close idle connections quickly to ensure freshness
-  keepAlive: true,
-  retryDelay: 1000 // Custom retry delay (not standard pg, but good for documentation)
+  keepAlive: true
 });
 
 pool.on('error', (err) => {

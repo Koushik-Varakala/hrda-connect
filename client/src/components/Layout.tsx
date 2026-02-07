@@ -1,15 +1,15 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
-import { Menu, X, Stethoscope, ChevronDown, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { Menu, X, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
-  NavigationMenuList,
+  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuContent,
+  NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle
+  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -18,16 +18,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { user } = useAuth();
 
-  const navLinks = [
+  const mainLinks = [
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
-    { name: "Achievements", href: "/achievements" },
     { name: "Panels", href: "/panels" },
-    { name: "Election Victory", href: "/election-panel" },
-    { name: "Media Coverage", href: "/media" },
-    { name: "Departments", href: "/departments" },
     { name: "Search", href: "/search" },
     { name: "Contact", href: "/contact" },
+  ];
+
+  const resourceLinks = [
+    { name: "Achievements", href: "/achievements", description: "Our milestones and success stories." },
+    { name: "Election Victory", href: "/election-panel", description: "Meet the elected panel members." },
+    { name: "Media Coverage", href: "/media", description: "News articles and press releases." },
+    { name: "Departments", href: "/departments", description: "Various functional departments." },
   ];
 
   const isActive = (path: string) => location === path;
@@ -55,22 +58,60 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
-                <div
-                  className={`
-                    text-sm font-medium px-4 py-2 rounded-md transition-colors cursor-pointer
-                    ${isActive(link.href)
-                      ? "text-primary bg-primary/5"
-                      : "text-muted-foreground hover:text-primary hover:bg-muted/50"}
-                  `}
-                >
-                  {link.name}
-                </div>
-              </Link>
-            ))}
-          </nav>
+          <div className="hidden lg:flex items-center gap-1">
+            <NavigationMenu>
+              <NavigationMenuList>
+                {mainLinks.slice(0, 3).map((link) => (
+                  <NavigationMenuItem key={link.href}>
+                    <Link href={link.href}>
+                      <NavigationMenuLink
+                        className={navigationMenuTriggerStyle()}
+                        active={isActive(link.href)}
+                      >
+                        {link.name}
+                      </NavigationMenuLink>
+                    </Link>
+                  </NavigationMenuItem>
+                ))}
+
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-white dark:bg-slate-950">
+                      {resourceLinks.map((link) => (
+                        <li key={link.href}>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href={link.href}
+                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            >
+                              <div className="text-sm font-medium leading-none">{link.name}</div>
+                              <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                {link.description}
+                              </p>
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                {mainLinks.slice(3).map((link) => (
+                  <NavigationMenuItem key={link.href}>
+                    <Link href={link.href}>
+                      <NavigationMenuLink
+                        className={navigationMenuTriggerStyle()}
+                        active={isActive(link.href)}
+                      >
+                        {link.name}
+                      </NavigationMenuLink>
+                    </Link>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
 
           <div className="hidden lg:flex items-center gap-3">
             <Link href="/index.php/new-registration-2/">
@@ -100,8 +141,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden absolute top-20 left-0 w-full bg-background border-b shadow-lg p-4 flex flex-col gap-2 animate-in slide-in-from-top-5">
-            {navLinks.map((link) => (
+          <div className="lg:hidden absolute top-20 left-0 w-full bg-background border-b shadow-lg p-4 flex flex-col gap-2 animate-in slide-in-from-top-5 max-h-[80vh] overflow-y-auto">
+            {/* Main Links */}
+            {mainLinks.slice(0, 3).map((link) => (
+              <Link key={link.href} href={link.href}>
+                <div
+                  className={`p-3 rounded-md font-medium ${isActive(link.href) ? "bg-primary/10 text-primary" : "text-foreground"}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </div>
+              </Link>
+            ))}
+
+            <div className="px-3 py-2 text-sm font-semibold text-muted-foreground">Resources</div>
+            <div className="pl-4 border-l-2 border-muted ml-3 space-y-1">
+              {resourceLinks.map((link) => (
+                <Link key={link.href} href={link.href}>
+                  <div
+                    className={`p-2 rounded-md text-sm ${isActive(link.href) ? "bg-primary/10 text-primary font-medium" : "text-foreground/80"}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.name}
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {mainLinks.slice(3).map((link) => (
               <Link key={link.href} href={link.href}>
                 <div
                   className={`p-3 rounded-md font-medium ${isActive(link.href) ? "bg-primary/10 text-primary" : "text-foreground"}`}
