@@ -104,25 +104,32 @@ async function seed() {
 
     // --- 2. SEED PANELS ---
     // Core Elected Members
-    const memberNames = [
-        "Dr. G. Srinivas", "Dr. Kiran Kumar Thotawar", "Dr. Anand S",
-        "Dr. Yeggana Srinivas", "Dr. Ravi Kumar Kusumaraju", "Dr. Naresh Kumar V",
-        "Dr. Srikanth Jukuru", "Dr. Sunny Davis Ayyala", "Dr. Vishnu KUN", "Dr. Syed Khaja Imran Ali",
-        "Dr. Pratibha Lakshmi", "Dr. Sai Krishna", "Dr. Madhusudhan Reddy" // Completed to 13 with likely names or generic placeholders
+    const panelMembers = [
+        { name: "Dr. Nagula Karthik", role: "President", priority: 1, category: "elected_member" },
+        { name: "Dr. D. Suresh Babu", role: "Vice President", priority: 2, category: "elected_member" },
+        { name: "Dr. Mohammad Ajith", role: "General Secretary", priority: 3, category: "elected_member" },
+        { name: "Dr. Mohammad Jahangir", role: "Joint Secretary", priority: 4, category: "elected_member" },
+        { name: "Dr. P. Shirish", role: "Joint Secretary", priority: 4, category: "elected_member" },
+        { name: "Dr. Mahesh Lingala", role: "Treasurer", priority: 5, category: "elected_member" },
+        { name: "Dr. Raghusuprith Reddy T", role: "Special Committee Chairman (Academic)", priority: 6, category: "elected_member" },
+        { name: "Dr. Dharaneedhar", role: "Special Committee Chairman (Sports & Culture)", priority: 7, category: "elected_member" },
+        { name: "Dr. Jagan Mohan Varakala", role: "Executive Committee Member", priority: 8, category: "elected_member" },
+        { name: "Dr. Hammad Hafeez Md", role: "Executive Committee Member", priority: 8, category: "elected_member" },
+        { name: "Dr. Mohammed Zeeshan Ali", role: "Executive Committee Member", priority: 8, category: "elected_member" },
+        { name: "Dr. Thogari Kiran Kumar", role: "Executive Committee Member", priority: 8, category: "elected_member" },
+        { name: "Dr. Jalagam Vijay", role: "Executive Committee Member", priority: 8, category: "elected_member" },
+        { name: "Dr. Srinath", role: "Executive Committee Member", priority: 8, category: "elected_member" },
+        { name: "Dr. Mothe Pranay", role: "Executive Committee Member", priority: 8, category: "elected_member" },
+        { name: "Dr. Sandeep Gampa & Dr. Chaitanya Konda", role: "Executive Committee Member", priority: 8, category: "elected_member" }
     ];
 
     console.log("Seeding Elected Panels...");
-    let priority = 1;
-    for (const name of memberNames) {
+    for (const member of panelMembers) {
         await db.insert(panels).values({
-            name,
-            role: priority === 1 ? "President" : (priority === 2 ? "General Secretary" : "Executive Member"),
-            category: "elected_member",
+            ...member,
             district: "State",
-            state: "Telangana",
             isStateLevel: true,
-            priority: priority++,
-            visible: true
+            active: true
         }).onConflictDoNothing();
     }
 
@@ -154,7 +161,7 @@ async function seed() {
         await db.insert(achievements).values({
             ...item,
             active: true,
-            date: new Date()
+            date: new Date().toISOString().split('T')[0]
         }).onConflictDoNothing();
     }
 

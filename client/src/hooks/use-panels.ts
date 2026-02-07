@@ -13,7 +13,7 @@ export function usePanels(filters?: { type?: 'state' | 'district', district?: st
       const params = new URLSearchParams();
       if (filters?.type) params.append('type', filters.type);
       if (filters?.district) params.append('district', filters.district);
-      
+
       if (params.toString()) url += `?${params.toString()}`;
 
       const res = await fetch(url, { credentials: "include" });
@@ -28,16 +28,19 @@ export function useCreatePanel() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: CreatePanelRequest) => {
+    mutationFn: async (data: CreatePanelRequest | FormData) => {
+      const isFormData = data instanceof FormData;
       const res = await fetch(api.panels.create.path, {
         method: api.panels.create.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
+        headers: isFormData ? {} : { "Content-Type": "application/json" },
+        body: isFormData ? data : JSON.stringify(data),
       });
-      
-      if (!res.ok) throw new Error("Failed to create panel member");
-      return api.panels.create.responses[201].parse(await res.json());
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to create panel member");
+      }
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.panels.list.path] });
@@ -54,17 +57,22 @@ export function useUpdatePanel() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: number } & UpdatePanelRequest) => {
+    mutationFn: async ({ id, ...data }: { id: number } & (UpdatePanelRequest | { formData: FormData })) => {
       const url = buildUrl(api.panels.update.path, { id });
+      const isFormData = 'formData' in data;
+      const body = isFormData ? data.formData : JSON.stringify(data);
+
       const res = await fetch(url, {
         method: api.panels.update.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
+        headers: isFormData ? {} : { "Content-Type": "application/json" },
+        body: body,
       });
 
-      if (!res.ok) throw new Error("Failed to update panel member");
-      return api.panels.update.responses[200].parse(await res.json());
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to update panel member");
+      }
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.panels.list.path] });
@@ -83,9 +91,9 @@ export function useDeletePanel() {
   return useMutation({
     mutationFn: async (id: number) => {
       const url = buildUrl(api.panels.delete.path, { id });
-      const res = await fetch(url, { 
+      const res = await fetch(url, {
         method: api.panels.delete.method,
-        credentials: "include" 
+        credentials: "include"
       });
       if (!res.ok) throw new Error("Failed to delete panel member");
     },

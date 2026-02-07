@@ -63,14 +63,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <NavigationMenuList>
                 {mainLinks.slice(0, 3).map((link) => (
                   <NavigationMenuItem key={link.href}>
-                    <Link href={link.href}>
-                      <NavigationMenuLink
-                        className={navigationMenuTriggerStyle()}
-                        active={isActive(link.href)}
-                      >
+                    <NavigationMenuLink
+                      asChild
+                      className={navigationMenuTriggerStyle()}
+                      active={isActive(link.href)}
+                    >
+                      <Link href={link.href}>
                         {link.name}
-                      </NavigationMenuLink>
-                    </Link>
+                      </Link>
+                    </NavigationMenuLink>
                   </NavigationMenuItem>
                 ))}
 
@@ -99,14 +100,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
                 {mainLinks.slice(3).map((link) => (
                   <NavigationMenuItem key={link.href}>
-                    <Link href={link.href}>
-                      <NavigationMenuLink
-                        className={navigationMenuTriggerStyle()}
-                        active={isActive(link.href)}
-                      >
+                    <NavigationMenuLink
+                      asChild
+                      className={navigationMenuTriggerStyle()}
+                      active={isActive(link.href)}
+                    >
+                      <Link href={link.href}>
                         {link.name}
-                      </NavigationMenuLink>
-                    </Link>
+                      </Link>
+                    </NavigationMenuLink>
                   </NavigationMenuItem>
                 ))}
               </NavigationMenuList>
@@ -114,19 +116,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
-            <Link href="/index.php/new-registration-2/">
-              <Button size="sm" className="font-semibold shadow-sm hover:shadow-md transition-all">
+            <Button asChild size="sm" className="font-semibold shadow-sm hover:shadow-md transition-all">
+              <Link href="/index.php/new-registration-2/">
                 Join HRDA
-              </Button>
-            </Link>
+              </Link>
+            </Button>
             {user ? (
-              <Link href="/admin/dashboard">
-                <Button variant="outline" size="sm">Admin</Button>
-              </Link>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/dashboard">
+                  Admin
+                </Link>
+              </Button>
             ) : (
-              <Link href="/login">
-                <Button variant="ghost" size="sm" className="text-muted-foreground">Login</Button>
-              </Link>
+              <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
+                <Link href="/login">
+                  Login
+                </Link>
+              </Button>
             )}
           </div>
 
@@ -179,17 +185,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
             <div className="h-px bg-border my-2" />
-            <Link href="/index.php/new-registration-2/">
-              <Button className="w-full justify-center">Join Membership</Button>
-            </Link>
+            <Button asChild className="w-full justify-center">
+              <Link href="/index.php/new-registration-2/">
+                Join Membership
+              </Link>
+            </Button>
             {user ? (
-              <Link href="/admin/dashboard">
-                <Button variant="outline" className="w-full justify-center mt-2">Admin Dashboard</Button>
-              </Link>
+              <Button asChild variant="outline" className="w-full justify-center mt-2">
+                <Link href="/admin/dashboard">
+                  Admin Dashboard
+                </Link>
+              </Button>
             ) : (
-              <Link href="/login" className="w-full block mt-2">
-                <Button variant="ghost" className="w-full justify-center">Login</Button>
-              </Link>
+              <Button asChild variant="ghost" className="w-full justify-center mt-2">
+                <Link href="/login">
+                  Login
+                </Link>
+              </Button>
             )}
           </div>
         )}

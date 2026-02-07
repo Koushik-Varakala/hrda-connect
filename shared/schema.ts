@@ -77,7 +77,7 @@ export const registrations = pgTable("registrations", {
 // === SCHEMAS ===
 
 export const insertAnnouncementSchema = createInsertSchema(announcements).omit({ id: true, createdAt: true });
-export const insertPanelSchema = createInsertSchema(panels).omit({ id: true, priority: true });
+export const insertPanelSchema = createInsertSchema(panels).omit({ id: true });
 export const insertAchievementSchema = createInsertSchema(achievements).omit({ id: true });
 export const insertMediaCoverageSchema = createInsertSchema(mediaCoverage).omit({ id: true });
 export const insertDepartmentSchema = createInsertSchema(departments).omit({ id: true, updatedAt: true });

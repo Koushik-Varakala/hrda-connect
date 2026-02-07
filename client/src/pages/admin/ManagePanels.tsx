@@ -30,42 +30,116 @@ export default function ManagePanels() {
       isStateLevel: false,
       imageUrl: "",
       phone: "",
+      priority: 99,
       active: true,
     }
   });
 
-  const onSubmit = (data: any) => {
-    // If state level, district should be null or empty
-    if (data.isStateLevel) data.district = null;
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-    // Auto-set isStateLevel based on category if needed, but keeping manual for flexibility
-    if (data.category === 'state_executive' || data.category === 'elected_member') {
-      data.isStateLevel = true;
-      data.district = null;
+  const onSubmit = (data: any) => {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("role", data.role);
+    formData.append("category", data.category || "state_executive");
+
+    // Logic for State/District
+    let isStateLevel = data.isStateLevel;
+    let district = data.district;
+
+    if (data.category === 'elected_member') {
+      isStateLevel = true;
+      district = "";
+    } else if (isStateLevel) {
+      district = "";
+    }
+
+    formData.append("isStateLevel", String(isStateLevel));
+    if (district) formData.append("district", district);
+
+    if (data.phone) formData.append("phone", data.phone);
+    if (data.priority) formData.append("priority", String(data.priority));
+    formData.append("active", String(data.active ?? true));
+
+    if (selectedFile) {
+      formData.append("image", selectedFile);
+    } else if (data.imageUrl) {
+      formData.append("imageUrl", data.imageUrl);
     }
 
     if (editingItem) {
-      updateMutation.mutate({ id: editingItem.id, ...data }, {
-        onSuccess: () => { setIsDialogOpen(false); setEditingItem(null); form.reset(); }
+      updateMutation.mutate({ id: editingItem.id, formData }, {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+          setEditingItem(null);
+          form.reset();
+          setSelectedFile(null);
+          setPreviewUrl(null);
+        }
       });
     } else {
-      createMutation.mutate(data, {
-        onSuccess: () => { setIsDialogOpen(false); form.reset(); }
+      createMutation.mutate(formData, {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+          form.reset();
+          setSelectedFile(null);
+          setPreviewUrl(null);
+        }
       });
     }
   };
 
-  // ... (keep openEdit, handleDelete)
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      form.setValue("imageUrl", ""); // Clear manual URL if file selected
+    }
+  };
+
+  const openEdit = (item: any) => {
+    setEditingItem(item);
+    form.reset({
+      name: item.name,
+      role: item.role,
+      category: item.category || "state_executive",
+      district: item.district || "",
+      isStateLevel: item.isStateLevel,
+      imageUrl: item.imageUrl || "",
+      phone: item.phone || "",
+      priority: item.priority || 99,
+      active: item.active
+    });
+    setPreviewUrl(item.imageUrl || null);
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm("Are you sure you want to delete this member?")) {
+      deleteMutation.mutate(id);
+    }
+  };
 
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Manage Panels</h1>
-        <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) { setEditingItem(null); form.reset(); } }}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setEditingItem(null);
+            form.reset();
+            setSelectedFile(null);
+            setPreviewUrl(null);
+          }
+        }}>
           <DialogTrigger asChild>
             <Button><Plus className="w-4 h-4 mr-2" /> Add Member</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingItem ? "Edit Member" : "New Member"}</DialogTitle>
             </DialogHeader>
@@ -120,12 +194,29 @@ export default function ManagePanels() {
               )}
 
               <div>
-                <label className="text-sm font-medium">Image URL</label>
-                <Input {...form.register("imageUrl")} placeholder="https://..." />
+                <label className="text-sm font-medium">Target Image</label>
+                <div className="flex flex-col gap-2">
+                  {previewUrl && (
+                    <img src={previewUrl} alt="Preview" className="w-20 h-20 object-cover rounded-md border" />
+                  )}
+                  {!previewUrl && form.watch("imageUrl") && (
+                    <img src={form.watch("imageUrl")} alt="Existing" className="w-20 h-20 object-cover rounded-md border" />
+                  )}
+                  <Input type="file" accept="image/*" onChange={handleFileChange} />
+                  <div className="text-xs text-muted-foreground text-center">- OR -</div>
+                  <Input {...form.register("imageUrl")} placeholder="Image URL (optional)" />
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium">Phone</label>
-                <Input {...form.register("phone")} />
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Phone</label>
+                  <Input {...form.register("phone")} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Priority (Sort Order)</label>
+                  <Input type="number" {...form.register("priority", { valueAsNumber: true })} placeholder="1" />
+                </div>
               </div>
 
               <Button type="submit" className="w-full" disabled={createMutation.isPending || updateMutation.isPending}>

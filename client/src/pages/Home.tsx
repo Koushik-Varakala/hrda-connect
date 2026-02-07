@@ -38,15 +38,17 @@ export default function Home() {
                 strengthen primary healthcare, and protect the interests of doctors across Telangana.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/index.php/new-registration-2/">
-                  <Button size="lg" className="rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-semibold">Join HRDA Today</Button>
-                </Link>
-                <Link href="/search">
-                  <Button size="lg" variant="outline" className="bg-transparent border-white/20 text-white hover:bg-white/10 h-12 text-base">
+                <Button asChild size="lg" className="rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-semibold">
+                  <Link href="/index.php/new-registration-2/">
+                    Join HRDA Today
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="bg-transparent border-white/20 text-white hover:bg-white/10 h-12 text-base">
+                  <Link href="/search">
                     <Search className="mr-2 h-4 w-4" />
                     Verify TGMC ID
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </motion.div>
 
@@ -175,11 +177,11 @@ export default function Home() {
           <p className="text-blue-100 text-lg max-w-2xl mx-auto mb-10">
             Become a member of HRDA today and contribute to the future of the medical profession in Telangana.
           </p>
-          <Link href="/index.php/new-registration-2/">
-            <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-slate-100 font-bold px-10 h-14 rounded-full shadow-xl">
+          <Button asChild size="lg" variant="secondary" className="bg-white text-primary hover:bg-slate-100 font-bold px-10 h-14 rounded-full shadow-xl">
+            <Link href="/index.php/new-registration-2/">
               Become a Member <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </section>
     </Layout>

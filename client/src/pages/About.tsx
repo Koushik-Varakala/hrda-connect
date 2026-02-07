@@ -35,7 +35,7 @@ export default function About() {
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl">
               {/* Unsplash: Medical team meeting */}
               <img
-                src="https://images.unsplash.com/photo-1576091160550-217358c7e618?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"
+                src="/HRDA-group.jpeg"
                 alt="HRDA History"
                 className="absolute inset-0 w-full h-full object-cover"
               />

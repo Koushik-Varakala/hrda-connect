@@ -131,11 +131,11 @@ export default function ElectionPanel() {
                                                 <Eye className="w-4 h-4" /> View
                                             </Button>
                                         </DialogTrigger>
-                                        <a href={`/documents/${doc.filename}`} download target="_blank" rel="noopener noreferrer">
-                                            <Button variant="ghost" size="sm" className="px-2 text-slate-400 hover:text-primary">
+                                        <Button asChild variant="ghost" size="sm" className="px-2 text-slate-400 hover:text-primary">
+                                            <a href={`/documents/${doc.filename}`} download target="_blank" rel="noopener noreferrer">
                                                 <FileDown className="w-4 h-4" />
-                                            </Button>
-                                        </a>
+                                            </a>
+                                        </Button>
                                     </div>
                                 </div>
                                 <DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0 gap-0">

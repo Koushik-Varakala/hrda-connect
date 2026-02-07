@@ -30,6 +30,26 @@ export default function Panels() {
       </div>
 
       <div className="container mx-auto px-4 py-12">
+        {/* Elected Panel Section */}
+        <div className="mb-16">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-2">Elected State Panel (2024-2029)</h2>
+            <p className="text-slate-600">The core leadership team elected to represent the fraternity.</p>
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-8">Loading...</div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-center">
+              {panels?.filter(p => p.category === 'elected_member')
+                .sort((a, b) => (a.priority || 99) - (b.priority || 99))
+                .map((member) => (
+                  <PanelCard key={member.id} member={member} isElected={true} />
+                ))}
+            </div>
+          )}
+        </div>
+
         <Tabs defaultValue="state" className="w-full">
           <div className="flex justify-center mb-8">
             <TabsList className="grid w-full max-w-md grid-cols-2">
@@ -86,18 +106,18 @@ export default function Panels() {
   );
 }
 
-function PanelCard({ member }: { member: any }) {
+function PanelCard({ member, isElected = false }: { member: any, isElected?: boolean }) {
   return (
-    <Card className="text-center card-hover border-t-2 border-t-primary/20">
+    <Card className={`text-center card-hover border-t-2 ${isElected ? 'border-t-primary shadow-md' : 'border-t-primary/20'}`}>
       <CardContent className="pt-8">
-        <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-white shadow-md">
+        <Avatar className={`${isElected ? 'w-32 h-32' : 'w-24 h-24'} mx-auto mb-4 border-4 border-white shadow-md`}>
           <AvatarImage src={member.imageUrl || ""} className="object-cover" />
           <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">
             {member.name[0]}
           </AvatarFallback>
         </Avatar>
-        <h3 className="font-bold text-lg mb-1">{member.name}</h3>
-        <p className="text-primary font-medium text-sm mb-2">{member.role}</p>
+        <h3 className={`font-bold ${isElected ? 'text-xl' : 'text-lg'} mb-1`}>{member.name}</h3>
+        <p className="text-primary font-medium text-sm mb-2 uppercase tracking-wide">{member.role}</p>
         {!member.isStateLevel && <p className="text-xs text-muted-foreground uppercase tracking-wider">{member.district}</p>}
         {member.phone && <p className="text-sm text-slate-500 mt-2">{member.phone}</p>}
       </CardContent>

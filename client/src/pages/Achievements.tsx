@@ -18,6 +18,7 @@ export default function Achievements() {
   const legalWins = achievements?.filter(a => a.category === 'legal') || [];
   const associationWins = achievements?.filter(a => a.category === 'association') || [];
   const postElectionWins = achievements?.filter(a => a.category === 'post_election') || [];
+  const galleryImages = achievements?.filter(a => a.imageUrl) || [];
 
   // Helper to get icon for category/title (simplified for dynamic content)
   const getIcon = (title: string) => {
@@ -50,6 +51,53 @@ export default function Achievements() {
           </motion.p>
         </div>
       </div>
+
+      {/* Gallery / Highlights Section */}
+      {galleryImages.length > 0 && (
+        <section className="py-16 bg-slate-50 border-b border-slate-200">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">Gallery & Highlights</h2>
+              <p className="text-slate-600 max-w-2xl mx-auto">
+                Visual evidence of our struggles, protests, and victories.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {galleryImages.map((item) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-all group"
+                >
+                  <div className="aspect-video relative overflow-hidden bg-slate-100">
+                    <img
+                      src={item.imageUrl!}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-2 right-2">
+                      <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-xs font-medium text-slate-800 shadow-sm">
+                        {item.date ? new Date(item.date).getFullYear() : ''}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-bold text-lg text-slate-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">{item.title}</h3>
+                    <p className="text-slate-600 text-sm line-clamp-3 mb-4">{item.description}</p>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 font-medium uppercase tracking-wider">
+                      {getIcon(item.title)}
+                      <span>{item.category.replace('_', ' ')}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Legal Victories Section */}
       <section className="py-16 bg-white">

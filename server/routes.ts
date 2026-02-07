@@ -240,16 +240,71 @@ export async function registerRoutes(
     res.json(data);
   });
 
-  app.post(api.panels.create.path, isAuthenticated, async (req, res) => {
-    const input = api.panels.create.input.parse(req.body);
-    const result = await storage.createPanel(input);
-    res.status(201).json(result);
+  app.post(api.panels.create.path, isAuthenticated, imageUpload.single('image'), async (req, res) => {
+    try {
+      const data = req.body;
+      if (req.file) {
+        data.imageUrl = `/uploads/${req.file.filename}`;
+      }
+
+      // Convert strict boolean/number types from FormData strings
+      if (data.isStateLevel === 'true') data.isStateLevel = true;
+      if (data.isStateLevel === 'false') data.isStateLevel = false;
+      if (data.active === 'true') data.active = true;
+      if (data.active === 'false') data.active = false;
+      if (data.priority && !isNaN(parseInt(data.priority, 10))) {
+        data.priority = parseInt(data.priority, 10);
+      } else {
+        delete data.priority; // Remove invalid/undefined priority so Zod doesn't fail if it expects number
+      }
+
+      const input = api.panels.create.input.parse(data);
+      const result = await storage.createPanel(input);
+      res.status(201).json(result);
+    } catch (err) {
+      if (err instanceof z.ZodError) res.status(400).json(err);
+      else throw err;
+    }
   });
 
-  app.put(api.panels.update.path, isAuthenticated, async (req, res) => {
-    const result = await storage.updatePanel(Number(req.params.id), req.body);
-    if (!result) return res.status(404).json({ message: "Not found" });
-    res.json(result);
+  app.put(api.panels.update.path, isAuthenticated, imageUpload.single('image'), async (req, res) => {
+    try {
+      console.log("Processing PUT /api/panels/:id");
+      const id = Number(req.params.id);
+      const data = req.body;
+      console.log("PUT /api/panels/:id called with id:", id);
+      console.log("Request body:", data);
+
+      if (req.file) {
+        data.imageUrl = `/uploads/${req.file.filename}`;
+      }
+
+      // Convert strict boolean/number types from FormData strings
+      if (data.isStateLevel === 'true') data.isStateLevel = true;
+      if (data.isStateLevel === 'false') data.isStateLevel = false;
+      if (data.active === 'true') data.active = true;
+      if (data.active === 'false') data.active = false;
+      if (data.priority && !isNaN(parseInt(data.priority, 10))) {
+        data.priority = parseInt(data.priority, 10);
+      } else {
+        delete data.priority;
+      }
+
+      console.log("Processed data for parsing:", data);
+
+      const input = api.panels.update.input.parse(data);
+      console.log("Parsed input:", input);
+
+      const result = await storage.updatePanel(id, input);
+      console.log("Storage update result:", result ? "Found" : "Not Found");
+
+      if (!result) return res.status(404).json({ message: "Not found" });
+      res.json(result);
+    } catch (err) {
+      console.error("Error updating panel:", err);
+      if (err instanceof z.ZodError) res.status(400).json(err);
+      else throw err;
+    }
   });
 
   app.delete(api.panels.delete.path, isAuthenticated, async (req, res) => {
