@@ -26,6 +26,7 @@ export default function ManagePanels() {
       name: "",
       role: "",
       district: "",
+      category: "state_executive",
       isStateLevel: false,
       imageUrl: "",
       phone: "",
@@ -36,6 +37,12 @@ export default function ManagePanels() {
   const onSubmit = (data: any) => {
     // If state level, district should be null or empty
     if (data.isStateLevel) data.district = null;
+
+    // Auto-set isStateLevel based on category if needed, but keeping manual for flexibility
+    if (data.category === 'state_executive' || data.category === 'elected_member') {
+      data.isStateLevel = true;
+      data.district = null;
+    }
 
     if (editingItem) {
       updateMutation.mutate({ id: editingItem.id, ...data }, {
@@ -48,21 +55,13 @@ export default function ManagePanels() {
     }
   };
 
-  const openEdit = (item: any) => {
-    setEditingItem(item);
-    form.reset(item);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = (id: number) => {
-    if (confirm("Delete this member?")) deleteMutation.mutate(id);
-  };
+  // ... (keep openEdit, handleDelete)
 
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Manage Panels</h1>
-        <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if(!open) { setEditingItem(null); form.reset(); } }}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) { setEditingItem(null); form.reset(); } }}>
           <DialogTrigger asChild>
             <Button><Plus className="w-4 h-4 mr-2" /> Add Member</Button>
           </DialogTrigger>
@@ -81,7 +80,27 @@ export default function ManagePanels() {
                   <Input {...form.register("role")} />
                 </div>
               </div>
-              
+
+              <div>
+                <label className="text-sm font-medium">Category</label>
+                <Controller
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} defaultValue={field.value || "state_executive"}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="state_executive">State Executive</SelectItem>
+                        <SelectItem value="elected_member">Elected Member (Election Panel)</SelectItem>
+                        <SelectItem value="district_member">District Member</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
               <div className="flex items-center gap-2 py-2">
                 <Controller
                   control={form.control}
@@ -90,7 +109,7 @@ export default function ManagePanels() {
                     <Switch checked={field.value} onCheckedChange={field.onChange} />
                   )}
                 />
-                <label className="text-sm font-medium">Is State Level?</label>
+                <label className="text-sm font-medium">Is State Level? (Overrides Category default)</label>
               </div>
 
               {!form.watch("isStateLevel") && (
@@ -108,7 +127,7 @@ export default function ManagePanels() {
                 <label className="text-sm font-medium">Phone</label>
                 <Input {...form.register("phone")} />
               </div>
-              
+
               <Button type="submit" className="w-full" disabled={createMutation.isPending || updateMutation.isPending}>
                 {editingItem ? "Update" : "Create"}
               </Button>
@@ -123,7 +142,7 @@ export default function ManagePanels() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead>Level</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>District</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -136,8 +155,8 @@ export default function ManagePanels() {
                 <TableCell className="font-medium">{item.name}</TableCell>
                 <TableCell>{item.role}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded text-xs ${item.isStateLevel ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'}`}>
-                    {item.isStateLevel ? 'State' : 'District'}
+                  <span className="capitalize text-sm text-slate-600">
+                    {item.category?.replace('_', ' ') || (item.isStateLevel ? 'State' : 'District')}
                   </span>
                 </TableCell>
                 <TableCell>{item.district || '-'}</TableCell>

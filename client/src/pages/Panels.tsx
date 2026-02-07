@@ -15,7 +15,7 @@ export default function Panels() {
   // Unique districts
   const districts = Array.from(new Set(panels?.filter(p => !p.isStateLevel && p.district).map(p => p.district) || [])).sort();
 
-  const statePanel = panels?.filter(p => p.isStateLevel).sort((a, b) => (a.priority || 99) - (b.priority || 99));
+  const statePanel = panels?.filter(p => p.category === 'state_executive' || (p.isStateLevel && p.category !== 'elected_member')).sort((a, b) => (a.priority || 99) - (b.priority || 99));
   const districtPanel = panels?.filter(p => !p.isStateLevel && (district === "all" || p.district === district));
 
   return (

@@ -1,9 +1,10 @@
 import { db } from "./db";
 import {
-  announcements, panels, achievements, departments, registrations,
+  announcements, panels, achievements, departments, registrations, mediaCoverage,
   type Announcement, type InsertAnnouncement, type UpdateAnnouncementRequest,
   type Panel, type InsertPanel, type UpdatePanelRequest,
   type Achievement, type InsertAchievement, type UpdateAchievementRequest,
+  type MediaCoverage, type InsertMediaCoverage, type UpdateMediaCoverageRequest,
   type Department, type UpdateDepartmentRequest,
   type Registration, type InsertRegistration, type UpdateRegistrationRequest, type SearchRegistrationParams
 } from "@shared/schema";
@@ -23,7 +24,7 @@ export interface IStorage {
   deletePanel(id: number): Promise<void>;
 
   // Achievements
-  getAchievements(): Promise<Achievement[]>;
+  getAchievements(category?: string): Promise<Achievement[]>;
   createAchievement(achievement: InsertAchievement): Promise<Achievement>;
   updateAchievement(id: number, updates: UpdateAchievementRequest): Promise<Achievement | undefined>;
   deleteAchievement(id: number): Promise<void>;
@@ -38,6 +39,12 @@ export interface IStorage {
   createRegistration(registration: InsertRegistration): Promise<Registration>;
   updateRegistration(id: number, updates: UpdateRegistrationRequest): Promise<Registration | undefined>;
   getRegistrations(): Promise<Registration[]>;
+
+  // Media Coverage
+  getMediaCoverage(): Promise<MediaCoverage[]>;
+  createMediaCoverage(media: InsertMediaCoverage): Promise<MediaCoverage>;
+  updateMediaCoverage(id: number, updates: UpdateMediaCoverageRequest): Promise<MediaCoverage | undefined>;
+  deleteMediaCoverage(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -92,8 +99,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Achievements
-  async getAchievements(): Promise<Achievement[]> {
-    return await db.select().from(achievements).orderBy(desc(achievements.date));
+  async getAchievements(category?: string): Promise<Achievement[]> {
+    let query = db.select().from(achievements);
+    if (category) {
+      // @ts-ignore
+      query.where(eq(achievements.category, category));
+    }
+    return await query.orderBy(desc(achievements.date));
   }
 
   async createAchievement(insert: InsertAchievement): Promise<Achievement> {
@@ -141,6 +153,25 @@ export class DatabaseStorage implements IStorage {
   async getRegistrations(): Promise<Registration[]> {
     return await db.select().from(registrations).orderBy(desc(registrations.createdAt));
   }
+
+  // Media Coverage
+  async getMediaCoverage(): Promise<MediaCoverage[]> {
+    return await db.select().from(mediaCoverage).orderBy(desc(mediaCoverage.date));
+  }
+
+  async createMediaCoverage(insert: InsertMediaCoverage): Promise<MediaCoverage> {
+    const [result] = await db.insert(mediaCoverage).values(insert).returning();
+    return result;
+  }
+
+  async updateMediaCoverage(id: number, updates: UpdateMediaCoverageRequest): Promise<MediaCoverage | undefined> {
+    const [result] = await db.update(mediaCoverage).set(updates).where(eq(mediaCoverage.id, id)).returning();
+    return result;
+  }
+
+  async deleteMediaCoverage(id: number): Promise<void> {
+    await db.delete(mediaCoverage).where(eq(mediaCoverage.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -149,6 +180,7 @@ export class MemStorage implements IStorage {
   private achievements: Map<number, Achievement>;
   private departments: Map<number, Department>;
   private registrations: Map<number, Registration>;
+  private mediaCoverage: Map<number, MediaCoverage>;
   private currentIds: { [key: string]: number };
 
   constructor() {
@@ -157,7 +189,8 @@ export class MemStorage implements IStorage {
     this.achievements = new Map();
     this.departments = new Map();
     this.registrations = new Map();
-    this.currentIds = { announcements: 1, panels: 1, achievements: 1, departments: 1, registrations: 1 };
+    this.mediaCoverage = new Map();
+    this.currentIds = { announcements: 1, panels: 1, achievements: 1, departments: 1, registrations: 1, mediaCoverage: 1 };
   }
 
   // Announcements
@@ -207,6 +240,7 @@ export class MemStorage implements IStorage {
       district: insert.district ?? null,
       imageUrl: insert.imageUrl ?? null,
       phone: insert.phone ?? null,
+      category: insert.category ?? null,
       isStateLevel: insert.isStateLevel ?? false,
       active: insert.active ?? true
     };
@@ -227,8 +261,12 @@ export class MemStorage implements IStorage {
   }
 
   // Achievements
-  async getAchievements(): Promise<Achievement[]> {
-    return Array.from(this.achievements.values()).sort((a, b) => {
+  async getAchievements(category?: string): Promise<Achievement[]> {
+    let results = Array.from(this.achievements.values());
+    if (category) {
+      results = results.filter(a => a.category === category);
+    }
+    return results.sort((a, b) => {
       if (!a.date || !b.date) return 0;
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     });
@@ -241,6 +279,7 @@ export class MemStorage implements IStorage {
       id,
       date: insert.date ?? null,
       imageUrl: insert.imageUrl ?? null,
+      category: insert.category ?? 'association',
       active: insert.active ?? true
     };
     this.achievements.set(id, achievement);
@@ -315,6 +354,38 @@ export class MemStorage implements IStorage {
       if (!a.createdAt || !b.createdAt) return 0;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
+  }
+
+  // Media Coverage
+  async getMediaCoverage(): Promise<MediaCoverage[]> {
+    return Array.from(this.mediaCoverage.values()).sort((a, b) => {
+      if (!a.date || !b.date) return 0;
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+  }
+
+  async createMediaCoverage(insert: InsertMediaCoverage): Promise<MediaCoverage> {
+    const id = this.currentIds.mediaCoverage++;
+    const media: MediaCoverage = {
+      ...insert,
+      id,
+      date: insert.date ?? null,
+      active: insert.active ?? true
+    };
+    this.mediaCoverage.set(id, media);
+    return media;
+  }
+
+  async updateMediaCoverage(id: number, updates: UpdateMediaCoverageRequest): Promise<MediaCoverage | undefined> {
+    if (!this.mediaCoverage.has(id)) return undefined;
+    const existing = this.mediaCoverage.get(id)!;
+    const updated = { ...existing, ...updates };
+    this.mediaCoverage.set(id, updated);
+    return updated;
+  }
+
+  async deleteMediaCoverage(id: number): Promise<void> {
+    this.mediaCoverage.delete(id);
   }
 }
 

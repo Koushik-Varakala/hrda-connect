@@ -23,7 +23,12 @@ import ManagePanels from "@/pages/admin/ManagePanels";
 import ManageAchievements from "@/pages/admin/ManageAchievements";
 import ManageDepartments from "@/pages/admin/ManageDepartments";
 import ManageRegistrations from "@/pages/admin/ManageRegistrations";
+import ManageMedia from "@/pages/admin/ManageMedia";
 import Login from "@/pages/Login";
+
+// New Pages
+import Media from "@/pages/Media";
+import ElectionPanel from "@/pages/ElectionPanel";
 
 function Router() {
   return (
@@ -36,6 +41,8 @@ function Router() {
       <Route path="/departments" component={Departments} />
       <Route path="/membership" component={Membership} />
       <Route path="/index.php/new-registration-2/" component={Membership} />
+      <Route path="/media" component={Media} />
+      <Route path="/election-panel" component={ElectionPanel} />
       <Route path="/contact" component={Contact} />
       <Route path="/search" component={Search} />
       <Route path="/thank-you" component={ThankYou} />
@@ -45,6 +52,7 @@ function Router() {
       <Route path="/admin/announcements" component={ManageAnnouncements} />
       <Route path="/admin/panels" component={ManagePanels} />
       <Route path="/admin/achievements" component={ManageAchievements} />
+      <Route path="/admin/media" component={ManageMedia} />
       <Route path="/admin/departments" component={ManageDepartments} />
       <Route path="/admin/registrations" component={ManageRegistrations} />
 

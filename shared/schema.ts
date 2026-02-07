@@ -23,6 +23,7 @@ export const panels = pgTable("panels", {
   imageUrl: text("image_url"),
   phone: text("phone"),
   priority: serial("priority"), // for ordering
+  category: text("category").default('state_executive'), // 'state_executive', 'elected_member'
   active: boolean("active").default(true).notNull(),
 });
 
@@ -32,6 +33,16 @@ export const achievements = pgTable("achievements", {
   description: text("description").notNull(),
   date: date("date"),
   imageUrl: text("image_url"),
+  category: text("category").default('association').notNull(), // 'association', 'legal', 'post_election', 'legacy'
+  active: boolean("active").default(true).notNull(),
+});
+
+export const mediaCoverage = pgTable("media_coverage", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  date: date("date"),
+  imageUrl: text("image_url").notNull(),
   active: boolean("active").default(true).notNull(),
 });
 
@@ -68,6 +79,7 @@ export const registrations = pgTable("registrations", {
 export const insertAnnouncementSchema = createInsertSchema(announcements).omit({ id: true, createdAt: true });
 export const insertPanelSchema = createInsertSchema(panels).omit({ id: true, priority: true });
 export const insertAchievementSchema = createInsertSchema(achievements).omit({ id: true });
+export const insertMediaCoverageSchema = createInsertSchema(mediaCoverage).omit({ id: true });
 export const insertDepartmentSchema = createInsertSchema(departments).omit({ id: true, updatedAt: true });
 export const insertRegistrationSchema = createInsertSchema(registrations).omit({ id: true, createdAt: true, updatedAt: true });
 
@@ -90,6 +102,12 @@ export type Achievement = typeof achievements.$inferSelect;
 export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
 export type CreateAchievementRequest = InsertAchievement;
 export type UpdateAchievementRequest = Partial<InsertAchievement>;
+
+// Media Coverage
+export type MediaCoverage = typeof mediaCoverage.$inferSelect;
+export type InsertMediaCoverage = z.infer<typeof insertMediaCoverageSchema>;
+export type CreateMediaCoverageRequest = InsertMediaCoverage;
+export type UpdateMediaCoverageRequest = Partial<InsertMediaCoverage>;
 
 // Departments
 export type Department = typeof departments.$inferSelect;

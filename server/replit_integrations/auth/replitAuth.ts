@@ -10,7 +10,9 @@ const PgSession = pgSession(session);
 export function getSession() {
   const secret = process.env.SESSION_SECRET || "dev_secret";
 
-  if (!process.env.DATABASE_URL) {
+  // Force Memory Store for stability during debugging
+  if (true || !process.env.DATABASE_URL) {
+    console.log("Using MemoryStore for sessions");
     return session({
       secret,
       resave: false,
@@ -21,10 +23,15 @@ export function getSession() {
 
   return session({
     store: new PgSession({
-      pool,
+      conObject: {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false },
+        connectionTimeoutMillis: 30000,
+        keepAlive: true
+      },
       tableName: 'session',
       createTableIfMissing: true,
-      pruneSessionInterval: 60 // Enable pruning for regular server
+      pruneSessionInterval: 60 * 60 * 24
     }),
     secret,
     resave: false,

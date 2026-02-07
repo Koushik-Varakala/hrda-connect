@@ -1,15 +1,17 @@
 import { z } from 'zod';
-import { 
-  insertAnnouncementSchema, 
-  insertPanelSchema, 
-  insertAchievementSchema, 
+import {
+  insertAnnouncementSchema,
+  insertPanelSchema,
+  insertAchievementSchema,
   insertDepartmentSchema,
   insertRegistrationSchema,
+  insertMediaCoverageSchema,
   announcements,
   panels,
   achievements,
   departments,
-  registrations
+  registrations,
+  mediaCoverage
 } from './schema';
 
 // === ERROR SCHEMAS ===
@@ -142,6 +144,44 @@ export const api = {
     delete: {
       method: 'DELETE' as const,
       path: '/api/achievements/:id',
+      responses: {
+        204: z.void(),
+        404: errorSchemas.notFound,
+        401: errorSchemas.unauthorized,
+      },
+    },
+  },
+  mediaCoverage: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/media-coverage',
+      responses: {
+        200: z.array(z.custom<typeof mediaCoverage.$inferSelect>()),
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/media-coverage',
+      input: insertMediaCoverageSchema,
+      responses: {
+        201: z.custom<typeof mediaCoverage.$inferSelect>(),
+        400: errorSchemas.validation,
+        401: errorSchemas.unauthorized,
+      },
+    },
+    update: {
+      method: 'PUT' as const,
+      path: '/api/media-coverage/:id',
+      input: insertMediaCoverageSchema.partial(),
+      responses: {
+        200: z.custom<typeof mediaCoverage.$inferSelect>(),
+        404: errorSchemas.notFound,
+        401: errorSchemas.unauthorized,
+      },
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/media-coverage/:id',
       responses: {
         204: z.void(),
         404: errorSchemas.notFound,
