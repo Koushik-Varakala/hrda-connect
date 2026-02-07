@@ -1,4 +1,5 @@
 import app, { httpServer, log } from "./app";
+import { seedElectionDocuments } from "./seed";
 
 // ALWAYS serve the app on the port specified in the environment variable PORT
 // Other ports are firewalled. Default to 5000 if not specified.
@@ -6,6 +7,13 @@ import app, { httpServer, log } from "./app";
 // It is the only port that is not firewalled.
 // For Vercel, we don't start the listener here (api/index.ts handles it)
 (async () => {
+  // Run seed
+  try {
+    await seedElectionDocuments();
+  } catch (e) {
+    console.error("Failed to seed election documents:", e);
+  }
+
   const port = parseInt(process.env.PORT || "3001", 10);
   httpServer.listen(
     {
