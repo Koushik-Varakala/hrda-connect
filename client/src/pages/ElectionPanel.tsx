@@ -32,6 +32,11 @@ export default function ElectionPanel() {
         "Senior Doctor Support (Helpdesk for >60 yrs)"
     ];
 
+    // Election Documents
+    const { data: documents = [] } = useQuery<any[]>({
+        queryKey: ["/api/election-documents"],
+    });
+
     return (
         <Layout>
             {/* Hero */}
@@ -105,7 +110,7 @@ export default function ElectionPanel() {
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {documents.map((doc, i) => (
-                            <Dialog key={i}>
+                            <Dialog key={doc.id || i}>
                                 <div className="group border border-slate-200 rounded-xl p-5 hover:shadow-md transition-all bg-slate-50 hover:bg-white hover:border-primary/50">
                                     <div className="flex justify-between items-start mb-3">
                                         <Badge variant="secondary" className="text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20">
@@ -153,90 +158,3 @@ export default function ElectionPanel() {
         </Layout>
     );
 }
-
-const documents = [
-    {
-        category: "Foundational",
-        title: "Election Notification",
-        filename: "HRDA-Election-Notification..pdf",
-        date: "Nov 25, 2025",
-        description: "Official announcement of state committee elections for 2025–2026."
-    },
-    {
-        category: "Foundational",
-        title: "Voting Manual (Instructions)",
-        filename: "HRDA LETTER HEAD Instructions .pdf",
-        date: "Jan 11, 2026",
-        description: "Instructions for polling venue and ballot marking."
-    },
-    {
-        category: "Candidates",
-        title: "Initial Candidate List",
-        filename: "HRDA Election Nominations -2025.pdf",
-        date: "Dec 23, 2025",
-        description: "Initial list of candidates (Approved/Rejected) for various posts."
-    },
-    {
-        category: "Candidates",
-        title: "Unanimous Winners List",
-        filename: "Unanimous List - HRDA Election Nominations -2025.pdf",
-        date: "Dec 28, 2025",
-        description: "Candidates elected without contest as sole nominees."
-    },
-    {
-        category: "Candidates",
-        title: "Final List (After Withdrawals)",
-        filename: "Final List After withdrawals- HRDA State Elections-2025.pdf",
-        date: "Jan 2025",
-        description: "Final slate of candidates contesting for posts."
-    },
-    {
-        category: "Notices",
-        title: "Nomination Deadline Extension",
-        filename: "HRDA LETTER HEAD-Notice.pdf",
-        date: "Dec 2025",
-        description: "Notice regarding extension of nomination filing deadline."
-    },
-    {
-        category: "Notices",
-        title: "Withdrawal Deadline Notice",
-        filename: "5_6206319448861711732.pdf",
-        date: "Dec 2025",
-        description: "Notice regarding extension of withdrawal deadline."
-    },
-    {
-        category: "Ballots",
-        title: "Model Ballot (ECM)",
-        filename: " ECM Model ballot .pdf",
-        date: "Jan 2026",
-        description: "Sample ballot paper for Executive Committee Members."
-    },
-    {
-        category: "Ballots",
-        title: "Model Ballot (SCCA)",
-        filename: "HRDA 2025-SCCA.pdf",
-        date: "Jan 2026",
-        description: "Sample ballot paper for Special Committee Chairman Academic."
-    },
-    {
-        category: "Results",
-        title: "Vote Counts (Tally Sheet)",
-        filename: "EC and scca Elected Candidates list-2025.pdf",
-        date: "Jan 11, 2026",
-        description: "Total vote counts for contested posts."
-    },
-    {
-        category: "Results",
-        title: "Final Winners List",
-        filename: "Elected Candidates list--2025.pdf",
-        date: "Jan 11, 2026",
-        description: "Final summary of all winnings candidates for 2025-2026."
-    },
-    {
-        category: "Records",
-        title: "Membership Registry",
-        filename: "HRDA FINAL MEMBERSHIP LIST 10-12-25.pdf",
-        date: "Dec 10, 2025",
-        description: "Registry of over 2,100 registered doctors."
-    }
-];

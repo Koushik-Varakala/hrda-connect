@@ -38,7 +38,103 @@ async function seedDatabase() {
     // ... add more seed if needed
   }
 
-  // Seed Achievements if needed, or leave empty for dynamic creation
+  // Seed Election Documents
+  const electionDocs = await storage.getElectionDocuments();
+  if (electionDocs.length === 0) {
+    const seedDocs = [
+      {
+        category: "Foundational",
+        title: "Election Notification",
+        filename: "HRDA-Election-Notification..pdf",
+        date: "Nov 25, 2025",
+        description: "Official announcement of state committee elections for 2025–2026."
+      },
+      {
+        category: "Foundational",
+        title: "Voting Manual (Instructions)",
+        filename: "HRDA LETTER HEAD Instructions .pdf",
+        date: "Jan 11, 2026",
+        description: "Instructions for polling venue and ballot marking."
+      },
+      {
+        category: "Candidates",
+        title: "Initial Candidate List",
+        filename: "HRDA Election Nominations -2025.pdf",
+        date: "Dec 23, 2025",
+        description: "Initial list of candidates (Approved/Rejected) for various posts."
+      },
+      {
+        category: "Candidates",
+        title: "Unanimous Winners List",
+        filename: "Unanimous List - HRDA Election Nominations -2025.pdf",
+        date: "Dec 28, 2025",
+        description: "Candidates elected without contest as sole nominees."
+      },
+      {
+        category: "Candidates",
+        title: "Final List (After Withdrawals)",
+        filename: "Final List After withdrawals- HRDA State Elections-2025.pdf",
+        date: "Jan 2025",
+        description: "Final slate of candidates contesting for posts."
+      },
+      {
+        category: "Notices",
+        title: "Nomination Deadline Extension",
+        filename: "HRDA LETTER HEAD-Notice.pdf",
+        date: "Dec 2025",
+        description: "Notice regarding extension of nomination filing deadline."
+      },
+      {
+        category: "Notices",
+        title: "Withdrawal Deadline Notice",
+        filename: "5_6206319448861711732.pdf",
+        date: "Dec 2025",
+        description: "Notice regarding extension of withdrawal deadline."
+      },
+      {
+        category: "Ballots",
+        title: "Model Ballot (ECM)",
+        filename: " ECM Model ballot .pdf",
+        date: "Jan 2026",
+        description: "Sample ballot paper for Executive Committee Members."
+      },
+      {
+        category: "Ballots",
+        title: "Model Ballot (SCCA)",
+        filename: "HRDA 2025-SCCA.pdf",
+        date: "Jan 2026",
+        description: "Sample ballot paper for Special Committee Chairman Academic."
+      },
+      {
+        category: "Results",
+        title: "Vote Counts (Tally Sheet)",
+        filename: "EC and scca Elected Candidates list-2025.pdf",
+        date: "Jan 11, 2026",
+        description: "Total vote counts for contested posts."
+      },
+      {
+        category: "Results",
+        title: "Final Winners List",
+        filename: "Elected Candidates list--2025.pdf",
+        date: "Jan 11, 2026",
+        description: "Final summary of all winnings candidates for 2025-2026."
+      },
+      {
+        category: "Records",
+        title: "Membership Registry",
+        filename: "HRDA FINAL MEMBERSHIP LIST 10-12-25.pdf",
+        date: "Dec 10, 2025",
+        description: "Registry of over 2,100 registered doctors."
+      }
+    ];
+
+    for (const doc of seedDocs) {
+      await storage.createElectionDocument({
+        ...doc,
+        active: true,
+      });
+    }
+  }
 }
 
 export async function registerRoutes(
@@ -377,8 +473,103 @@ export async function registerRoutes(
     }
   });
 
+  // Election Documents
+  const fs = await import("fs");
+  const path = await import("path");
+  const multer = (await import("multer")).default;
+
+  // Ensure documents directory exists
+  const documentsDir = path.join(process.cwd(), "client/public/documents");
+  if (!fs.existsSync(documentsDir)) {
+    fs.mkdirSync(documentsDir, { recursive: true });
+  }
+
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, documentsDir);
+      },
+      filename: (req, file, cb) => {
+        // Keep original name but sanitise slightly if needed, or just use original
+        // Using original name as per requirement to match existing files
+        cb(null, file.originalname);
+      }
+    }),
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype === "application/pdf") {
+        cb(null, true);
+      } else {
+        cb(new Error("Only PDF files are allowed"));
+      }
+    }
+  });
+
+  app.get("/api/election-documents", async (req, res) => {
+    const data = await storage.getElectionDocuments();
+    res.json(data);
+  });
+
+  app.post("/api/election-documents", isAuthenticated, upload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      // Parse body fields
+      // Multer puts body fields in req.body
+      const { insertElectionDocumentSchema } = await import("@shared/schema");
+
+      // We need to construct the input object matching the schema
+      // req.body values will be strings, so we might need to handle that if schema expects other types
+      // But here everything is text/string in schema for election docs
+      const docData = {
+        title: req.body.title,
+        description: req.body.description,
+        category: req.body.category,
+        date: req.body.date,
+        filename: req.file.originalname,
+        active: true
+      };
+
+      const input = insertElectionDocumentSchema.parse(docData);
+      const result = await storage.createElectionDocument(input);
+      res.status(201).json(result);
+    } catch (err) {
+      console.error("Upload error:", err);
+      if (err instanceof z.ZodError) res.status(400).json(err);
+      else res.status(500).json({ message: "Failed to upload document" });
+    }
+  });
+
+  app.delete("/api/election-documents/:id", isAuthenticated, async (req, res) => {
+    const id = Number(req.params.id);
+    // Get doc to find filename
+    // We don't have getElectionDocumentById but we can filter from getAll or add method.
+    // For now with array filter in memstorage it's fine, but with DB... 
+    // Let's iterate or find. 
+    // Actually standard storage doesn't have getById. 
+    // I can filter the list since it's small.
+    const docs = await storage.getElectionDocuments();
+    const doc = docs.find(d => d.id === id);
+
+    if (doc) {
+      // Try to delete file
+      const filePath = path.join(documentsDir, doc.filename);
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+        } catch (e) {
+          console.error("Failed to delete file:", e);
+        }
+      }
+      await storage.deleteElectionDocument(id);
+    }
+
+    res.status(204).end();
+  });
+
   // Seed
-  // seedDatabase().catch(console.error);
+  seedDatabase().catch(console.error);
 
   return httpServer;
 }

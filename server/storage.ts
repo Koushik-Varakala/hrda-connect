@@ -6,7 +6,8 @@ import {
   type Achievement, type InsertAchievement, type UpdateAchievementRequest,
   type MediaCoverage, type InsertMediaCoverage, type UpdateMediaCoverageRequest,
   type Department, type UpdateDepartmentRequest,
-  type Registration, type InsertRegistration, type UpdateRegistrationRequest, type SearchRegistrationParams
+  type Registration, type InsertRegistration, type UpdateRegistrationRequest, type SearchRegistrationParams,
+  electionDocuments, type ElectionDocument, type InsertElectionDocument
 } from "@shared/schema";
 import { eq, desc, and, ilike } from "drizzle-orm";
 
@@ -44,7 +45,10 @@ export interface IStorage {
   getMediaCoverage(): Promise<MediaCoverage[]>;
   createMediaCoverage(media: InsertMediaCoverage): Promise<MediaCoverage>;
   updateMediaCoverage(id: number, updates: UpdateMediaCoverageRequest): Promise<MediaCoverage | undefined>;
-  deleteMediaCoverage(id: number): Promise<void>;
+  // Election Documents
+  getElectionDocuments(): Promise<ElectionDocument[]>;
+  createElectionDocument(doc: InsertElectionDocument): Promise<ElectionDocument>;
+  deleteElectionDocument(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -172,6 +176,20 @@ export class DatabaseStorage implements IStorage {
   async deleteMediaCoverage(id: number): Promise<void> {
     await db.delete(mediaCoverage).where(eq(mediaCoverage.id, id));
   }
+
+  // Election Documents
+  async getElectionDocuments(): Promise<ElectionDocument[]> {
+    return await db.select().from(electionDocuments).orderBy(electionDocuments.id);
+  }
+
+  async createElectionDocument(insert: InsertElectionDocument): Promise<ElectionDocument> {
+    const [result] = await db.insert(electionDocuments).values(insert).returning();
+    return result;
+  }
+
+  async deleteElectionDocument(id: number): Promise<void> {
+    await db.delete(electionDocuments).where(eq(electionDocuments.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -181,6 +199,7 @@ export class MemStorage implements IStorage {
   private departments: Map<number, Department>;
   private registrations: Map<number, Registration>;
   private mediaCoverage: Map<number, MediaCoverage>;
+  private electionDocuments: Map<number, ElectionDocument>;
   private currentIds: { [key: string]: number };
 
   constructor() {
@@ -190,7 +209,8 @@ export class MemStorage implements IStorage {
     this.departments = new Map();
     this.registrations = new Map();
     this.mediaCoverage = new Map();
-    this.currentIds = { announcements: 1, panels: 1, achievements: 1, departments: 1, registrations: 1, mediaCoverage: 1 };
+    this.electionDocuments = new Map();
+    this.currentIds = { announcements: 1, panels: 1, achievements: 1, departments: 1, registrations: 1, mediaCoverage: 1, electionDocuments: 1 };
   }
 
   // Announcements
@@ -386,6 +406,28 @@ export class MemStorage implements IStorage {
 
   async deleteMediaCoverage(id: number): Promise<void> {
     this.mediaCoverage.delete(id);
+  }
+
+  // Election Documents
+  async getElectionDocuments(): Promise<ElectionDocument[]> {
+    return Array.from(this.electionDocuments.values()).sort((a, b) => b.id - a.id);
+  }
+
+  async createElectionDocument(insert: InsertElectionDocument): Promise<ElectionDocument> {
+    const id = this.currentIds.electionDocuments++;
+    const doc: ElectionDocument = {
+      ...insert,
+      id,
+      createdAt: new Date(),
+      description: insert.description ?? null,
+      active: insert.active ?? true
+    };
+    this.electionDocuments.set(id, doc);
+    return doc;
+  }
+
+  async deleteElectionDocument(id: number): Promise<void> {
+    this.electionDocuments.delete(id);
   }
 }
 

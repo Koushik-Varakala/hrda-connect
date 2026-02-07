@@ -21,6 +21,7 @@ import Dashboard from "@/pages/admin/Dashboard";
 import ManageAnnouncements from "@/pages/admin/ManageAnnouncements";
 import ManagePanels from "@/pages/admin/ManagePanels";
 import ManageAchievements from "@/pages/admin/ManageAchievements";
+import AdminElectionDocs from "@/pages/admin/ManageElectionDocs";
 import ManageDepartments from "@/pages/admin/ManageDepartments";
 import ManageRegistrations from "@/pages/admin/ManageRegistrations";
 import ManageMedia from "@/pages/admin/ManageMedia";
@@ -52,6 +53,7 @@ function Router() {
       <Route path="/admin/announcements" component={ManageAnnouncements} />
       <Route path="/admin/panels" component={ManagePanels} />
       <Route path="/admin/achievements" component={ManageAchievements} />
+      <Route path="/admin/election-docs" component={AdminElectionDocs} />
       <Route path="/admin/media" component={ManageMedia} />
       <Route path="/admin/departments" component={ManageDepartments} />
       <Route path="/admin/registrations" component={ManageRegistrations} />

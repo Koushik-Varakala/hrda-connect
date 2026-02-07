@@ -127,3 +127,21 @@ export interface SearchRegistrationParams {
 }
 
 export type RegistrationSearchResponse = Registration[];
+// Election Documents
+export const electionDocuments = pgTable("election_documents", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  category: text("category").notNull(), // 'Foundational', 'Candidates', 'Notices', 'Ballots', 'Results', 'Records'
+  filename: text("filename").notNull(),
+  date: text("date").notNull(), // Display date string e.g. "Jan 11, 2026"
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertElectionDocumentSchema = createInsertSchema(electionDocuments).omit({ id: true, createdAt: true });
+
+export type ElectionDocument = typeof electionDocuments.$inferSelect;
+export type InsertElectionDocument = z.infer<typeof insertElectionDocumentSchema>;
+export type CreateElectionDocumentRequest = InsertElectionDocument;
+export type UpdateElectionDocumentRequest = Partial<InsertElectionDocument>;
