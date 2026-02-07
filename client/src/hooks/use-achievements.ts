@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type CreateAchievementRequest, type UpdateAchievementRequest } from "@shared/routes";
+import { api, buildUrl } from "@shared/routes";
+import { type CreateAchievementRequest, type UpdateAchievementRequest } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
 export function useAchievements() {
@@ -18,14 +19,24 @@ export function useCreateAchievement() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: CreateAchievementRequest) => {
+    mutationFn: async (data: FormData | CreateAchievementRequest) => {
+      let body;
+      let headers = {};
+
+      if (data instanceof FormData) {
+        body = data;
+      } else {
+        body = JSON.stringify(data as CreateAchievementRequest);
+        headers = { "Content-Type": "application/json" };
+      }
+
       const res = await fetch(api.achievements.create.path, {
         method: api.achievements.create.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        headers,
+        body: body as BodyInit,
         credentials: "include",
       });
-      
+
       if (!res.ok) throw new Error("Failed to create achievement");
       return api.achievements.create.responses[201].parse(await res.json());
     },
@@ -44,12 +55,22 @@ export function useUpdateAchievement() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: number } & UpdateAchievementRequest) => {
+    mutationFn: async ({ id, data }: { id: number, data: FormData | UpdateAchievementRequest }) => {
       const url = buildUrl(api.achievements.update.path, { id });
+      let body;
+      let headers = {};
+
+      if (data instanceof FormData) {
+        body = data;
+      } else {
+        body = JSON.stringify(data as UpdateAchievementRequest);
+        headers = { "Content-Type": "application/json" };
+      }
+
       const res = await fetch(url, {
         method: api.achievements.update.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        headers,
+        body: body as BodyInit,
         credentials: "include",
       });
 
@@ -73,9 +94,9 @@ export function useDeleteAchievement() {
   return useMutation({
     mutationFn: async (id: number) => {
       const url = buildUrl(api.achievements.delete.path, { id });
-      const res = await fetch(url, { 
+      const res = await fetch(url, {
         method: api.achievements.delete.method,
-        credentials: "include" 
+        credentials: "include"
       });
       if (!res.ok) throw new Error("Failed to delete achievement");
     },

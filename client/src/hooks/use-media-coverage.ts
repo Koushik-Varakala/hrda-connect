@@ -14,8 +14,28 @@ export function useCreateMediaCoverage() {
     const { toast } = useToast();
 
     return useMutation({
-        mutationFn: async (item: InsertMediaCoverage) => {
-            const res = await apiRequest("POST", "/api/media-coverage", item);
+        mutationFn: async (data: FormData | InsertMediaCoverage) => {
+            let body;
+            let headers = {};
+
+            if (data instanceof FormData) {
+                body = data;
+                // Content-Type header is set automatically by browser for FormData
+            } else {
+                body = JSON.stringify(data);
+                headers = { "Content-Type": "application/json" };
+            }
+
+            const res = await fetch("/api/media-coverage", {
+                method: "POST",
+                headers,
+                body: body as BodyInit,
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.message || "Failed to create media coverage");
+            }
             return res.json();
         },
         onSuccess: () => {
@@ -40,9 +60,28 @@ export function useUpdateMediaCoverage() {
     const { toast } = useToast();
 
     return useMutation({
-        mutationFn: async (item: UpdateMediaCoverageRequest & { id: number }) => {
-            const { id, ...data } = item;
-            const res = await apiRequest("PUT", `/api/media-coverage/${id}`, data);
+        mutationFn: async (input: { id: number; data: FormData | UpdateMediaCoverageRequest }) => {
+            const { id, data } = input;
+            let body;
+            let headers = {};
+
+            if (data instanceof FormData) {
+                body = data;
+            } else {
+                body = JSON.stringify(data);
+                headers = { "Content-Type": "application/json" };
+            }
+
+            const res = await fetch(`/api/media-coverage/${id}`, {
+                method: "PUT",
+                headers,
+                body: body as BodyInit,
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.message || "Failed to update media coverage");
+            }
             return res.json();
         },
         onSuccess: () => {

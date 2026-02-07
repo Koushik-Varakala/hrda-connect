@@ -145,6 +145,60 @@ export async function registerRoutes(
   await setupAuth(app);
   registerAuthRoutes(app);
 
+  // === MULTER CONFIG ===
+  const fs = await import("fs");
+  const path = await import("path");
+  const multer = (await import("multer")).default;
+
+  // Ensure documents directory exists
+  const documentsDir = path.join(process.cwd(), "client/public/documents");
+  if (!fs.existsSync(documentsDir)) {
+    fs.mkdirSync(documentsDir, { recursive: true });
+  }
+
+  // Ensure uploads directory exists for images
+  const uploadsDir = path.join(process.cwd(), "client/public/uploads");
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, documentsDir);
+      },
+      filename: (req, file, cb) => {
+        cb(null, file.originalname);
+      }
+    }),
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype === "application/pdf") {
+        cb(null, true);
+      } else {
+        cb(new Error("Only PDF files are allowed"));
+      }
+    }
+  });
+
+  const imageUpload = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, uploadsDir);
+      },
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+      }
+    }),
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith("image/")) {
+        cb(null, true);
+      } else {
+        cb(new Error("Only image files are allowed"));
+      }
+    }
+  });
+
   // === API ROUTES ===
 
   // Announcements
@@ -210,16 +264,42 @@ export async function registerRoutes(
     res.json(data);
   });
 
-  app.post(api.achievements.create.path, isAuthenticated, async (req, res) => {
-    const input = api.achievements.create.input.parse(req.body);
-    const result = await storage.createAchievement(input);
-    res.status(201).json(result);
+  app.post(api.achievements.create.path, isAuthenticated, imageUpload.single("image"), async (req, res) => {
+    try {
+      const inputData = { ...req.body };
+      if (req.file) {
+        inputData.imageUrl = `/uploads/${req.file.filename}`;
+      }
+      // Handle boolean conversion if coming from FormData
+      if (typeof inputData.active === 'string') inputData.active = inputData.active === 'true';
+
+      const input = api.achievements.create.input.parse(inputData);
+      const result = await storage.createAchievement(input);
+      res.status(201).json(result);
+    } catch (err) {
+      if (err instanceof z.ZodError) res.status(400).json(err);
+      else res.status(500).json({ message: "Failed to create achievement" });
+    }
   });
 
-  app.put(api.achievements.update.path, isAuthenticated, async (req, res) => {
-    const result = await storage.updateAchievement(Number(req.params.id), req.body);
-    if (!result) return res.status(404).json({ message: "Not found" });
-    res.json(result);
+  app.put(api.achievements.update.path, isAuthenticated, imageUpload.single("image"), async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const inputData = { ...req.body };
+      if (req.file) {
+        inputData.imageUrl = `/uploads/${req.file.filename}`;
+      }
+      // Handle boolean conversion if coming from FormData
+      if (typeof inputData.active === 'string') inputData.active = inputData.active === 'true';
+
+      // We need to partial parse strictly or just pass to storage
+      // The schema might expect dates as strings which is fine
+      const result = await storage.updateAchievement(id, inputData);
+      if (!result) return res.status(404).json({ message: "Not found" });
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to update achievement" });
+    }
   });
 
   app.delete(api.achievements.delete.path, isAuthenticated, async (req, res) => {
@@ -239,19 +319,38 @@ export async function registerRoutes(
     res.json(data);
   });
 
-  app.post("/api/media-coverage", isAuthenticated, async (req, res) => {
-    // Manual zod parse or trust body for now, ideally strictly typed but I didn't export route input schemas in shared/routes yet
-    // I'll reuse the insert schema
-    const { insertMediaCoverageSchema } = await import("@shared/schema");
-    const input = insertMediaCoverageSchema.parse(req.body);
-    const result = await storage.createMediaCoverage(input);
-    res.status(201).json(result);
+  app.post("/api/media-coverage", isAuthenticated, imageUpload.single("image"), async (req, res) => {
+    try {
+      const { insertMediaCoverageSchema } = await import("@shared/schema");
+      const inputData = { ...req.body };
+      if (req.file) {
+        inputData.imageUrl = `/uploads/${req.file.filename}`;
+      }
+      if (typeof inputData.active === 'string') inputData.active = inputData.active === 'true';
+
+      const input = insertMediaCoverageSchema.parse(inputData);
+      const result = await storage.createMediaCoverage(input);
+      res.status(201).json(result);
+    } catch (err) {
+      if (err instanceof z.ZodError) res.status(400).json(err);
+      else res.status(500).json({ message: "Failed to create media coverage" });
+    }
   });
 
-  app.put("/api/media-coverage/:id", isAuthenticated, async (req, res) => {
-    const result = await storage.updateMediaCoverage(Number(req.params.id), req.body);
-    if (!result) return res.status(404).json({ message: "Not found" });
-    res.json(result);
+  app.put("/api/media-coverage/:id", isAuthenticated, imageUpload.single("image"), async (req, res) => {
+    try {
+      const inputData = { ...req.body };
+      if (req.file) {
+        inputData.imageUrl = `/uploads/${req.file.filename}`;
+      }
+      if (typeof inputData.active === 'string') inputData.active = inputData.active === 'true';
+
+      const result = await storage.updateMediaCoverage(Number(req.params.id), inputData);
+      if (!result) return res.status(404).json({ message: "Not found" });
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to update media coverage" });
+    }
   });
 
   app.delete("/api/media-coverage/:id", isAuthenticated, async (req, res) => {
@@ -474,35 +573,6 @@ export async function registerRoutes(
   });
 
   // Election Documents
-  const fs = await import("fs");
-  const path = await import("path");
-  const multer = (await import("multer")).default;
-
-  // Ensure documents directory exists
-  const documentsDir = path.join(process.cwd(), "client/public/documents");
-  if (!fs.existsSync(documentsDir)) {
-    fs.mkdirSync(documentsDir, { recursive: true });
-  }
-
-  const upload = multer({
-    storage: multer.diskStorage({
-      destination: (req, file, cb) => {
-        cb(null, documentsDir);
-      },
-      filename: (req, file, cb) => {
-        // Keep original name but sanitise slightly if needed, or just use original
-        // Using original name as per requirement to match existing files
-        cb(null, file.originalname);
-      }
-    }),
-    fileFilter: (req, file, cb) => {
-      if (file.mimetype === "application/pdf") {
-        cb(null, true);
-      } else {
-        cb(new Error("Only PDF files are allowed"));
-      }
-    }
-  });
 
   app.get("/api/election-documents", async (req, res) => {
     const data = await storage.getElectionDocuments();

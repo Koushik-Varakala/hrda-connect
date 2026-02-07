@@ -10,7 +10,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertMediaCoverageSchema } from "@shared/schema";
 import { useState } from "react";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Upload, X, Image as ImageIcon } from "lucide-react";
 
 export default function ManageMedia() {
     const { data: mediaItems, isLoading } = useMediaCoverage();
@@ -19,6 +19,8 @@ export default function ManageMedia() {
     const deleteMutation = useDeleteMediaCoverage();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
+    const [file, setFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const form = useForm({
         resolver: zodResolver(insertMediaCoverageSchema),
@@ -32,24 +34,55 @@ export default function ManageMedia() {
     });
 
     const onSubmit = (data: any) => {
+        const formData = new FormData();
+        formData.append("title", data.title);
+        formData.append("description", data.description);
+        formData.append("date", data.date);
+        formData.append("active", String(data.active));
+
+        if (file) {
+            formData.append("image", file);
+        } else if (editingItem && data.imageUrl) {
+            formData.append("imageUrl", data.imageUrl);
+        }
+
         if (editingItem) {
-            updateMutation.mutate({ id: editingItem.id, ...data }, {
-                onSuccess: () => { setIsDialogOpen(false); setEditingItem(null); form.reset(); }
+            updateMutation.mutate({ id: editingItem.id, data: formData }, {
+                onSuccess: () => { handleClose(); }
             });
         } else {
-            createMutation.mutate(data, {
-                onSuccess: () => { setIsDialogOpen(false); form.reset(); }
+            createMutation.mutate(formData, {
+                onSuccess: () => { handleClose(); }
             });
         }
     };
 
+    const handleClose = () => {
+        setIsDialogOpen(false);
+        setEditingItem(null);
+        setFile(null);
+        setPreviewUrl(null);
+        form.reset();
+    };
+
     const openEdit = (item: any) => {
         setEditingItem(item);
+        setPreviewUrl(item.imageUrl);
         form.reset({
             ...item,
             date: item.date ? new Date(item.date).toISOString().split('T')[0] : ""
         });
         setIsDialogOpen(true);
+    };
+
+    const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setFile(file);
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+            form.setValue("imageUrl", "/uploads/placeholder"); // Dummy valid URL to pass Zod validation if required, or make schema optional
+        }
     };
 
     const handleDelete = (id: number) => {
@@ -60,7 +93,7 @@ export default function ManageMedia() {
         <AdminLayout>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Manage Media Coverage</h1>
-                <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) { setEditingItem(null); form.reset(); } }}>
+                <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsDialogOpen(true); }}>
                     <DialogTrigger asChild>
                         <Button><Plus className="w-4 h-4 mr-2" /> Add Clipping</Button>
                     </DialogTrigger>
@@ -79,9 +112,36 @@ export default function ManageMedia() {
                                 <Textarea {...form.register("description")} placeholder="Summary of the news..." />
                             </div>
 
-                            <div>
-                                <label className="text-sm font-medium">Image URL</label>
-                                <Input {...form.register("imageUrl")} placeholder="/press/image.jpg" />
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Image</label>
+
+                                <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer relative">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={onFileChange}
+                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                    />
+
+                                    {previewUrl ? (
+                                        <div className="relative w-full">
+                                            <img src={previewUrl} alt="Preview" className="h-40 w-full object-contain rounded-md" />
+                                            <div className="text-center mt-2">
+                                                <p className="text-sm text-emerald-600 font-medium">
+                                                    {file ? "New Image Selected" : "Current Image"}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">Tap to change</p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center">
+                                            <ImageIcon className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                                            <p className="text-sm font-medium text-slate-700">Tap to upload image</p>
+                                            <p className="text-xs text-muted-foreground">JPG, PNG, WebP</p>
+                                        </div>
+                                    )}
+                                </div>
+                                <input type="hidden" {...form.register("imageUrl")} />
                             </div>
 
                             <div>
