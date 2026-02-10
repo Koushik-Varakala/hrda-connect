@@ -20,10 +20,21 @@ const registrationSchema = z.object({
     email: z.string().email("Invalid email address"),
     phone: z.string().min(10, "Valid phone number required"),
     address: z.string().min(5, "Address is required"),
+    district: z.string().min(1, "District is required"),
     // Couple specific
     spouseName: z.string().optional(),
     spouseTgmcId: z.string().optional(),
 });
+
+const districts = [
+    "Adilabad", "Bhadradri Kothagudem", "Hanumakonda", "Hyderabad", "Jagtial",
+    "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy",
+    "Karimnagar", "Khammam", "Kumuram Bheem Asifabad", "Mahabubabad",
+    "Mahabubnagar", "Mancherial", "Medak", "Medchal-Malkajgiri", "Mulugu",
+    "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad",
+    "Peddapalli", "Rajanna Sircilla", "Ranga Reddy", "Sangareddy",
+    "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal", "Yadadri Bhuvanagiri"
+];
 
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
 
@@ -110,6 +121,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             email: "",
             phone: "",
             address: "",
+            district: "",
             spouseName: "",
             spouseTgmcId: "",
         },
@@ -220,7 +232,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                                         name="tgmcId"
                                         render={({ field }) => (
                                             <FormItem className="flex-1">
-                                                <FormLabel>TGMC Registration Number</FormLabel>
+                                                <FormLabel>Telangana Medical Council ID</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="Enter TGMC ID (e.g. 17599)" {...field} />
                                                 </FormControl>
@@ -311,7 +323,30 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                                 />
                             </div>
 
-
+                            <FormField
+                                control={form.control}
+                                name="district"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Choose the district you want to represent</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select District" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent className="max-h-[200px]">
+                                                {districts.map((d) => (
+                                                    <SelectItem key={d} value={d}>
+                                                        {d}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <FormField
                                 control={form.control}

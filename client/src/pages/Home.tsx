@@ -7,9 +7,17 @@ import { Link } from "wouter";
 import { useAnnouncements } from "@/hooks/use-announcements";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { Panel } from "@shared/schema";
+import { Vote } from "lucide-react";
 
 export default function Home() {
   const { data: announcements, isLoading } = useAnnouncements();
+  const { data: panels } = useQuery<Panel[]>({
+    queryKey: ["/api/panels"],
+  });
+
+  const electedMembers = panels?.filter(p => p.category === 'elected_member') || [];
 
   return (
     <Layout>
@@ -122,6 +130,73 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Elected Panel Members - Horizontal Scroll */}
+      {electedMembers.length > 0 && (
+        <section className="py-20 bg-slate-900 text-white overflow-hidden">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-10">
+              <div>
+                <h2 className="text-3xl text-headline font-serif font-bold mb-2 flex items-center gap-2">
+                  <Vote className="w-8 h-8 text-primary" />
+                  Elected Panel Members
+                </h2>
+                <p className="text-slate-400">Our representatives leading the change.</p>
+              </div>
+              <Button asChild variant="outline" className="border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 hidden md:flex">
+                <Link href="/panels">View All Members</Link>
+              </Button>
+            </div>
+
+            <div className="flex overflow-x-auto pb-8 gap-6 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800">
+              {electedMembers.map((member) => (
+                <motion.div
+                  key={member.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="snap-start shrink-0 w-[280px] bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:bg-slate-800 transition-colors"
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-24 h-24 rounded-full bg-slate-700 mb-4 flex items-center justify-center overflow-hidden border-4 border-slate-600">
+                      {member.imageUrl ? (
+                        <img
+                          src={member.imageUrl}
+                          alt={member.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-2xl font-bold text-slate-400">
+                          {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">{member.name}</h3>
+                    <Badge variant="secondary" className="bg-primary/20 text-primary hover:bg-primary/30 border-none mb-3">
+                      Elected Member
+                    </Badge>
+                  </div>
+                </motion.div>
+              ))}
+
+              <div className="snap-start shrink-0 w-[100px] flex items-center justify-center">
+                <Link href="/election-panel" className="flex flex-col items-center gap-2 text-slate-500 hover:text-primary transition-colors group">
+                  <div className="w-12 h-12 rounded-full border-2 border-slate-700 flex items-center justify-center group-hover:border-primary transition-colors">
+                    <ArrowRight className="w-5 h-5" />
+                  </div>
+                  <span className="text-sm font-medium">View All</span>
+                </Link>
+              </div>
+            </div>
+
+            <div className="md:hidden mt-4 text-center">
+              <Button asChild variant="outline" className="w-full border-slate-700 text-slate-300">
+                <Link href="/election-panel">View All Members</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Announcements */}
       <section className="py-20 bg-slate-50">

@@ -1,6 +1,7 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { CheckCircle2 } from "lucide-react";
 
 export default function About() {
   return (
@@ -32,12 +33,12 @@ export default function About() {
                 </p>
               </div>
             </div>
-            <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl">
+            <div className="rounded-2xl overflow-hidden shadow-2xl">
               {/* Unsplash: Medical team meeting */}
               <img
                 src="/HRDA-group.jpeg"
                 alt="HRDA History"
-                className="absolute inset-0 w-full h-full object-cover"
+                className="w-full h-auto object-cover"
               />
             </div>
           </div>
@@ -54,19 +55,21 @@ export default function About() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-6">
             {[
-              { title: "Medical Education", desc: "Ensuring quality standards, fair admission processes, and adequate infrastructure in medical colleges." },
-              { title: "Public Health", desc: "Strengthening primary healthcare centers and ensuring accessible medical services for rural populations." },
-              { title: "Doctors' Rights", desc: "Advocating for safety in the workplace, fair compensation, and protection against violence." },
-              { title: "Policy Transparency", desc: "Demanding transparency in the functioning of medical councils and regulatory bodies." },
-              { title: "Research & Innovation", desc: "Promoting medical research and adopting modern technologies in healthcare delivery." },
-              { title: "Community Welfare", desc: "Conducting health camps and awareness programs for the general public." }
+              "To work for Reforms in present Healthcare System, especially in Primary Health Sector of both Rural & Urban areas (Universal Health Care).",
+              "To work until separate medical recruitment board is established for calendar year recruitment of Healthcare Professionals for improved healthcare delivery.",
+              "To promote Ethical Practice among Registered Healthcare Professionals.",
+              "To Conduct Health Awareness Programs and Multidisciplinary Health Camps.",
+              "To Work for Total ban on Quack practice which is causing adverse effects on health of people.",
+              "To pursue for strict Act implementation for not issuing of drugs other than on-counter medicines by pharmacies.",
+              "To work for minimum wages for duty doctors in private sector.",
+              "To bring the Doctors under common platform to deal with assaults on Healthcare Professionals"
             ].map((item, i) => (
-              <Card key={i} className="card-hover border-t-4 border-t-primary">
-                <CardContent className="pt-6">
-                  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm">{item.desc}</p>
+              <Card key={i} className="card-hover border-l-4 border-l-primary border-t-0 bg-white shadow-sm">
+                <CardContent className="pt-6 flex gap-4">
+                  <CheckCircle2 className="w-6 h-6 text-primary shrink-0" />
+                  <p className="text-slate-700 text-sm md:text-base leading-relaxed">{item}</p>
                 </CardContent>
               </Card>
             ))}

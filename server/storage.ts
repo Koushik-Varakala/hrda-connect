@@ -349,6 +349,7 @@ export class MemStorage implements IStorage {
       tgmcId: insert.tgmcId ?? null,
       email: insert.email ?? null,
       address: insert.address ?? null,
+      district: insert.district ?? null,
       razorpayTxnId: insert.razorpayTxnId ?? null,
       membershipType: insert.membershipType ?? 'single',
       paymentStatus: insert.paymentStatus ?? 'pending',

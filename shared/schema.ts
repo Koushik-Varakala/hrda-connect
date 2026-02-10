@@ -1,9 +1,15 @@
-import { pgTable, text, serial, boolean, timestamp, varchar, date } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, boolean, timestamp, varchar, date, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 export * from "./models/auth";
 
 // === TABLE DEFINITIONS ===
+
+export const sessions = pgTable("session", {
+  sid: varchar("sid").primaryKey(),
+  sess: json("sess").notNull(),
+  expire: timestamp("expire", { precision: 6 }).notNull(),
+});
 
 export const announcements = pgTable("announcements", {
   id: serial("id").primaryKey(),
@@ -64,6 +70,7 @@ export const registrations = pgTable("registrations", {
   email: text("email"),
   phone: text("phone").notNull(),
   address: text("address"),
+  district: text("district"),
   membershipType: text("membership_type").default('single'), // single, couple
   paymentStatus: text("payment_status").default('pending'), // pending, success, failed
   razorpayTxnId: text("razorpay_txn_id"),

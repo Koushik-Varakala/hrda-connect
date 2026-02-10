@@ -577,6 +577,7 @@ export async function registerRoutes(
           phone: newReg.phone,
           email: newReg.email || "",
           address: newReg.address || "",
+          district: newReg.district || "",
           membershipType: newReg.membershipType || "single",
           paymentStatus: "success",
           status: "verified",
