@@ -24,7 +24,7 @@ export default function Search() {
     <Layout>
       <div className="bg-slate-50 py-12">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-serif font-bold mb-4">Verify & Update TGMC ID</h1>
+          <h1 className="text-4xl font-serif font-bold mb-4">Search & Update TGMC ID</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Search for registered doctors in the HRDA database using their Telangana State Medical Council (TGMC) ID.
             You can also update your contact details here.
@@ -157,7 +157,12 @@ function ResultCard({ registration }: { registration: any }) {
               {registration.status?.replace('_', ' ')}
             </span>
           </div>
-          <p className="text-muted-foreground mb-1">TGMC ID: <span className="text-foreground font-medium">{registration.tgmcId}</span></p>
+          <div className="flex flex-col gap-1 mb-2">
+            <p className="text-muted-foreground">TGMC ID: <span className="text-foreground font-medium">{registration.tgmcId}</span></p>
+            {registration.hrdaId && (
+              <p className="text-muted-foreground">HRDA ID: <span className="text-primary font-bold">{registration.hrdaId}</span></p>
+            )}
+          </div>
           {registration.membershipType && <p className="text-sm text-slate-500 capitalize">{registration.membershipType} Membership</p>}
 
           <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-slate-600">

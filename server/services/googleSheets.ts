@@ -153,6 +153,7 @@ export class GoogleSheetsService {
             // Map back to our internal structure used by search page
             return {
                 id: row.get("S.No"), // Use S.No as ID
+                hrdaId: row.get("HRDAREGISTRATIONNUMBER"),
                 tgmcId: row.get("MedicalCounselRegistration"),
                 firstName: row.get("Name"), // We'll have to return full name as first name or split logic
                 lastName: "", // handled by consumer or split

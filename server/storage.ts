@@ -346,6 +346,7 @@ export class MemStorage implements IStorage {
       id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      hrdaId: insert.hrdaId ?? null,
       tgmcId: insert.tgmcId ?? null,
       email: insert.email ?? null,
       address: insert.address ?? null,

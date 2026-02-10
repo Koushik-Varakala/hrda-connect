@@ -135,6 +135,209 @@ async function seedDatabase() {
       });
     }
   }
+
+  // Seed Achievements
+  const achievements = await storage.getAchievements();
+  if (achievements.length === 0) {
+    const seedAchievements = [
+      // Legal Victories
+      {
+        title: "Revoked G.Os 41 and 43 (PG Fee Reduction)",
+        description: "Led to a significant fee reduction (115% to 990%) for PG courses in private medical colleges for 2017-2019 batches, saving approx. ₹200 crores for 1500 students.",
+        category: "legal",
+        date: "2019-01-01"
+      },
+      {
+        title: "Assistance to APJU (G.Os 72 and 77)",
+        description: "Provided legal assistance resulting in cancellation of exorbitant fee hikes for 2017-2019 batches in Andhra Pradesh private medical colleges.",
+        category: "legal",
+        date: "2019-02-01"
+      },
+      {
+        title: "Exposed Quackery Lapses via RTI",
+        description: "Revealed through RTI that Telangana Govt hadn't issued a single training certificate to quacks nor enacted laws for first aid centers.",
+        category: "legal", // or association
+        date: "2018-05-01"
+      },
+      {
+        title: "Halted Quack Training Program",
+        description: "Successfully halted quacks training program through a PIL filed in 2018, and reopened the case in 2023 to seek cancellation of GOs 1273 and 428.",
+        category: "legal",
+        date: "2018-06-01"
+      },
+      {
+        title: "Cancelled G.O 78 (Super Specialty Fee Hike)",
+        description: "With student support, cancelled G.O 78 which permitted exorbitant fee hike (3.7L to 25L/annum) for super specialty courses.",
+        category: "legal",
+        date: "2019-03-01"
+      },
+      {
+        title: "Cancelled G.O 149 (AP Super Specialty Fee Hike)",
+        description: "Played a key role in cancellation of G.O 149 involving similar fee hike for super specialty courses in AP.",
+        category: "legal",
+        date: "2019-04-01"
+      },
+      {
+        title: "Fought Against PG Seat Blocking",
+        description: "Solely fought against PG seats blocking, leading to a Mop-up round for management quota by KNRUHS.",
+        category: "legal",
+        date: "2020-01-01"
+      },
+      {
+        title: "Opposed Non-Medical TVVP Commissioner",
+        description: "Opposed appointment of non-medical person as TVVP Commissioner resulting in cancellation under HRDA's case against GO 604.",
+        category: "legal",
+        date: "2020-02-01"
+      },
+      {
+        title: "Defunct Outdated Council Members",
+        description: "High Court defunct existing council member who continued since 2007 without elections for over a decade and failed to establish Anti Quackery Committees.",
+        category: "legal",
+        date: "2021-01-01"
+      },
+      {
+        title: "High Court Order for 13 TSMC Seats",
+        description: "High Court issued order to conduct elections for 13 members instead of reduced 5 proposed by Govt, preserving TSMC's autonomy.",
+        category: "legal",
+        date: "2022-01-01"
+      },
+      {
+        title: "Supreme Court Victory for Elections",
+        description: "HRDA filed caveat in Supreme Court against Govt/TSMC petition to stop elections. SC upheld High Court decision for 13 member elections.",
+        category: "legal",
+        date: "2023-01-01"
+      },
+      {
+        title: "PIL for New OGH Building",
+        description: "Actively pursuing construction of new building for Osmania General Hospital through PIL, currently in final stages.",
+        category: "legal",
+        date: "2023-05-01"
+      },
+      {
+        title: "Reduced Bank Guarantee Duration",
+        description: "Successfully reduced bank guarantee for pvt medical college admissions from 2 years to 1 year through High Court petition.",
+        category: "legal",
+        date: "2021-06-01"
+      },
+      {
+        title: "Interim Order on G.O 20 (2020-22 Fee Hike)",
+        description: "Obtained interim order on G.O 20 addressing fee hike for PG courses (2020-22 batches), allowing 1600 students to join with reduced fees.",
+        category: "legal",
+        date: "2020-05-01"
+      },
+      {
+        title: "PG Stipend Claim Assistance",
+        description: "Provided legal assistance to 2018 batch PG students enabling them to claim stipend of Rs. 80,500 for May 2021.",
+        category: "legal",
+        date: "2021-05-01"
+      },
+      {
+        title: "Release of Original Certificates",
+        description: "Filed complaint with TS Human Rights Commission to secure release of original certificates by pvt colleges to course-completed PGs.",
+        category: "legal",
+        date: "2021-07-01"
+      },
+
+      // Association / Advocacy
+      {
+        title: "Completion of Pending Recruitments",
+        description: "Consistent efforts led to completion of recruitments for 2017 DME, 2017 Tutors, 2018 CAS, 2018 TVVP specialist, and GDMO positions.",
+        category: "association",
+        date: "2019-01-01"
+      },
+      {
+        title: "Medical & Health Services Recruitment Board",
+        description: "HRDA's success resulted in GO for creation of MHSRB, streamlining recruitment for CAS and Assistant Professor positions.",
+        category: "association",
+        date: "2020-01-01"
+      },
+      {
+        title: "Pioneering Crowd Funding",
+        description: "HRDA was the pioneering association in Telangana to initiate crowd funding efforts.",
+        category: "association",
+        date: "2020-03-01"
+      },
+      {
+        title: "COVID-19 Relief Distribution",
+        description: "Distributed medical supplies worth 60 Lakhs (PPEs, N95 masks, sanitizers) to doctors throughout the state.",
+        category: "association",
+        date: "2020-04-01"
+      },
+      {
+        title: "Recognizing COVID Warriors",
+        description: "Felicitated 2000 COVID-19 warrior doctors for their dedicated services.",
+        category: "association",
+        date: "2021-01-01"
+      },
+      {
+        title: "Plasma Donation Drives",
+        description: "Coordinated plasma donation drives to aid COVID-19 patients.",
+        category: "association",
+        date: "2020-06-01"
+      },
+      {
+        title: "Special ICU for Doctors",
+        description: "Secured special ICU ward allocation for govt doctors and families at NIMS, Punjagutta.",
+        category: "association",
+        date: "2020-07-01"
+      },
+      {
+        title: "Telangana Vaidhya Garjana",
+        description: "Organized massive protest against training to quacks.",
+        category: "association",
+        date: "2018-01-01"
+      },
+      {
+        title: "Protest Against NMC Bill",
+        description: "Advocated and protested against the NMC BILL in New Delhi.",
+        category: "association",
+        date: "2019-01-01"
+      },
+      {
+        title: "Collection of Quacks' Prescriptions",
+        description: "Initiated movement to collect quacks' prescriptions to combat quackery.",
+        category: "association",
+        date: "2018-01-01"
+      },
+
+      // Post Election Reforms
+      {
+        title: "New Premises within 8 Months",
+        description: "Moved TSMC into a new modern building within 8 months of assuming office.",
+        category: "post_election",
+        date: "2024-08-01"
+      },
+      {
+        title: "Aggressive Anti-Quackery Campaign",
+        description: "Launched campaign filing 600+ FIRs against quacks, setting a national precedent.",
+        category: "post_election",
+        date: "2024-01-01"
+      },
+      {
+        title: "Digital Council Transformation",
+        description: "Made all registrations and renewals fully online and cut down exorbitant charges.",
+        category: "post_election",
+        date: "2024-02-01"
+      },
+      {
+        title: "Transparent FMGE Internships",
+        description: " ensured transparent, fair, and hassle-free internship allotments for FMGs.",
+        category: "post_election",
+        date: "2024-03-01"
+      },
+      {
+        title: "Drafting National Anti-Quackery Guidelines",
+        description: "NMC appointed HRDA Chairman Dr. Mahesh Kumar K to draft Anti-Quackery Guidelines for India.",
+        category: "post_election",
+        date: "2024-05-01"
+      }
+    ];
+
+    for (const item of seedAchievements) {
+      // @ts-ignore
+      await storage.createAchievement({ ...item, active: true });
+    }
+  }
 }
 
 export async function registerRoutes(
@@ -429,8 +632,29 @@ export async function registerRoutes(
   app.get(api.registrations.search.path, async (req, res) => {
     const tgmcId = req.query.tgmcId as string;
     const data = await storage.searchRegistrations({ tgmcId });
+
     if (data.length === 0) return res.status(404).json({ message: "Not found" });
-    res.json(data);
+
+    // Lazy sync: If HRDA ID is missing locally, check Google Sheets
+    // Iterate through results (usually 1)
+    const updatedData = await Promise.all(data.map(async (reg) => {
+      if (!reg.hrdaId && reg.tgmcId) {
+        try {
+          const { googleSheetsService } = await import("./services/googleSheets");
+          const sheetReg = await googleSheetsService.findRegistrationByTGMC(reg.tgmcId);
+          if (sheetReg && sheetReg.hrdaId) {
+            // Update local DB
+            await storage.updateRegistration(reg.id, { hrdaId: sheetReg.hrdaId });
+            return { ...reg, hrdaId: sheetReg.hrdaId };
+          }
+        } catch (e) {
+          console.error("Lazy sync failed for", reg.tgmcId, e);
+        }
+      }
+      return reg;
+    }));
+
+    res.json(updatedData);
   });
 
   app.post(api.registrations.create.path, async (req, res) => {
@@ -588,6 +812,8 @@ export async function registerRoutes(
 
         if (sheetId) {
           formattedHrdaId = sheetId;
+          // Update local DB with HRDA ID
+          await storage.updateRegistration(newReg.id, { hrdaId: String(formattedHrdaId) });
         }
 
       } catch (e) {

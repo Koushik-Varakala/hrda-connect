@@ -64,6 +64,7 @@ export const departments = pgTable("departments", {
 // Cache/Mirror of registrations for search & verification
 export const registrations = pgTable("registrations", {
   id: serial("id").primaryKey(),
+  hrdaId: text("hrda_id"), // Added field for HRDA Registration Number
   tgmcId: text("tgmc_id"), // Can be null if not yet assigned
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),

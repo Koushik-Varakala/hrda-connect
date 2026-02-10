@@ -159,24 +159,92 @@ export default function Achievements() {
         </div>
       </section>
 
+      {/* TGMC Elections 2023 Section */}
+      <section className="py-16 bg-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">TGMC Elections 2023</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">
+              A historic turning point for the medical fraternity in Telangana.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            {/* Manifesto */}
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+              <div className="flex items-center gap-3 mb-6 border-b pb-4">
+                <Vote className="w-8 h-8 text-primary" />
+                <h3 className="text-2xl font-serif font-bold text-slate-800">Election Manifesto</h3>
+              </div>
+              <p className="text-slate-600 mb-6 italic">
+                "A roadmap rooted in years of struggle to restore dignity and modernize the Council."
+              </p>
+              <ul className="space-y-4">
+                {[
+                  "State-of-the-Art TSMC Building",
+                  "Eradication of Quackery & Crosspathy",
+                  "Digital Transformation (Online Services)",
+                  "Affordable Fees (Rationalize charges)",
+                  "Enforcing Ethics & Professional Dignity",
+                  "FMGE & Stipend Reforms (Equal stipends)",
+                  "Professional Development (CPD & CME)",
+                  "Accountability (Audit last 15 years)"
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                      {idx + 1}
+                    </span>
+                    <span className="text-slate-700 font-medium">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Victory */}
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <ShieldCheck className="w-8 h-8 text-green-600" />
+                <h3 className="text-2xl font-serif font-bold text-slate-900">Unprecedented Victory</h3>
+              </div>
+              <div className="prose prose-lg text-slate-600">
+                <p className="mb-4">
+                  In December 2023, history was written. For the first time in 17 years, elections were held for 13 seats in the Telangana State Medical Council.
+                </p>
+                <div className="bg-green-50 border-l-4 border-green-500 p-6 my-6 rounded-r-lg">
+                  <p className="font-bold text-green-900 text-lg mb-2">
+                    HRDA won every single seat with a staggering majority.
+                  </p>
+                  <p className="text-green-800 text-sm">
+                    A clean sweep of all 13 elected positions, reiterating the absolute trust of doctors all over Telangana.
+                  </p>
+                </div>
+                <p>
+                  This victory was not merely about winning seats; it was a mandate for reform. It validated years of HRDA's struggle and set the stage for a new era of accountability and professional dignity.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Post Election Impact */}
       <section className="py-16 bg-slate-900 text-slate-100">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-serif font-bold mb-4">Post-Election Reforms</h2>
+            <h2 className="text-3xl text-headline font-serif font-bold mb-4">Post-Election Reforms</h2>
             <p className="text-slate-400 w-full max-w-2xl mx-auto">
               Delivering on promises: Key milestones achieved after the historic victory.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className=" grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {postElectionWins.map((win) => (
               <div key={win.id} className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-xl hover:bg-white/10 transition-colors">
-                <div className="mb-4 bg-blue-500/20 w-12 h-12 rounded-lg flex items-center justify-center text-blue-400">
+                <div className="text-headlinemb-4 bg-blue-500/20 w-12 h-12 rounded-lg flex items-center justify-center text-blue-400">
                   {/* Dynamic Icon placeholder or generic */}
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold mb-2">{win.title}</h3>
+                <h3 className="text-headline text-lg font-bold mb-2">{win.title}</h3>
                 <p className="text-sm text-slate-400">{win.description}</p>
               </div>
             ))}

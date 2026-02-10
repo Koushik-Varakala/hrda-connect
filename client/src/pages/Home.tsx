@@ -54,7 +54,7 @@ export default function Home() {
                 <Button asChild size="lg" variant="outline" className="bg-transparent border-white/20 text-white hover:bg-white/10 h-12 text-base">
                   <Link href="/search">
                     <Search className="mr-2 h-4 w-4" />
-                    Verify TGMC ID
+                    Search and Edit TGMC ID
                   </Link>
                 </Button>
               </div>
