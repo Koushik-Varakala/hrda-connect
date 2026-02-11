@@ -249,10 +249,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div>
             <h4 className="text-white font-semibold mb-4 text-base">Quick Links</h4>
             <ul className="space-y-3 text-sm">
+              <li><Link href="/" className="hover:text-white transition-colors hover:underline decoration-blue-500 underline-offset-4">Home</Link></li>
               <li><Link href="/about" className="hover:text-white transition-colors hover:underline decoration-blue-500 underline-offset-4">About Us</Link></li>
-              <li><Link href="/panels" className="hover:text-white transition-colors hover:underline decoration-blue-500 underline-offset-4">Panels</Link></li>
+              <li><Link href="/panels" className="hover:text-white transition-colors hover:underline decoration-blue-500 underline-offset-4">Leadership Panels</Link></li>
               <li><Link href="/achievements" className="hover:text-white transition-colors hover:underline decoration-blue-500 underline-offset-4">Achievements</Link></li>
-              <li><Link href="/search" className="hover:text-white transition-colors hover:underline decoration-blue-500 underline-offset-4">Verify a Doctor</Link></li>
+              <li><Link href="/gallery" className="hover:text-white transition-colors hover:underline decoration-blue-500 underline-offset-4">Gallery</Link></li>
+              <li><Link href="/media" className="hover:text-white transition-colors hover:underline decoration-blue-500 underline-offset-4">Media Coverage</Link></li>
+              <li><Link href="/membership" className="hover:text-white transition-colors hover:underline decoration-blue-500 underline-offset-4">Join HRDA</Link></li>
+              <li><Link href="/search" className="hover:text-white transition-colors hover:underline decoration-blue-500 underline-offset-4">Verify Membership</Link></li>
             </ul>
           </div>
 
