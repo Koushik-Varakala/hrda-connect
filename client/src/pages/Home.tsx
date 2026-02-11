@@ -86,54 +86,73 @@ export default function Home() {
       {/* Gallery Slideshow */}
       <GallerySlideshow />
 
-      {/* Mission & Vision Grid */}
-      <section className="py-16 md:py-24 bg-background">
+      {/* Announcements */}
+      <section className="py-16 md:py-24 bg-slate-50">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-none shadow-lg bg-white/50 backdrop-blur card-hover">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                  <Users className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle>United Community</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Bringing together doctors from all specialties to create a unified voice for the medical fraternity in Telangana.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="flex items-end justify-between mb-8 border-b-2 border-slate-200 pb-2">
+            <div className="relative">
+              <h2 className="text-3xl font-bold text-slate-900">Announcements</h2>
+              <div className="absolute -bottom-[10px] left-0 w-24 h-1 bg-[#007bff] rounded-full"></div>
+            </div>
+            <Button variant="ghost" className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 font-medium hidden md:flex items-center gap-1">
+              View All <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
 
-            <Card className="border-none shadow-lg bg-white/50 backdrop-blur card-hover">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center mb-4">
-                  <CheckCircle2 className="w-6 h-6 text-teal-600" />
-                </div>
-                <CardTitle>Policy Reform</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Actively engaging with policymakers to shape healthcare legislation that benefits both patients and practitioners.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid md:grid-cols-2 gap-6">
+            {isLoading ? (
+              <div className="col-span-2 text-center py-10 text-muted-foreground">Loading announcements...</div>
+            ) : announcements?.length === 0 ? (
+              <div className="col-span-2 text-center py-10 text-muted-foreground bg-white rounded-xl shadow-sm border">No active announcements</div>
+            ) : (
+              announcements?.filter(a => a.active).slice(0, 4).map((announcement) => {
+                const isNew = new Date(announcement.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // New if within last 7 days
+                return (
+                  <motion.div
+                    key={announcement.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="h-full"
+                  >
+                    <Card className="h-full border-none shadow-sm hover:shadow-md transition-shadow bg-white rounded-xl overflow-hidden group border-l-4 border-l-transparent hover:border-l-primary/50 relative">
+                      <CardContent className="p-6 flex flex-col h-full relative">
+                        {isNew && (
+                          <Badge className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white border-none px-2 py-0.5 text-xs font-semibold rounded-sm z-10">
+                            New
+                          </Badge>
+                        )}
+                        <div className="mb-4 pr-10">
+                          <h3 className="text-lg font-bold text-slate-900 leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                            {announcement.title}
+                          </h3>
+                        </div>
 
-            <Card className="border-none shadow-lg bg-white/50 backdrop-blur card-hover">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mb-4">
-                  <Megaphone className="w-6 h-6 text-indigo-600" />
-                </div>
-                <CardTitle>Public Advocacy</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Raising awareness about critical health issues and fighting for the dignity and safety of medical professionals.
-                </p>
-              </CardContent>
-            </Card>
+                        <p className="text-slate-600 text-sm mb-4 line-clamp-3 flex-grow leading-relaxed">
+                          {announcement.content}
+                        </p>
+
+                        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mt-auto pt-4 border-t border-slate-50">
+                          <div className="flex items-center gap-1.5 text-pink-500/80 bg-pink-50 px-2 py-1 rounded">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-days"><rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /><path d="M16 18h.01" /></svg>
+                            <span>{format(new Date(announcement.date), 'MMMM dd, yyyy')}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })
+            )}
+          </div>
+          <div className="mt-6 md:hidden text-center">
+            <Button variant="outline" className="w-full text-teal-600 border-teal-200">View All</Button>
           </div>
         </div>
       </section>
+
+
+
 
       {/* Elected Panel Members - Horizontal Scroll */}
       {
@@ -204,52 +223,55 @@ export default function Home() {
         )
       }
 
-      {/* Announcements */}
-      <section className="py-16 md:py-24 bg-slate-50">
+      {/* Mission & Vision Grid */}
+      <section className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">Latest Updates</h2>
-              <p className="text-muted-foreground">News and announcements from HRDA</p>
-            </div>
-            {/* Optionally add 'View All' link */}
-          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="border-none shadow-lg bg-white/50 backdrop-blur card-hover">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                  <Users className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle>United Community</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Bringing together doctors from all specialties to create a unified voice for the medical fraternity in Telangana.
+                </p>
+              </CardContent>
+            </Card>
 
-          <div className="grid gap-6">
-            {isLoading ? (
-              <div className="text-center py-10 text-muted-foreground">Loading announcements...</div>
-            ) : announcements?.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground bg-white rounded-xl shadow-sm border">No active announcements</div>
-            ) : (
-              announcements?.filter(a => a.active).slice(0, 3).map((announcement) => (
-                <motion.div
-                  key={announcement.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                >
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex flex-col md:flex-row gap-4">
-                        <div className="md:w-32 flex-shrink-0">
-                          <div className="bg-primary/10 text-primary rounded-lg p-3 text-center">
-                            <span className="block text-2xl font-bold leading-none">{format(new Date(announcement.date), 'dd')}</span>
-                            <span className="block text-sm font-medium uppercase mt-1">{format(new Date(announcement.date), 'MMM')}</span>
-                          </div>
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold mb-2 hover:text-primary transition-colors cursor-pointer">{announcement.title}</h3>
-                          <p className="text-muted-foreground">{announcement.content}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))
-            )}
+            <Card className="border-none shadow-lg bg-white/50 backdrop-blur card-hover">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center mb-4">
+                  <CheckCircle2 className="w-6 h-6 text-teal-600" />
+                </div>
+                <CardTitle>Policy Reform</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Actively engaging with policymakers to shape healthcare legislation that benefits both patients and practitioners.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-lg bg-white/50 backdrop-blur card-hover">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mb-4">
+                  <Megaphone className="w-6 h-6 text-indigo-600" />
+                </div>
+                <CardTitle>Public Advocacy</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Raising awareness about critical health issues and fighting for the dignity and safety of medical professionals.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
+
 
       {/* CTA */}
       <section className="py-16 md:py-24 bg-primary text-white">
