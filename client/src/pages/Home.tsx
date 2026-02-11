@@ -182,7 +182,7 @@ export default function Home() {
                     className="snap-start shrink-0 w-[280px] bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:bg-slate-800 transition-colors"
                   >
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-24 h-24 rounded-full bg-slate-700 mb-4 flex items-center justify-center overflow-hidden border-4 border-slate-600">
+                      <div className="w-40 h-40 rounded-full bg-slate-700 mb-6 flex items-center justify-center overflow-hidden border-4 border-slate-600 shadow-lg">
                         {member.imageUrl ? (
                           <img
                             src={member.imageUrl}
@@ -190,7 +190,7 @@ export default function Home() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <span className="text-2xl font-bold text-slate-400">
+                          <span className="text-4xl font-bold text-slate-400">
                             {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                           </span>
                         )}
