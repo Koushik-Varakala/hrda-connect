@@ -197,7 +197,7 @@ export default function Home() {
                       </div>
                       <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">{member.name}</h3>
                       <Badge variant="secondary" className="bg-primary/20 text-primary hover:bg-primary/30 border-none mb-3">
-                        Elected Member
+                        {member.role || "Elected Member"}
                       </Badge>
                     </div>
                   </motion.div>
