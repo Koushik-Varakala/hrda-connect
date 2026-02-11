@@ -273,16 +273,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </ul>
 
             <div className="flex gap-3">
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-blue-600 transition-all text-white hover:scale-110">
+              <a href="https://x.com/ReformsHrda" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-black transition-all text-white hover:scale-110" aria-label="Twitter (X)">
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-blue-700 transition-all text-white hover:scale-110">
+              <a href="https://www.facebook.com/hrda4people/" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-blue-700 transition-all text-white hover:scale-110" aria-label="Facebook">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-pink-600 transition-all text-white hover:scale-110">
+              <a href="https://www.instagram.com/hrda4people/" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-pink-600 transition-all text-white hover:scale-110" aria-label="Instagram">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-red-600 transition-all text-white hover:scale-110">
+              <a href="https://www.youtube.com/@healthcarereformsdoctorsas6094" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-red-600 transition-all text-white hover:scale-110" aria-label="YouTube">
                 <Youtube className="w-4 h-4" />
               </a>
             </div>
