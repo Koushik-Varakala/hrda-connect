@@ -32,10 +32,12 @@ import Media from "@/pages/Media";
 import ElectionPanel from "@/pages/ElectionPanel";
 import Gallery from "@/pages/Gallery";
 import ManageGallery from "@/pages/admin/ManageGallery";
+import ScrollToTop from "@/components/ScrollToTop";
 
 function Router() {
   return (
     <Switch>
+      <ScrollToTop />
       {/* Public Routes */}
       <Route path="/" component={Home} />
       <Route path="/about" component={About} />
