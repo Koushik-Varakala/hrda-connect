@@ -15,9 +15,9 @@ export default function Media() {
 
     return (
         <Layout>
-            <div className="bg-slate-900 text-white py-20 relative overflow-hidden">
+            <div className="bg-slate-900 text-white py-16 md:py-24 relative overflow-hidden">
                 <div className="absolute inset-0 bg-slate-800 opacity-50"></div>
-                <div className="container mx-auto px-4 relative z-10 text-center">
+                <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10 text-center">
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -36,8 +36,8 @@ export default function Media() {
                 </div>
             </div>
 
-            <div className="bg-white py-16">
-                <div className="container mx-auto px-4">
+            <div className="bg-white py-12 md:py-16">
+                <div className="container mx-auto px-4 md:px-6 lg:px-8">
                     {isLoading ? (
                         <div className="flex justify-center py-20">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

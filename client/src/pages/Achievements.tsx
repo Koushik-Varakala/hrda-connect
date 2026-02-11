@@ -31,9 +31,9 @@ export default function Achievements() {
   return (
     <Layout>
       {/* Hero Section */}
-      <div className="bg-slate-900 text-white py-20 relative overflow-hidden">
+      <div className="bg-slate-900 text-white py-16 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-10"></div>
-        <div className="container mx-auto px-4 relative z-10 text-center">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -54,8 +54,8 @@ export default function Achievements() {
 
       {/* Gallery / Highlights Section */}
       {galleryImages.length > 0 && (
-        <section className="py-16 bg-slate-50 border-b border-slate-200">
-          <div className="container mx-auto px-4">
+        <section className="py-16 md:py-20 bg-slate-50 border-b border-slate-200">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">Gallery & Highlights</h2>
               <p className="text-slate-600 max-w-2xl mx-auto">
@@ -100,8 +100,8 @@ export default function Achievements() {
       )}
 
       {/* Legal Victories Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
+      <section className="py-16 md:py-20 bg-white">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12">
 
             {/* Legal */}
@@ -160,8 +160,8 @@ export default function Achievements() {
       </section>
 
       {/* TGMC Elections 2023 Section */}
-      <section className="py-16 bg-blue-50">
-        <div className="container mx-auto px-4">
+      <section className="py-16 md:py-20 bg-blue-50">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">TGMC Elections 2023</h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
@@ -228,8 +228,8 @@ export default function Achievements() {
       </section>
 
       {/* Post Election Impact */}
-      <section className="py-16 bg-slate-900 text-slate-100">
-        <div className="container mx-auto px-4">
+      <section className="py-16 md:py-20 bg-slate-900 text-slate-100">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl text-headline font-serif font-bold mb-4">Post-Election Reforms</h2>
             <p className="text-slate-400 w-full max-w-2xl mx-auto">

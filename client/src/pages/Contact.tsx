@@ -23,8 +23,8 @@ export default function Contact() {
 
   return (
     <Layout>
-      <div className="bg-slate-50 py-12">
-        <div className="container mx-auto px-4">
+      <div className="bg-slate-50 py-12 md:py-16">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <h1 className="text-4xl font-serif font-bold text-center mb-4">Contact Us</h1>
           <p className="text-center text-muted-foreground max-w-2xl mx-auto">
             Get in touch with us for inquiries, support, or to volunteer.
@@ -32,7 +32,7 @@ export default function Contact() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
         <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
           {/* Contact Info */}
           <div>

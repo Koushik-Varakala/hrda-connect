@@ -13,14 +13,14 @@ export default function GalleryPage() {
         <Layout>
             <div className="min-h-screen bg-slate-50">
                 {/* Hero Section */}
-                <div className="bg-[#1a237e] text-white py-16">
-                    <div className="container mx-auto px-4 text-center">
+                <div className="bg-[#1a237e] text-white py-16 md:py-20">
+                    <div className="container mx-auto px-4 md:px-6 lg:px-8 text-center">
                         <h1 className="text-headline text-4xl md:text-5xl font-bold mb-4 font-serif">Media Gallery</h1>
 
                     </div>
                 </div>
 
-                <div className="container mx-auto px-4 py-12">
+                <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
                     {isLoading ? (
                         <div className="flex justify-center py-20">
                             <Loader2 className="h-12 w-12 animate-spin text-primary" />

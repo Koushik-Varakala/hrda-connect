@@ -23,8 +23,8 @@ export default function Search() {
 
   return (
     <Layout>
-      <div className="bg-slate-50 py-12">
-        <div className="container mx-auto px-4 text-center">
+      <div className="bg-slate-50 py-12 md:py-16">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-serif font-bold mb-4">Search & Update Details</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Search for registered doctors in the HRDA database using your <strong>Registered Phone Number</strong>.
@@ -33,7 +33,7 @@ export default function Search() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
         <div className="max-w-xl mx-auto mb-12">
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input

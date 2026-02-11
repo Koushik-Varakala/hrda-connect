@@ -64,7 +64,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           : "bg-white shadow-sm py-4"
           }`}
       >
-        <div className="container mx-auto px-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center group">
             <img
@@ -230,8 +230,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
-        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <footer className="bg-slate-900 text-slate-300 py-12 md:py-16 border-t border-slate-800">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-3 mb-6">
               <img src="/hrda_logo.png" alt="HRDA Logo" className="h-10 w-10 object-contain rounded-full bg-white p-1" />
@@ -288,7 +288,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </div>
-        <div className="container mx-auto px-4 mt-12 pt-8 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 mt-12 pt-8 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Healthcare Reforms Doctors Association. All rights reserved.</p>
           <div className="flex gap-6">
             <Link href="#" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>

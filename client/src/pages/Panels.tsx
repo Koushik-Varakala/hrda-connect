@@ -20,8 +20,8 @@ export default function Panels() {
 
   return (
     <Layout>
-      <div className="bg-slate-50 py-12">
-        <div className="container mx-auto px-4">
+      <div className="bg-slate-50 py-12 md:py-16">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <h1 className="text-4xl font-serif font-bold text-center mb-4">Leadership Panels</h1>
           <p className="text-center text-muted-foreground max-w-2xl mx-auto">
             Meet the dedicated doctors leading HRDA at the state and district levels.
@@ -29,7 +29,7 @@ export default function Panels() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
         {/* Elected Panel Section */}
         <div className="mb-16">
           <div className="text-center mb-10">

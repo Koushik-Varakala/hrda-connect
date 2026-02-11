@@ -28,7 +28,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-10"></div>
         {/* Unsplash: Doctor abstract background */}
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -87,8 +87,8 @@ export default function Home() {
       <GallerySlideshow />
 
       {/* Mission & Vision Grid */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
+      <section className="py-16 md:py-24 bg-background">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="border-none shadow-lg bg-white/50 backdrop-blur card-hover">
               <CardHeader>
@@ -138,8 +138,8 @@ export default function Home() {
       {/* Elected Panel Members - Horizontal Scroll */}
       {
         electedMembers.length > 0 && (
-          <section className="py-20 bg-slate-900 text-white overflow-hidden">
-            <div className="container mx-auto px-4">
+          <section className="py-16 md:py-24 bg-slate-900 text-white overflow-hidden">
+            <div className="container mx-auto px-4 md:px-6 lg:px-8">
               <div className="flex items-center justify-between mb-10">
                 <div>
                   <h2 className="text-3xl text-headline font-serif font-bold mb-2 flex items-center gap-2">
@@ -205,8 +205,8 @@ export default function Home() {
       }
 
       {/* Announcements */}
-      <section className="py-20 bg-slate-50">
-        <div className="container mx-auto px-4">
+      <section className="py-16 md:py-24 bg-slate-50">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-10">
             <div>
               <h2 className="text-3xl font-bold mb-2">Latest Updates</h2>
@@ -252,8 +252,8 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-primary text-white">
-        <div className="container mx-auto px-4 text-center">
+      <section className="py-16 md:py-24 bg-primary text-white">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6">Join the Movement for Better Healthcare</h2>
           <p className="text-blue-100 text-lg max-w-2xl mx-auto mb-10">
             Become a member of HRDA today and contribute to the future of the medical profession in Telangana.

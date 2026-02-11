@@ -6,8 +6,8 @@ import { CheckCircle2 } from "lucide-react";
 export default function About() {
   return (
     <Layout>
-      <div className="bg-slate-50 py-12">
-        <div className="container mx-auto px-4">
+      <div className="bg-slate-50 py-12 md:py-16">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <h1 className="text-4xl font-serif font-bold text-center mb-4">About HRDA</h1>
           <p className="text-center text-muted-foreground max-w-2xl mx-auto">
             Our history, mission, and the team behind the movement.
@@ -15,7 +15,7 @@ export default function About() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12 space-y-20">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16 space-y-16 md:space-y-20">
         {/* History */}
         <section>
           <div className="grid md:grid-cols-2 gap-12 items-center">
