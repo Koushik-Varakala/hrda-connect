@@ -30,6 +30,8 @@ import Login from "@/pages/Login";
 // New Pages
 import Media from "@/pages/Media";
 import ElectionPanel from "@/pages/ElectionPanel";
+import Gallery from "@/pages/Gallery";
+import ManageGallery from "@/pages/admin/ManageGallery";
 
 function Router() {
   return (
@@ -57,6 +59,10 @@ function Router() {
       <Route path="/admin/media" component={ManageMedia} />
       <Route path="/admin/departments" component={ManageDepartments} />
       <Route path="/admin/registrations" component={ManageRegistrations} />
+      <Route path="/admin/gallery" component={ManageGallery} />
+
+      {/* Gallery Route */}
+      <Route path="/gallery" component={Gallery} />
 
       {/* Login Route */}
       <Route path="/login" component={Login} />

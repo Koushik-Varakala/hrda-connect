@@ -15,18 +15,18 @@ export function useRegistrationsList() {
 }
 
 // Search (Public)
-export function useSearchRegistration(tgmcId: string | undefined) {
+export function useSearchRegistration(phone: string | undefined) {
   return useQuery({
-    queryKey: [api.registrations.search.path, tgmcId],
+    queryKey: [api.registrations.search.path, phone],
     queryFn: async () => {
-      if (!tgmcId) return null;
-      const url = `${api.registrations.search.path}?tgmcId=${tgmcId}`;
+      if (!phone) return null;
+      const url = `${api.registrations.search.path}?phone=${phone}`;
       const res = await fetch(url, { credentials: "include" });
       if (res.status === 404) return [];
       if (!res.ok) throw new Error("Failed to search");
       return api.registrations.search.responses[200].parse(await res.json());
     },
-    enabled: !!tgmcId && tgmcId.length > 2,
+    enabled: !!phone && phone.length > 2,
     retry: false,
   });
 }
@@ -43,7 +43,7 @@ export function useCreateRegistration() {
         body: JSON.stringify(data),
         credentials: "include",
       });
-      
+
       if (!res.ok) throw new Error("Failed to create registration");
       return api.registrations.create.responses[201].parse(await res.json());
     },

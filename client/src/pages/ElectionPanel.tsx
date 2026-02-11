@@ -43,11 +43,9 @@ export default function ElectionPanel() {
             <div className="bg-slate-900 text-white py-20 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-10"></div>
                 <div className="container mx-auto px-4 relative z-10 text-center">
-                    <Badge variant="outline" className="text-yellow-400 border-yellow-400 mb-4">December 2023</Badge>
+                    <Badge variant="outline" className="text-yellow-400 border-yellow-400 mb-4">January 2026</Badge>
                     <h1 className="text-4xl text-headline md:text-6xl font-serif font-bold mb-6">Election Panel</h1>
-                    <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto">
-                        After 17 years, elections were held. HRDA won <b>13 out of 13 seats</b>, a clean sweep that reiterated the trust of doctors across Telangana.
-                    </p>
+
                 </div>
             </div>
 

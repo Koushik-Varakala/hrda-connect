@@ -10,24 +10,24 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Search() {
-  const [tgmcId, setTgmcId] = useState("");
+  const [phone, setPhone] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: results, isLoading } = useSearchRegistration(searchTerm);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setSearchTerm(tgmcId);
+    setSearchTerm(phone);
   };
 
   return (
     <Layout>
       <div className="bg-slate-50 py-12">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-serif font-bold mb-4">Search & Update TGMC ID</h1>
+          <h1 className="text-4xl font-serif font-bold mb-4">Search & Update Details</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Search for registered doctors in the HRDA database using their Telangana State Medical Council (TGMC) ID.
-            You can also update your contact details here.
+            Search for registered doctors in the HRDA database using your <strong>Registered Phone Number</strong>.
+            You can verify your HRDA ID and update your contact details here.
           </p>
         </div>
       </div>
@@ -36,9 +36,9 @@ export default function Search() {
         <div className="max-w-xl mx-auto mb-12">
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
-              placeholder="Enter TGMC ID (e.g. 12345)"
-              value={tgmcId}
-              onChange={(e) => setTgmcId(e.target.value)}
+              placeholder="Enter Phone Number (e.g. 9876543210)"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="h-12 text-lg shadow-sm"
             />
             <Button type="submit" size="lg" className="h-12 px-8" disabled={isLoading}>
@@ -62,7 +62,7 @@ export default function Search() {
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Not Found</AlertTitle>
               <AlertDescription>
-                No records found matching TGMC ID "{searchTerm}". Please check the ID and try again.
+                No records found matching Phone Number "{searchTerm}". Please check the number and try again.
               </AlertDescription>
             </Alert>
           )}

@@ -232,7 +232,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                                         name="tgmcId"
                                         render={({ field }) => (
                                             <FormItem className="flex-1">
-                                                <FormLabel>Telangana Medical Council ID</FormLabel>
+                                                <FormLabel>Telangana Medical Council Reg. No</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="Enter TGMC ID (e.g. 17599)" {...field} />
                                                 </FormControl>
@@ -250,7 +250,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                                         {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : "Fetch Details"}
                                     </Button>
                                 </div>
-                                <p className="text-xs text-muted-foreground -mt-3 mb-2">
+                                <p className="text-red-500   text-xs text-muted-foreground -mt-3 mb-2">
                                     If details are not found, you can still register by filling the form manually.
                                 </p>
 

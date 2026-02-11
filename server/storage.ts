@@ -7,7 +7,8 @@ import {
   type MediaCoverage, type InsertMediaCoverage, type UpdateMediaCoverageRequest,
   type Department, type UpdateDepartmentRequest,
   type Registration, type InsertRegistration, type UpdateRegistrationRequest, type SearchRegistrationParams,
-  electionDocuments, type ElectionDocument, type InsertElectionDocument
+  electionDocuments, type ElectionDocument, type InsertElectionDocument,
+  galleryPhotos, type GalleryPhoto, type InsertGalleryPhoto
 } from "@shared/schema";
 import { eq, desc, and, ilike } from "drizzle-orm";
 
@@ -20,12 +21,14 @@ export interface IStorage {
 
   // Panels
   getPanels(type?: 'state' | 'district', district?: string): Promise<Panel[]>;
+  getPanel(id: number): Promise<Panel | undefined>;
   createPanel(panel: InsertPanel): Promise<Panel>;
   updatePanel(id: number, updates: UpdatePanelRequest): Promise<Panel | undefined>;
   deletePanel(id: number): Promise<void>;
 
   // Achievements
   getAchievements(category?: string): Promise<Achievement[]>;
+  getAchievement(id: number): Promise<Achievement | undefined>;
   createAchievement(achievement: InsertAchievement): Promise<Achievement>;
   updateAchievement(id: number, updates: UpdateAchievementRequest): Promise<Achievement | undefined>;
   deleteAchievement(id: number): Promise<void>;
@@ -33,7 +36,6 @@ export interface IStorage {
   // Departments
   getDepartments(): Promise<Department[]>;
   updateDepartment(id: number, updates: UpdateDepartmentRequest): Promise<Department | undefined>;
-  // (We seed departments initially, usually don't delete/create dynamically in this simple app, but update content)
 
   // Registrations
   searchRegistrations(params: SearchRegistrationParams): Promise<Registration[]>;
@@ -43,12 +45,21 @@ export interface IStorage {
 
   // Media Coverage
   getMediaCoverage(): Promise<MediaCoverage[]>;
+  getMediaCoverageById(id: number): Promise<MediaCoverage | undefined>;
   createMediaCoverage(media: InsertMediaCoverage): Promise<MediaCoverage>;
   updateMediaCoverage(id: number, updates: UpdateMediaCoverageRequest): Promise<MediaCoverage | undefined>;
+  deleteMediaCoverage(id: number): Promise<void>;
+
   // Election Documents
   getElectionDocuments(): Promise<ElectionDocument[]>;
   createElectionDocument(doc: InsertElectionDocument): Promise<ElectionDocument>;
   deleteElectionDocument(id: number): Promise<void>;
+
+  // Gallery
+  getGalleryPhotos(): Promise<GalleryPhoto[]>;
+  getGalleryPhoto(id: number): Promise<GalleryPhoto | undefined>;
+  createGalleryPhoto(photo: InsertGalleryPhoto): Promise<GalleryPhoto>;
+  deleteGalleryPhoto(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -75,7 +86,7 @@ export class DatabaseStorage implements IStorage {
   async getPanels(type?: 'state' | 'district', district?: string): Promise<Panel[]> {
     let query = db.select().from(panels);
     if (type === 'state') {
-      // @ts-ignore - weird drizzle type inference on boolean sometimes
+      // @ts-ignore
       query.where(eq(panels.isStateLevel, true));
     } else if (type === 'district') {
       // @ts-ignore
@@ -86,6 +97,11 @@ export class DatabaseStorage implements IStorage {
       }
     }
     return await query.orderBy(panels.priority);
+  }
+
+  async getPanel(id: number): Promise<Panel | undefined> {
+    const [result] = await db.select().from(panels).where(eq(panels.id, id));
+    return result;
   }
 
   async createPanel(insert: InsertPanel): Promise<Panel> {
@@ -106,10 +122,14 @@ export class DatabaseStorage implements IStorage {
   async getAchievements(category?: string): Promise<Achievement[]> {
     let query = db.select().from(achievements);
     if (category) {
-      // @ts-ignore
       query.where(eq(achievements.category, category));
     }
     return await query.orderBy(desc(achievements.date));
+  }
+
+  async getAchievement(id: number): Promise<Achievement | undefined> {
+    const [result] = await db.select().from(achievements).where(eq(achievements.id, id));
+    return result;
   }
 
   async createAchievement(insert: InsertAchievement): Promise<Achievement> {
@@ -141,6 +161,9 @@ export class DatabaseStorage implements IStorage {
     if (params.tgmcId) {
       return await db.select().from(registrations).where(eq(registrations.tgmcId, params.tgmcId));
     }
+    if (params.phone) {
+      return await db.select().from(registrations).where(eq(registrations.phone, params.phone));
+    }
     return [];
   }
 
@@ -161,6 +184,11 @@ export class DatabaseStorage implements IStorage {
   // Media Coverage
   async getMediaCoverage(): Promise<MediaCoverage[]> {
     return await db.select().from(mediaCoverage).orderBy(desc(mediaCoverage.date));
+  }
+
+  async getMediaCoverageById(id: number): Promise<MediaCoverage | undefined> {
+    const [result] = await db.select().from(mediaCoverage).where(eq(mediaCoverage.id, id));
+    return result;
   }
 
   async createMediaCoverage(insert: InsertMediaCoverage): Promise<MediaCoverage> {
@@ -190,6 +218,25 @@ export class DatabaseStorage implements IStorage {
   async deleteElectionDocument(id: number): Promise<void> {
     await db.delete(electionDocuments).where(eq(electionDocuments.id, id));
   }
+
+  // Gallery
+  async getGalleryPhotos(): Promise<GalleryPhoto[]> {
+    return await db.select().from(galleryPhotos).where(eq(galleryPhotos.active, true)).orderBy(desc(galleryPhotos.createdAt));
+  }
+
+  async getGalleryPhoto(id: number): Promise<GalleryPhoto | undefined> {
+    const [result] = await db.select().from(galleryPhotos).where(eq(galleryPhotos.id, id));
+    return result;
+  }
+
+  async createGalleryPhoto(insert: InsertGalleryPhoto): Promise<GalleryPhoto> {
+    const [result] = await db.insert(galleryPhotos).values(insert).returning();
+    return result;
+  }
+
+  async deleteGalleryPhoto(id: number): Promise<void> {
+    await db.delete(galleryPhotos).where(eq(galleryPhotos.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -200,6 +247,7 @@ export class MemStorage implements IStorage {
   private registrations: Map<number, Registration>;
   private mediaCoverage: Map<number, MediaCoverage>;
   private electionDocuments: Map<number, ElectionDocument>;
+  private galleryPhotos: Map<number, GalleryPhoto>;
   private currentIds: { [key: string]: number };
 
   constructor() {
@@ -210,7 +258,8 @@ export class MemStorage implements IStorage {
     this.registrations = new Map();
     this.mediaCoverage = new Map();
     this.electionDocuments = new Map();
-    this.currentIds = { announcements: 1, panels: 1, achievements: 1, departments: 1, registrations: 1, mediaCoverage: 1, electionDocuments: 1 };
+    this.galleryPhotos = new Map();
+    this.currentIds = { announcements: 1, panels: 1, achievements: 1, departments: 1, registrations: 1, mediaCoverage: 1, electionDocuments: 1, galleryPhotos: 1 };
   }
 
   // Announcements
@@ -249,6 +298,10 @@ export class MemStorage implements IStorage {
       }
     }
     return results.sort((a, b) => (a.priority || 0) - (b.priority || 0));
+  }
+
+  async getPanel(id: number): Promise<Panel | undefined> {
+    return this.panels.get(id);
   }
 
   async createPanel(insert: InsertPanel): Promise<Panel> {
@@ -292,6 +345,10 @@ export class MemStorage implements IStorage {
     });
   }
 
+  async getAchievement(id: number): Promise<Achievement | undefined> {
+    return this.achievements.get(id);
+  }
+
   async createAchievement(insert: InsertAchievement): Promise<Achievement> {
     const id = this.currentIds.achievements++;
     const achievement: Achievement = {
@@ -333,10 +390,11 @@ export class MemStorage implements IStorage {
 
   // Registrations
   async searchRegistrations(params: SearchRegistrationParams): Promise<Registration[]> {
-    if (params.tgmcId) {
-      return Array.from(this.registrations.values()).filter(r => r.tgmcId === params.tgmcId);
-    }
-    return [];
+    return Array.from(this.registrations.values()).filter(r => {
+      if (params.tgmcId && r.tgmcId === params.tgmcId) return true;
+      if (params.phone && r.phone === params.phone) return true;
+      return false;
+    });
   }
 
   async createRegistration(insert: InsertRegistration): Promise<Registration> {
@@ -386,6 +444,10 @@ export class MemStorage implements IStorage {
     });
   }
 
+  async getMediaCoverageById(id: number): Promise<MediaCoverage | undefined> {
+    return this.mediaCoverage.get(id);
+  }
+
   async createMediaCoverage(insert: InsertMediaCoverage): Promise<MediaCoverage> {
     const id = this.currentIds.mediaCoverage++;
     const media: MediaCoverage = {
@@ -430,6 +492,38 @@ export class MemStorage implements IStorage {
 
   async deleteElectionDocument(id: number): Promise<void> {
     this.electionDocuments.delete(id);
+  }
+
+  // Gallery
+  async getGalleryPhotos(): Promise<GalleryPhoto[]> {
+    return Array.from(this.galleryPhotos.values())
+      .filter(p => p.active)
+      .sort((a, b) => {
+        if (!a.createdAt || !b.createdAt) return 0;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+  }
+
+  async getGalleryPhoto(id: number): Promise<GalleryPhoto | undefined> {
+    return this.galleryPhotos.get(id);
+  }
+
+  async createGalleryPhoto(insert: InsertGalleryPhoto): Promise<GalleryPhoto> {
+    const id = this.currentIds.galleryPhotos++;
+    const photo: GalleryPhoto = {
+      ...insert,
+      id,
+      createdAt: new Date(),
+      title: insert.title ?? null,
+      description: insert.description ?? null,
+      active: insert.active ?? true
+    };
+    this.galleryPhotos.set(id, photo);
+    return photo;
+  }
+
+  async deleteGalleryPhoto(id: number): Promise<void> {
+    this.galleryPhotos.delete(id);
   }
 }
 

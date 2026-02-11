@@ -153,3 +153,20 @@ export type ElectionDocument = typeof electionDocuments.$inferSelect;
 export type InsertElectionDocument = z.infer<typeof insertElectionDocumentSchema>;
 export type CreateElectionDocumentRequest = InsertElectionDocument;
 export type UpdateElectionDocumentRequest = Partial<InsertElectionDocument>;
+
+// Gallery Photos
+export const galleryPhotos = pgTable("gallery_photos", {
+  id: serial("id").primaryKey(),
+  url: text("url").notNull(),
+  title: text("title"),
+  description: text("description"),
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertGalleryPhotoSchema = createInsertSchema(galleryPhotos).omit({ id: true, createdAt: true });
+
+export type GalleryPhoto = typeof galleryPhotos.$inferSelect;
+export type InsertGalleryPhoto = z.infer<typeof insertGalleryPhotoSchema>;
+export type CreateGalleryPhotoRequest = InsertGalleryPhoto;
+export type UpdateGalleryPhotoRequest = Partial<InsertGalleryPhoto>;

@@ -168,6 +168,37 @@ export class GoogleSheetsService {
         }
     }
 
+    async findRegistrationByPhone(phone: string): Promise<any | null> {
+        await this.initPromise;
+
+        if (!this.isConnected || !this.doc) {
+            log(`[Mock] Finding registration by Phone: ${phone}`);
+            return null;
+        }
+
+        try {
+            const sheet = this.doc.sheetsByIndex[0];
+            const rows = await sheet.getRows();
+            const row = rows.reverse().find(r => r.get("ContactNumber") === phone);
+
+            if (!row) return null;
+
+            return {
+                id: row.get("S.No"),
+                hrdaId: row.get("HRDAREGISTRATIONNUMBER"),
+                tgmcId: row.get("MedicalCounselRegistration"),
+                firstName: row.get("Name"),
+                phone: row.get("ContactNumber"),
+                email: row.get("MailID"),
+                address: row.get("Address"),
+                district: row.get("District")
+            };
+        } catch (error) {
+            console.error("Error searching Google Sheet by Phone:", error);
+            return null;
+        }
+    }
+
     async updateRegistration(tgmcId: string, newData: Partial<SheetRegistration>): Promise<boolean> {
         await this.initPromise;
 

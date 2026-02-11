@@ -31,6 +31,10 @@ export const errorSchemas = {
   })
 };
 
+// === API TYPES ===
+export type CreateRegistrationRequest = z.infer<typeof insertRegistrationSchema>;
+export type UpdateRegistrationRequest = Partial<CreateRegistrationRequest>;
+
 // === API CONTRACT ===
 export const api = {
   announcements: {
@@ -214,6 +218,7 @@ export const api = {
       path: '/api/registrations/search',
       input: z.object({
         tgmcId: z.string().optional(),
+        phone: z.string().optional(),
       }),
       responses: {
         200: z.array(z.custom<typeof registrations.$inferSelect>()),
