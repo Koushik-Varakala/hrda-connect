@@ -172,7 +172,7 @@ export default function Home() {
                 </Button>
               </div>
 
-              <div className="flex overflow-x-auto pb-8 gap-6 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800">
+              <div className="flex overflow-x-auto pb-8 gap-6 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {electedMembers.map((member) => (
                   <motion.div
                     key={member.id}
