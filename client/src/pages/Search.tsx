@@ -8,6 +8,7 @@ import { useSearchRegistration, useUpdateRegistration } from "@/hooks/use-regist
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Search() {
   const [phone, setPhone] = useState("");
@@ -72,12 +73,23 @@ export default function Search() {
   );
 }
 
+const districts = [
+  "Adilabad", "Bhadradri Kothagudem", "Hanumakonda", "Hyderabad", "Jagtial",
+  "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy",
+  "Karimnagar", "Khammam", "Kumuram Bheem Asifabad", "Mahabubabad",
+  "Mahabubnagar", "Mancherial", "Medak", "Medchal-Malkajgiri", "Mulugu",
+  "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad",
+  "Peddapalli", "Rajanna Sircilla", "Ranga Reddy", "Sangareddy",
+  "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal", "Yadadri Bhuvanagiri"
+];
+
 function ResultCard({ registration }: { registration: any }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     phone: registration.phone,
     email: registration.email || "",
-    address: registration.address || ""
+    address: registration.address || "",
+    district: registration.district || ""
   });
   const updateMutation = useUpdateRegistration();
   const { toast } = useToast();
@@ -131,6 +143,24 @@ function ResultCard({ registration }: { registration: any }) {
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               />
             </div>
+            <div className="grid gap-2">
+              <Label>District</Label>
+              <Select
+                value={formData.district}
+                onValueChange={(value) => setFormData({ ...formData, district: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select District" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[200px]">
+                  {districts.map((d) => (
+                    <SelectItem key={d} value={d}>
+                      {d}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
         <CardFooter className="bg-slate-50 p-4 flex justify-end gap-2">
@@ -174,6 +204,9 @@ function ResultCard({ registration }: { registration: any }) {
             </div>
             <div className="col-span-2">
               <span className="font-medium text-slate-900">Address:</span> {registration.address || "-"}
+            </div>
+            <div className="col-span-2">
+              <span className="font-medium text-slate-900">District:</span> {registration.district || "-"}
             </div>
           </div>
         </div>
