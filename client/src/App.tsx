@@ -36,41 +36,43 @@ import ScrollToTop from "@/components/ScrollToTop";
 
 function Router() {
   return (
-    <Switch>
+    <div className="app-container">
       <ScrollToTop />
-      {/* Public Routes */}
-      <Route path="/" component={Home} />
-      <Route path="/about" component={About} />
-      <Route path="/achievements" component={Achievements} />
-      <Route path="/panels" component={Panels} />
-      <Route path="/departments" component={Departments} />
-      <Route path="/membership" component={Membership} />
-      <Route path="/index.php/new-registration-2/" component={Membership} />
-      <Route path="/media" component={Media} />
-      <Route path="/election-panel" component={ElectionPanel} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/search" component={Search} />
-      <Route path="/thank-you" component={ThankYou} />
+      <Switch>
+        {/* Public Routes */}
+        <Route path="/" component={Home} />
+        <Route path="/about" component={About} />
+        <Route path="/achievements" component={Achievements} />
+        <Route path="/panels" component={Panels} />
+        <Route path="/departments" component={Departments} />
+        <Route path="/membership" component={Membership} />
+        <Route path="/index.php/new-registration-2/" component={Membership} />
+        <Route path="/media" component={Media} />
+        <Route path="/election-panel" component={ElectionPanel} />
+        <Route path="/contact" component={Contact} />
+        <Route path="/search" component={Search} />
+        <Route path="/thank-you" component={ThankYou} />
 
-      {/* Admin Routes */}
-      <Route path="/admin/dashboard" component={Dashboard} />
-      <Route path="/admin/announcements" component={ManageAnnouncements} />
-      <Route path="/admin/panels" component={ManagePanels} />
-      <Route path="/admin/achievements" component={ManageAchievements} />
-      <Route path="/admin/election-docs" component={AdminElectionDocs} />
-      <Route path="/admin/media" component={ManageMedia} />
-      <Route path="/admin/departments" component={ManageDepartments} />
-      <Route path="/admin/registrations" component={ManageRegistrations} />
-      <Route path="/admin/gallery" component={ManageGallery} />
+        {/* Admin Routes */}
+        <Route path="/admin/dashboard" component={Dashboard} />
+        <Route path="/admin/announcements" component={ManageAnnouncements} />
+        <Route path="/admin/panels" component={ManagePanels} />
+        <Route path="/admin/achievements" component={ManageAchievements} />
+        <Route path="/admin/election-docs" component={AdminElectionDocs} />
+        <Route path="/admin/media" component={ManageMedia} />
+        <Route path="/admin/departments" component={ManageDepartments} />
+        <Route path="/admin/registrations" component={ManageRegistrations} />
+        <Route path="/admin/gallery" component={ManageGallery} />
 
-      {/* Gallery Route */}
-      <Route path="/gallery" component={Gallery} />
+        {/* Gallery Route */}
+        <Route path="/gallery" component={Gallery} />
 
-      {/* Login Route */}
-      <Route path="/login" component={Login} />
+        {/* Login Route */}
+        <Route path="/login" component={Login} />
 
-      <Route component={NotFound} />
-    </Switch>
+        <Route component={NotFound} />
+      </Switch>
+    </div>
   );
 }
 
