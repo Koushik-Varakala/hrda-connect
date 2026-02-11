@@ -11,6 +11,7 @@ import About from "@/pages/About";
 import Achievements from "@/pages/Achievements";
 import Panels from "@/pages/Panels";
 import Departments from "@/pages/Departments";
+import Announcements from "@/pages/Announcements";
 import Membership from "@/pages/Membership";
 import Contact from "@/pages/Contact";
 import Search from "@/pages/Search";
@@ -43,6 +44,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/about" component={About} />
         <Route path="/achievements" component={Achievements} />
+        <Route path="/announcements" component={Announcements} />
         <Route path="/panels" component={Panels} />
         <Route path="/departments" component={Departments} />
         <Route path="/membership" component={Membership} />

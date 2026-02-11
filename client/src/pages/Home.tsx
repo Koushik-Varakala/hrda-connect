@@ -94,9 +94,11 @@ export default function Home() {
               <h2 className="text-3xl font-bold text-slate-900">Announcements</h2>
               <div className="absolute -bottom-[10px] left-0 w-24 h-1 bg-[#007bff] rounded-full"></div>
             </div>
-            <Button variant="ghost" className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 font-medium hidden md:flex items-center gap-1">
-              View All <ArrowRight className="w-4 h-4" />
-            </Button>
+            <Link href="/announcements">
+              <Button variant="ghost" className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 font-medium hidden md:flex items-center gap-1">
+                View All <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -146,7 +148,9 @@ export default function Home() {
             )}
           </div>
           <div className="mt-6 md:hidden text-center">
-            <Button variant="outline" className="w-full text-teal-600 border-teal-200">View All</Button>
+            <Link href="/announcements">
+              <Button variant="outline" className="w-full text-teal-600 border-teal-200">View All</Button>
+            </Link>
           </div>
         </div>
       </section>
