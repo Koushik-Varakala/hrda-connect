@@ -2,13 +2,23 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Search as SearchIcon, User, AlertCircle, Edit2, Save, X } from "lucide-react";
+import { Search as SearchIcon, User, AlertCircle, Edit2, Save, X, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useSearchRegistration, useUpdateRegistration } from "@/hooks/use-registrations";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Loader2 } from "lucide-react";
 
 export default function Search() {
   const [phone, setPhone] = useState("");
@@ -93,6 +103,57 @@ function ResultCard({ registration }: { registration: any }) {
   });
   const updateMutation = useUpdateRegistration();
   const { toast } = useToast();
+
+  const [showOtpDialog, setShowOtpDialog] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+
+  const handleSendOtp = async () => {
+    setIsSendingOtp(true);
+    try {
+      await apiRequest("POST", "/api/registrations/send-otp", { registrationId: registration.id });
+      toast({ title: "OTP Sent", description: "Please check your registered email for the code." });
+      setIsSendingOtp(false);
+      setShowOtpDialog(true);
+    } catch (e: any) {
+      setIsSendingOtp(false);
+      toast({
+        title: "Error",
+        description: e.message || "Failed to send OTP. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp || otp.length !== 6) {
+      toast({ title: "Invalid OTP", description: "Please enter a valid 6-digit code.", variant: "destructive" });
+      return;
+    }
+
+    setIsVerifyingOtp(true);
+    try {
+      await apiRequest("POST", "/api/registrations/verify-otp", {
+        registrationId: registration.id,
+        otp
+      });
+
+      toast({ title: "Verified", description: "You can now edit your details." });
+      setShowOtpDialog(false);
+      setIsVerifyingOtp(false);
+
+      // Refresh data to get unmasked details
+      queryClient.invalidateQueries({ queryKey: ["/api/registrations/search"] });
+    } catch (e: any) {
+      setIsVerifyingOtp(false);
+      toast({
+        title: "Verification Failed",
+        description: e.message || "Invalid OTP. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleSave = async () => {
     try {
@@ -210,10 +271,53 @@ function ResultCard({ registration }: { registration: any }) {
             </div>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-          <Edit2 className="w-4 h-4 mr-2" /> Edit
-        </Button>
-      </CardContent>
-    </Card>
+
+        {
+          registration.isMasked ? (
+            <Button variant="outline" size="sm" onClick={handleSendOtp} disabled={isSendingOtp}>
+              {isSendingOtp ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
+              Verify to Edit
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+              <Edit2 className="w-4 h-4 mr-2" /> Edit
+            </Button>
+          )
+        }
+      </CardContent >
+
+      <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Enter Verification Code</DialogTitle>
+            <DialogDescription>
+              We've sent a 6-digit code to your registered email <strong>{registration.email}</strong>.
+              Enter it below to verify your identity.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2 py-4 justify-center">
+            <Input
+              id="otp"
+              className="text-center text-2xl font-bold tracking-[0.5em] h-14 w-full max-w-[200px]"
+              maxLength={6}
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
+              placeholder="000000"
+            />
+          </div>
+          <DialogFooter className="sm:justify-between">
+            <Button variant="ghost" size="sm" onClick={() => setShowOtpDialog(false)}>Cancel</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleSendOtp} disabled={isSendingOtp}>
+                {isSendingOtp ? "Sending..." : "Resend"}
+              </Button>
+              <Button type="submit" onClick={handleVerifyOtp} disabled={isVerifyingOtp || otp.length !== 6}>
+                {isVerifyingOtp ? "Verifying..." : "Verify"}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card >
   );
 }

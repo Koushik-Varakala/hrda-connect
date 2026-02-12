@@ -106,6 +106,18 @@ Regards,
 HRDA Team`
         });
     }
+
+    async sendOtp(to: string, otp: string) {
+        return this.sendEmail({
+            to,
+            subject: "HRDA Verification Code",
+            text: `Your verification code is: ${otp}
+
+This code will expire in 5 minutes. Do not share this code with anyone.
+
+If you did not request this code, please ignore this email.`
+        });
+    }
 }
 
 export const emailService = new EmailService();

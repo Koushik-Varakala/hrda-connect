@@ -39,6 +39,7 @@ export interface IStorage {
 
   // Registrations
   searchRegistrations(params: SearchRegistrationParams): Promise<Registration[]>;
+  getRegistration(id: number): Promise<Registration | undefined>;
   createRegistration(registration: InsertRegistration): Promise<Registration>;
   updateRegistration(id: number, updates: UpdateRegistrationRequest): Promise<Registration | undefined>;
   getRegistrations(): Promise<Registration[]>;
@@ -165,6 +166,11 @@ export class DatabaseStorage implements IStorage {
       return await db.select().from(registrations).where(eq(registrations.phone, params.phone));
     }
     return [];
+  }
+
+  async getRegistration(id: number): Promise<Registration | undefined> {
+    const [registration] = await db.select().from(registrations).where(eq(registrations.id, id));
+    return registration;
   }
 
   async createRegistration(insert: InsertRegistration): Promise<Registration> {
@@ -397,6 +403,10 @@ export class MemStorage implements IStorage {
     });
   }
 
+  async getRegistration(id: number): Promise<Registration | undefined> {
+    return this.registrations.get(id);
+  }
+
   async createRegistration(insert: InsertRegistration): Promise<Registration> {
     const id = this.currentIds.registrations++;
     const registration: Registration = {
@@ -415,7 +425,10 @@ export class MemStorage implements IStorage {
       registrationSource: insert.registrationSource ?? 'site_contact',
       status: insert.status ?? 'pending_verification',
       notes: insert.notes ?? null,
-      phone: insert.phone
+      phone: insert.phone,
+      otpCode: null,
+      otpExpiresAt: null,
+      otpAttempts: 0
     };
     this.registrations.set(id, registration);
     return registration;

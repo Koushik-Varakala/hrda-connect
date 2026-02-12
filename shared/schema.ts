@@ -80,6 +80,10 @@ export const registrations = pgTable("registrations", {
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  // OTP Verification fields
+  otpCode: text("otp_code"),
+  otpExpiresAt: timestamp("otp_expires_at"),
+  otpAttempts: serial("otp_attempts"), // default 0
 });
 
 // === SCHEMAS ===

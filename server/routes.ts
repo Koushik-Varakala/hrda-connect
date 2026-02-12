@@ -5,6 +5,7 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
 import { upload as cloudinaryUpload, deleteImageFromCloudinary } from "./cloudinary";
+import { emailService } from "./services/email";
 
 // Seed Data Function
 async function seedDatabase() {
@@ -669,15 +670,14 @@ export async function registerRoutes(
 
     if (data.length === 0) return res.status(404).json({ message: "Not found" });
 
-    // Lazy sync: If HRDA ID is missing locally, check Google Sheets
-    // Iterate through results (usually 1)
+    // Lazy sync logic...
     const updatedData = await Promise.all(data.map(async (reg) => {
+      // ... (existing lazy sync code) ...
       if (!reg.hrdaId && reg.tgmcId) {
         try {
           const { googleSheetsService } = await import("./services/googleSheets");
           const sheetReg = await googleSheetsService.findRegistrationByTGMC(reg.tgmcId);
           if (sheetReg && sheetReg.hrdaId) {
-            // Update local DB
             await storage.updateRegistration(reg.id, { hrdaId: sheetReg.hrdaId });
             return { ...reg, hrdaId: sheetReg.hrdaId };
           }
@@ -688,7 +688,107 @@ export async function registerRoutes(
       return reg;
     }));
 
-    res.json(updatedData);
+    // Mask sensitive data if not verified
+    const maskedData = updatedData.map(reg => {
+      // Check if this specific registration is verified in session
+      // @ts-ignore
+      const isVerified = req.session.verifiedRegistrationId === reg.id;
+
+      if (isVerified) {
+        return reg;
+      }
+
+      // Return masked version
+      return {
+        ...reg,
+        email: reg.email ? reg.email.replace(/(.{2})(.*)(@.*)/, "$1****$3") : null,
+        phone: reg.phone ? reg.phone.replace(/(\d{2})(\d{6})(\d{2})/, "$1******$3") : reg.phone,
+        address: null, // Hide address completely
+        isMasked: true
+      };
+    });
+
+    res.json(maskedData);
+  });
+
+  // OTP Endpoints
+  const otpRateLimit = new Map<number, number>(); // userId -> timestamp
+
+  app.post("/api/registrations/send-otp", async (req, res) => {
+    const { registrationId } = req.body;
+
+    // Rate limiting: 1 min
+    const lastSent = otpRateLimit.get(registrationId);
+    if (lastSent && Date.now() - lastSent < 60000) {
+      return res.status(429).json({ message: "Please wait before requesting another code." });
+    }
+
+    const reg = await storage.getRegistration(registrationId);
+    if (!reg) return res.status(404).json({ message: "Registration not found" });
+
+    if (!reg.email) {
+      return res.status(400).json({ message: "No email address linked to this registration. Please contact support." });
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
+
+    await storage.updateRegistration(registrationId, {
+      otpCode: otp,
+      otpExpiresAt: expiresAt,
+      otpAttempts: 0
+    });
+
+    const emailSent = await emailService.sendOtp(reg.email, otp);
+
+    if (emailSent) {
+      otpRateLimit.set(registrationId, Date.now());
+      res.json({ message: "OTP sent successfully" });
+    } else {
+      res.status(500).json({ message: "Failed to send email. Please try again later." });
+    }
+  });
+
+  app.post("/api/registrations/verify-otp", async (req, res) => {
+    const { registrationId, otp } = req.body;
+
+    const reg = await storage.getRegistration(registrationId);
+    if (!reg) return res.status(404).json({ message: "Registration not found" });
+
+    // Check expiry
+    if (!reg.otpExpiresAt || new Date() > new Date(reg.otpExpiresAt)) {
+      return res.status(400).json({ message: "OTP expired. Please request a new one." });
+    }
+
+    // Check attempts
+    if ((reg.otpAttempts || 0) >= 3) {
+      return res.status(400).json({ message: "Too many failed attempts. Please request a new code." });
+    }
+
+    // Check code
+    if (reg.otpCode !== otp) {
+      await storage.updateRegistration(registrationId, {
+        otpAttempts: (reg.otpAttempts || 0) + 1
+      });
+      return res.status(400).json({ message: "Invalid verification code." });
+    }
+
+    // Success: Clear OTP and Set Session
+    await storage.updateRegistration(registrationId, {
+      otpCode: null,
+      otpExpiresAt: null,
+      otpAttempts: 0
+    });
+
+    // @ts-ignore
+    req.session.verifiedRegistrationId = registrationId;
+
+    // Return full unmasked details
+    res.json({
+      success: true,
+      registration: reg
+    });
   });
 
   app.post(api.registrations.create.path, async (req, res) => {
@@ -699,6 +799,13 @@ export async function registerRoutes(
 
   app.put(api.registrations.update.path, async (req, res) => {
     const id = Number(req.params.id);
+
+    // Security Check: Verify Session
+    // @ts-ignore
+    if (req.session.verifiedRegistrationId !== id) {
+      return res.status(403).json({ message: "Unauthorized. Please verify OTP first." });
+    }
+
     const result = await storage.updateRegistration(id, req.body);
     if (!result) return res.status(404).json({ message: "Not found" });
 
