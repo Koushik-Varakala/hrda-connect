@@ -1,4 +1,4 @@
-import { googleSheetsService } from "../server/services/googleSheets";
+import { googleSheetsService } from "../lib/services/googleSheets";
 
 async function main() {
     const phone = "7799001102";

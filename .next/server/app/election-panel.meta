@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/election-panel/layout,_N_T_/election-panel/page,_N_T_/election-panel"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/election-panel/__PAGE__",
+    "/election-panel",
+    "/_index",
+    "/_head"
+  ]
+}

@@ -1,5 +1,5 @@
 
-import { db } from "./server/db";
+import { db } from "./lib/db";
 import { sql } from "drizzle-orm";
 
 async function checkSchema() {

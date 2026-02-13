@@ -1,0 +1,12 @@
+{
+  "pages": {
+    "/_app": []
+  },
+  "devFiles": [],
+  "polyfillFiles": [],
+  "lowPriorityFiles": [
+    "static/UaUdpTbK9RNC823ptS2Yn/_ssgManifest.js",
+    "static/UaUdpTbK9RNC823ptS2Yn/_buildManifest.js"
+  ],
+  "rootMainFiles": []
+}

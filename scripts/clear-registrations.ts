@@ -1,5 +1,5 @@
 
-import { db, pool } from "../server/db";
+import { db, pool } from "../lib/db";
 import { registrations } from "../shared/schema";
 import { sql } from "drizzle-orm";
 

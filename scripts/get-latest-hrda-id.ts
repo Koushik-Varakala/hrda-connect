@@ -1,6 +1,6 @@
 
 import "dotenv/config";
-import { db } from "../server/db";
+import { db } from "../lib/db";
 import { registrations } from "../shared/schema";
 import { desc, sql } from "drizzle-orm";
 

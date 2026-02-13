@@ -2,7 +2,7 @@
 import "dotenv/config";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
-import { db } from "../server/db";
+import { db } from "../lib/db";
 import { registrations } from "../shared/schema";
 import fs from "fs";
 
