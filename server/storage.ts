@@ -42,6 +42,7 @@ export interface IStorage {
   getRegistration(id: number): Promise<Registration | undefined>;
   createRegistration(registration: InsertRegistration): Promise<Registration>;
   updateRegistration(id: number, updates: UpdateRegistrationRequest): Promise<Registration | undefined>;
+  deleteRegistration(id: number): Promise<void>;
   getRegistrations(): Promise<Registration[]>;
 
   // Media Coverage
@@ -181,6 +182,10 @@ export class DatabaseStorage implements IStorage {
   async updateRegistration(id: number, updates: UpdateRegistrationRequest): Promise<Registration | undefined> {
     const [result] = await db.update(registrations).set(updates).where(eq(registrations.id, id)).returning();
     return result;
+  }
+
+  async deleteRegistration(id: number): Promise<void> {
+    await db.delete(registrations).where(eq(registrations.id, id));
   }
 
   async getRegistrations(): Promise<Registration[]> {
@@ -440,6 +445,10 @@ export class MemStorage implements IStorage {
     const updated = { ...existing, ...updates, updatedAt: new Date() };
     this.registrations.set(id, updated);
     return updated;
+  }
+
+  async deleteRegistration(id: number): Promise<void> {
+    this.registrations.delete(id);
   }
 
   async getRegistrations(): Promise<Registration[]> {

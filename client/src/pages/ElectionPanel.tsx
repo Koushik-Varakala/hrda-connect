@@ -51,50 +51,24 @@ export default function ElectionPanel() {
 
             <div className="py-16 bg-slate-50">
                 <div className="container mx-auto px-4">
-                    <div className="grid md:grid-cols-2 gap-12">
+                    {/* Elected Members */}
+                    <div className="bg-gradient-to-br from-blue-900 to-slate-900 text-white p-8 rounded-2xl shadow-xl max-w-4xl mx-auto">
+                        <h3 className="text-2xl font-serif font-bold mb-6 flex items-center gap-2">
+                            <Vote className="w-6 h-6 text-green-400" />
+                            The Elected Panel
+                        </h3>
 
-                        {/* Manifesto */}
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-                            <h3 className="text-2xl font-serif font-bold mb-6 flex items-center gap-2 text-slate-900">
-                                <FileText className="w-6 h-6 text-primary" />
-                                Our Vision (Manifesto)
-                            </h3>
-                            <ul className="grid gap-3">
-                                {manifestoPoints.map((point, i) => (
-                                    <li key={i} className="flex items-center gap-3 text-slate-700">
-                                        <div className="w-2 h-2 rounded-full bg-primary"></div>
-                                        {point}
-                                    </li>
+                        {electedMembers.length === 0 ? (
+                            <div className="text-slate-400 italic">No members added yet.</div>
+                        ) : (
+                            <div className="flex flex-wrap gap-2">
+                                {electedMembers.map((member) => (
+                                    <Badge key={member.id} className="bg-white/10 hover:bg-white/20 text-white border-white/20 px-3 py-1.5 text-base whitespace-nowrap">
+                                        {member.name}
+                                    </Badge>
                                 ))}
-                            </ul>
-                        </div>
-
-                        {/* Elected Members */}
-                        <div className="bg-gradient-to-br from-blue-900 to-slate-900 text-white p-8 rounded-2xl shadow-xl">
-                            <h3 className="text-2xl font-serif font-bold mb-6 flex items-center gap-2">
-                                <Vote className="w-6 h-6 text-green-400" />
-                                The Elected Panel
-                            </h3>
-
-                            {electedMembers.length === 0 ? (
-                                <div className="text-slate-400 italic">No members added yet.</div>
-                            ) : (
-                                <div className="flex flex-wrap gap-2">
-                                    {electedMembers.map((member) => (
-                                        <Badge key={member.id} className="bg-white/10 hover:bg-white/20 text-white border-white/20 px-3 py-1.5 text-base whitespace-nowrap">
-                                            {member.name}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            )}
-
-                            <div className="mt-8 pt-8 border-t border-white/10">
-                                <p className="text-slate-400 italic">
-                                    "Probably for the first time in history, a single panel has won all elected positions."
-                                </p>
                             </div>
-                        </div>
-
+                        )}
                     </div>
                 </div>
             </div>

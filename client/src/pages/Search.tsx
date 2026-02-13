@@ -272,8 +272,8 @@ function ResultCard({ registration }: { registration: any }) {
           </div>
         </div>
 
-        {
-          registration.isMasked ? (
+        <div className="flex flex-col items-end gap-2">
+          {registration.isMasked ? (
             <Button variant="outline" size="sm" onClick={handleSendOtp} disabled={isSendingOtp}>
               {isSendingOtp ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
               Verify to Edit
@@ -282,8 +282,11 @@ function ResultCard({ registration }: { registration: any }) {
             <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
               <Edit2 className="w-4 h-4 mr-2" /> Edit
             </Button>
-          )
-        }
+          )}
+          <p className="text-xs text-red-600 font-medium text-right max-w-[150px] leading-tight mt-2">
+            In case you're facing issues, Contact : 9441568635
+          </p>
+        </div>
       </CardContent >
 
       <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>

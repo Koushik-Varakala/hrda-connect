@@ -84,3 +84,28 @@ export function useUpdateRegistration() {
     }
   });
 }
+
+export function useDeleteRegistration() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const url = buildUrl(api.registrations.delete.path, { id });
+      const res = await fetch(url, {
+        method: api.registrations.delete.method,
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error("Failed to delete registration");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.registrations.list.path] });
+      queryClient.invalidateQueries({ queryKey: [api.registrations.search.path] });
+      toast({ title: "Success", description: "Registration deleted successfully" });
+    },
+    onError: (error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
+  });
+}

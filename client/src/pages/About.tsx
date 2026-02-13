@@ -76,50 +76,7 @@ export default function About() {
           </div>
         </section>
 
-        <Separator />
 
-        {/* Founders Note - can be dynamic later */}
-        {/* Founders Section */}
-        <section>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-primary">Our Founders</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              The visionaries who established HRDA to fight for the rights of the medical fraternity.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {[
-              {
-                name: "Dr. K. Mahesh Kumar",
-                role: "Founder & President",
-                image: "https://placehold.co/400x400?text=Mahesh+Kumar",
-                bio: "A dedicated advocate for medical reforms, Dr. Mahesh Kumar led the charge in establishing HRDA to address systemic issues in healthcare administration."
-              },
-              {
-                name: "Dr. G. Srinivas",
-                role: "Co-Founder",
-                image: "https://placehold.co/400x400?text=G.+Srinivas",
-                bio: "With a passion for policy transparency, Dr. Srinivas has been instrumental in shaping the organizational structure and strategic goals of HRDA."
-              }
-            ].map((founder, i) => (
-              <div key={i} className="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-xl shadow-lg border border-slate-100 items-center">
-                <img
-                  src={founder.image}
-                  alt={founder.name}
-                  className="w-32 h-32 rounded-full object-cover border-4 border-slate-100 shadow-md"
-                />
-                <div className="text-center md:text-left">
-                  <h3 className="text-xl font-bold text-slate-800">{founder.name}</h3>
-                  <div className="text-primary font-medium mb-2">{founder.role}</div>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    {founder.bio}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
       </div>
     </Layout>
   );

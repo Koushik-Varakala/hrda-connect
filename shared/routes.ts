@@ -243,6 +243,15 @@ export const api = {
         404: errorSchemas.notFound,
       },
     },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/registrations/:id',
+      responses: {
+        204: z.void(),
+        404: errorSchemas.notFound,
+        401: errorSchemas.unauthorized,
+      },
+    },
     list: {
       method: 'GET' as const,
       path: '/api/admin/registrations',

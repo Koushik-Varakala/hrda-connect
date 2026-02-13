@@ -118,6 +118,28 @@ This code will expire in 5 minutes. Do not share this code with anyone.
 If you did not request this code, please ignore this email.`
         });
     }
+    async sendContactMessage(data: { firstName: string, lastName: string, email: string, subject: string, message: string }) {
+        // Prioritize CONTACT_EMAIL env var, otherwise default to "hrda4people@gmail.com"
+        // Do not use SMTP_USER as fallback for destination, as it's the sender account.
+        const adminEmail = process.env.CONTACT_EMAIL || "hrda4people@gmail.com";
+
+        return this.sendEmail({
+            to: adminEmail,
+            subject: `[Contact Form] ${data.subject} - ${data.firstName} ${data.lastName}`,
+            text: `You have received a new message from the HRDA Connect contact form.
+
+From: ${data.firstName} ${data.lastName}
+Email: ${data.email}
+Subject: ${data.subject}
+
+Message:
+${data.message}
+
+------------------------------------------------
+Please reply directly to ${data.email}
+`
+        });
+    }
 }
 
 export const emailService = new EmailService();

@@ -908,6 +908,12 @@ export async function registerRoutes(
     res.json(data);
   });
 
+  app.delete(api.registrations.delete.path, isAuthenticated, async (req, res) => {
+    const id = Number(req.params.id);
+    await storage.deleteRegistration(id);
+    res.status(204).end();
+  });
+
 
   // Alias for client-side admin dashboard which might be using this path
   app.get("/api/admin/registrations", isAuthenticated, async (req, res) => {
@@ -1117,6 +1123,35 @@ export async function registerRoutes(
     }
 
     res.status(204).end();
+  });
+
+  // Contact Form
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const contactSchema = z.object({
+        firstName: z.string().min(1),
+        lastName: z.string().min(1),
+        email: z.string().email(),
+        subject: z.string().min(1),
+        message: z.string().min(1),
+      });
+
+      const data = contactSchema.parse(req.body);
+      const sent = await emailService.sendContactMessage(data);
+
+      if (sent) {
+        res.json({ message: "Message sent successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to send email" });
+      }
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        res.status(400).json(err);
+      } else {
+        console.error("Contact API Error:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
   });
 
   // Seed

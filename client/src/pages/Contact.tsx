@@ -6,19 +6,33 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import React from "react";
+
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Contact() {
   const { toast } = useToast();
   const { register, handleSubmit, reset } = useForm();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const onSubmit = (data: any) => {
-    // In a real app, send to API
-    console.log(data);
-    toast({
-      title: "Message Sent",
-      description: "We have received your message and will get back to you shortly.",
-    });
-    reset();
+  const onSubmit = async (data: any) => {
+    setIsSubmitting(true);
+    try {
+      await apiRequest("POST", "/api/contact", data);
+      toast({
+        title: "Message Sent",
+        description: "We have received your message and will get back to you shortly.",
+      });
+      reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -63,18 +77,6 @@ export default function Contact() {
                   </div>
                 </CardContent>
               </Card>
-
-              <Card>
-                <CardContent className="p-6 flex items-start gap-4">
-                  <div className="bg-primary/10 p-3 rounded-lg text-primary">
-                    <Phone className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">Phone</h3>
-                    <p className="text-muted-foreground">+91 98765 43210 (Example)</p>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </div>
 
@@ -104,7 +106,9 @@ export default function Contact() {
                 <label className="text-sm font-medium">Message</label>
                 <Textarea {...register("message")} placeholder="How can we help you?" className="min-h-[120px]" required />
               </div>
-              <Button type="submit" className="w-full h-12 text-base">Send Message</Button>
+              <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
+                {isSubmitting ? "Sending..." : "Send Message"}
+              </Button>
             </form>
           </div>
         </div>
