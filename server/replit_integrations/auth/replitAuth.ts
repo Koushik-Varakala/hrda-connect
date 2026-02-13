@@ -7,38 +7,29 @@ import pgSession from "connect-pg-simple";
 
 const PgSession = pgSession(session);
 
-export function getSession() {
-  const secret = process.env.SESSION_SECRET || "dev_secret";
+const secret = process.env.SESSION_SECRET || "dev_secret";
 
-  // Force Memory Store for stability during debugging
-  if (true || !process.env.DATABASE_URL) {
-    console.log("Using MemoryStore for sessions");
-    return session({
-      secret,
-      resave: false,
-      saveUninitialized: false,
-      cookie: { secure: false } // memory store for local dev without DB
-    });
-  }
-
+if (!process.env.DATABASE_URL) {
+  console.warn("DATABASE_URL not set. Falling back to MemoryStore (Sessions will not persist).");
   return session({
-    store: new PgSession({
-      conObject: {
-        connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false },
-        connectionTimeoutMillis: 30000,
-        keepAlive: true
-      },
-      tableName: 'session',
-      createTableIfMissing: true,
-      pruneSessionInterval: 60 * 60 * 24
-    }),
     secret,
     resave: false,
     saveUninitialized: false,
+    cookie: { secure: false }
+  });
+}
+
+console.log("Using Postgres Session Store");
+return session({
+  store: new PgSession({
+    conObject: {
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+    },
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      secure: process.env.NODE_ENV === "production"
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" // Recommend lax for general navigation
     }
   });
 }
