@@ -1,0 +1,10 @@
+var R=require("../../../chunks/[turbopack]_runtime.js")("server/app/api/departments/route.js")
+R.c("server/chunks/node_modules_next_80c82442._.js")
+R.c("server/chunks/node_modules_@neondatabase_serverless_index_mjs_2c73916b._.js")
+R.c("server/chunks/node_modules_drizzle-orm_3e994e56._.js")
+R.c("server/chunks/node_modules_zod_lib_index_mjs_db18e9a4._.js")
+R.c("server/chunks/node_modules_drizzle-zod_index_mjs_95b155c7._.js")
+R.c("server/chunks/[root-of-the-server]__10fc91f1._.js")
+R.c("server/chunks/_next-internal_server_app_api_departments_route_actions_bf210f22.js")
+R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/app/api/departments/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/app/api/departments/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

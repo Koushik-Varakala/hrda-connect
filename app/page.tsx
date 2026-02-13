@@ -287,7 +287,7 @@ export default function Home() {
                         Become a member of HRDA today and contribute to the future of the medical profession in Telangana.
                     </p>
                     <Button asChild size="lg" variant="secondary" className="bg-white text-primary hover:bg-slate-100 font-bold px-10 h-14 rounded-full shadow-xl">
-                        <Link href="/index.php/new-registration-2/">
+                        <Link href="/register">
                             Become a Member <ArrowRight className="ml-2 w-5 h-5" />
                         </Link>
                     </Button>

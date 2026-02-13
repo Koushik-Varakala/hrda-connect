@@ -9,31 +9,6 @@ import { z } from "zod";
 // Temporary: storage import might fail if it depends on local files.
 // We need to move server/storage.ts to lib/storage.ts and ensure it doesn't use 'express' types.
 
-export async function GET(request: Request) {
-    try {
-        const { searchParams } = new URL(request.url);
-        const query = searchParams.get("query");
-
-        if (query) {
-            // Search logic
-            // storage.searchRegistrations is async
-            // Simple heuristic to map query to specific params
-            if (/^\d{10}$/.test(query)) {
-                const results = await storage.searchRegistrations({ phone: query });
-                return NextResponse.json(results);
-            }
-            // Assume TGMC ID otherwise
-            const results = await storage.searchRegistrations({ tgmcId: query });
-            return NextResponse.json(results);
-        }
-
-        const results = await storage.getRegistrations();
-        return NextResponse.json(results);
-    } catch (err) {
-        console.error("Registrations API Error:", err);
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
-    }
-}
 
 export async function POST(request: Request) {
     try {

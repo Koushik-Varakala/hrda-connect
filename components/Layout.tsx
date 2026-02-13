@@ -155,7 +155,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             )}
 
             <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 shadow-md transition-all hover:shadow-lg font-medium">
-              <Link href="/index.php/new-registration-2/">
+              <Link href="/register">
                 Join HRDA
               </Link>
             </Button>
@@ -217,7 +217,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             )}
 
             <Button asChild className="w-full justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm mt-2">
-              <Link href="/index.php/new-registration-2/">
+              <Link href="/register">
                 Join HRDA
               </Link>
             </Button>

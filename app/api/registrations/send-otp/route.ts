@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { storage } from "@/lib/storage";
 import { auth } from "@/lib/auth";
+import { emailService } from "@/lib/services/email";
 // Not needed for OTP usually, but maybe for rate limiting session logic?
 // Actually OTP is for login/verification without auth.
 
@@ -35,9 +36,15 @@ export async function POST(request: Request) {
             otpAttempts: 0
         });
 
-        // TODO: Send Email (emailService)
-        // await emailService.sendOtp(reg.email, otp);
-        console.log(`[Mock] Sent OTP ${otp} to ${reg.email} `);
+        // Send Email
+        const emailSent = await emailService.sendOtp(reg.email, otp);
+        if (!emailSent) {
+            console.error("Failed to send OTP email");
+            // Force log for debugging even if email fails (development only)
+            console.log(`[DEV ONLY] OTP for ${reg.email}: ${otp}`);
+        } else {
+            console.log(`Sent OTP to ${reg.email}`);
+        }
 
         otpRateLimit.set(registrationId, Date.now());
         return NextResponse.json({ message: "OTP sent successfully" });

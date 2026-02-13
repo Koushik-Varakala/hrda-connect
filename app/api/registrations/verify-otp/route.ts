@@ -33,14 +33,22 @@ export async function POST(request: Request) {
             otpAttempts: 0
         });
 
-        // In Next.js, we don't use 'req.session' like Express. 
-        // We should issue a JWT or a cookie here, OR if using NextAuth, perform a SignIn.
-        // For now, we return success and let frontend handle state (or use a secure HTTP-only cookie).
-        // HRDA implementation used session for "Verified" state. 
-        // We can return a specific token or just trust the client for this flow if it's just for viewing masked data.
-        // Ideally, we return a signed JWT.
+        // Set Secure Cookie
+        const response = NextResponse.json({ success: true, registration: reg });
+        // We can't set cookies on NextResponse directly if we want to read them in Server Components cleanly sometimes, but here it works.
+        // Actually, in App Router Route Handlers, use `cookies().set(...)`
 
-        return NextResponse.json({ success: true, registration: reg });
+        const { cookies } = require("next/headers");
+        const cookieStore = await cookies();
+        cookieStore.set("verified_registration_id", String(registrationId), {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 60 * 60, // 1 hour
+            path: "/",
+        });
+
+        return NextResponse.json({ success: true });
 
     } catch (err) {
         console.error("OTP Verify Error:", err);

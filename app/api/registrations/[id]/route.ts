@@ -10,6 +10,9 @@ import { googleSheetsService } from "@/lib/services/googleSheets";
 export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const id = Number(params.id);
+    if (isNaN(id)) {
+        return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+    }
     const data = await storage.getRegistration(id);
     if (!data) return NextResponse.json({ message: "Not found" }, { status: 404 });
     return NextResponse.json(data);
@@ -19,23 +22,22 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const id = Number(params.id);
-    const session = await auth(); // We might need this for admin or self update
-
-    // Logic from routes.ts: verify session "verifiedRegistrationId" matches id for self-update, OR admin.
-    // We don't have "verifiedRegistrationId" in NextAuth session by default unless we put it there.
-    // For now, let's assume if you have the ID and are calling this, you might be authorized or we rely on OTP session cookie if we implemented it.
-    // In `routes.ts`: `if (req.session.verifiedRegistrationId !== id)` check.
-
-    // TODO: We need to figure out how to handle the "OTP Verified" state in Next.js without Express session.
-    // Ideally, the OTP verify endpoint sets a secure cookie "verified_reg_id".
-    // For now, let's relax this check or assume the frontend handles it, OR check for a custom header/cookie.
-
-    // Let's implement Admin check at least.
+    if (isNaN(id)) {
+        return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+    }
+    const session = await auth();
     const isAdmin = session?.user && (session.user as any).isAdmin;
 
-    // If not admin, we should ideally check generic "is this user allowed".
-    // For the MVP migration, assuming if they passed OTP they are good is risky without server check.
-    // Let's skip the strict "verifiedRegistrationId" check for this step to unblock, but mark for TODO.
+    if (!isAdmin) {
+        // Check for verified cookie
+        const { cookies } = require("next/headers");
+        const cookieStore = await cookies();
+        const verifiedId = cookieStore.get("verified_registration_id")?.value;
+
+        if (verifiedId !== String(id)) {
+            return NextResponse.json({ message: "Unauthorized. Please verify via OTP first." }, { status: 401 });
+        }
+    }
 
     try {
         const body = await request.json();
@@ -80,9 +82,18 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
 export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const id = Number(params.id);
+    if (isNaN(id)) {
+        return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+    }
+    if (isNaN(id)) {
+        return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+    }
     const session = await auth();
+    const isAdmin = session?.user && (session.user as any).isAdmin;
 
-    if (!session?.user || !(session.user as any).isAdmin) {
+    // Admins can delete. Users typically cannot delete themselves in this app, but if they could:
+    // strict check: only admin.
+    if (!isAdmin) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
