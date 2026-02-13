@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///Users/KoushikVarakala/Downloads/HRDA-Connect/app/providers.tsx"],"sourcesContent":["\"use client\";\n\nimport { QueryClient, QueryClientProvider } from \"@tanstack/react-query\";\nimport { SessionProvider } from \"next-auth/react\";\nimport { useState } from \"react\";\n\nexport function Providers({ children }: { children: React.ReactNode }) {\n    const [queryClient] = useState(() => new QueryClient());\n\n    return (\n        <SessionProvider>\n            <QueryClientProvider client={queryClient}>\n                {children}\n            </QueryClientProvider>\n        </SessionProvider>\n    );\n}\n"],"names":[],"mappings":";;;;;AAEA;AAAA;AACA;AACA;AAJA;;;;;AAMO,SAAS,UAAU,EAAE,QAAQ,EAAiC;IACjE,MAAM,CAAC,YAAY,GAAG,IAAA,iNAAQ,EAAC,IAAM,IAAI,4LAAW;IAEpD,qBACI,8OAAC,wJAAe;kBACZ,cAAA,8OAAC,6MAAmB;YAAC,QAAQ;sBACxB;;;;;;;;;;;AAIjB"}}]
-}
