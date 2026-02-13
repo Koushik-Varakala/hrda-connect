@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/AdminLayout";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -61,7 +61,7 @@ export default function ManageAnnouncements() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Manage Announcements</h1>
                 <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) { setEditingItem(null); form.reset(); } }}>
@@ -132,6 +132,6 @@ export default function ManageAnnouncements() {
                     </TableBody>
                 </Table>
             </div>
-        </AdminLayout>
+        </>
     );
 }

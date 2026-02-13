@@ -17,7 +17,13 @@
   "headers": [],
   "rewrites": {
     "beforeFiles": [],
-    "afterFiles": [],
+    "afterFiles": [
+      {
+        "source": "/index.php/new-registration-2{/}?",
+        "destination": "/register",
+        "regex": "^/index\\.php/new-registration-2(?:/)?(?:/)?$"
+      }
+    ],
     "fallback": []
   },
   "dynamicRoutes": [
@@ -188,10 +194,22 @@
       "namedRegex": "^/admin/registrations(?:/)?$"
     },
     {
+      "page": "/announcements",
+      "regex": "^/announcements(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/announcements(?:/)?$"
+    },
+    {
       "page": "/api/achievements",
       "regex": "^/api/achievements(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/achievements(?:/)?$"
+    },
+    {
+      "page": "/api/admin/registrations",
+      "regex": "^/api/admin/registrations(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/registrations(?:/)?$"
     },
     {
       "page": "/api/announcements",
@@ -248,6 +266,12 @@
       "namedRegex": "^/api/registrations/order(?:/)?$"
     },
     {
+      "page": "/api/registrations/search",
+      "regex": "^/api/registrations/search(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/registrations/search(?:/)?$"
+    },
+    {
       "page": "/api/registrations/send-otp",
       "regex": "^/api/registrations/send\\-otp(?:/)?$",
       "routeKeys": {},
@@ -264,6 +288,12 @@
       "regex": "^/api/registrations/verify\\-otp(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/registrations/verify\\-otp(?:/)?$"
+    },
+    {
+      "page": "/api/upload",
+      "regex": "^/api/upload(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/upload(?:/)?$"
     },
     {
       "page": "/contact",

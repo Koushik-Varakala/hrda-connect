@@ -1,7 +1,7 @@
 "use client";
 
 import { Layout } from "@/components/Layout";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { X, ZoomIn } from "lucide-react";
@@ -10,9 +10,20 @@ import { MediaCoverage } from "@shared/schema";
 
 export default function Media() {
     const [selectedMedia, setSelectedMedia] = useState<MediaCoverage | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const handleMediaClick = (media: MediaCoverage) => {
+        setSelectedMedia(media);
+        setIsDialogOpen(true);
+    };
 
     const { data: mediaItems, isLoading } = useQuery<MediaCoverage[]>({
         queryKey: ["/api/media-coverage"],
+        queryFn: async () => {
+            const res = await fetch("/api/media-coverage");
+            if (!res.ok) throw new Error("Failed to fetch media coverage");
+            return res.json();
+        }
     });
 
     return (
@@ -50,7 +61,7 @@ export default function Media() {
                                 <MediaCard
                                     key={item.id}
                                     item={item}
-                                    onClick={() => setSelectedMedia(item)}
+                                    onClick={() => handleMediaClick(item)}
                                 />
                             ))}
                         </div>
@@ -58,11 +69,16 @@ export default function Media() {
                 </div>
             </div>
 
-            <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 bg-transparent border-none shadow-none flex items-center justify-center overflow-hidden">
+                    {/* Accessible Title */}
+                    <DialogTitle className="sr-only">
+                        {selectedMedia?.title || "Media Preview"}
+                    </DialogTitle>
+
                     <div className="relative w-full h-full flex items-center justify-center">
                         <button
-                            onClick={() => setSelectedMedia(null)}
+                            onClick={() => setIsDialogOpen(false)}
                             className="absolute top-4 right-4 z-50 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
                         >
                             <X className="w-6 h-6" />

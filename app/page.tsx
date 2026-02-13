@@ -50,7 +50,7 @@ export default function Home() {
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Button asChild size="lg" className="rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-semibold">
-                                    <Link href="/register">
+                                    <Link href="/index.php/new-registration-2/">
                                         Join HRDA Today
                                     </Link>
                                 </Button>
@@ -287,7 +287,7 @@ export default function Home() {
                         Become a member of HRDA today and contribute to the future of the medical profession in Telangana.
                     </p>
                     <Button asChild size="lg" variant="secondary" className="bg-white text-primary hover:bg-slate-100 font-bold px-10 h-14 rounded-full shadow-xl">
-                        <Link href="/register">
+                        <Link href="/index.php/new-registration-2/">
                             Become a Member <ArrowRight className="ml-2 w-5 h-5" />
                         </Link>
                     </Button>

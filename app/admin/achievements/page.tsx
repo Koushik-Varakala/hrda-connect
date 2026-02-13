@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/AdminLayout";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -105,7 +105,7 @@ export default function ManageAchievements() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Manage Achievements</h1>
                 <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsDialogOpen(true); }}>
@@ -246,6 +246,6 @@ export default function ManageAchievements() {
                     </TableBody>
                 </Table>
             </div>
-        </AdminLayout>
+        </>
     );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/AdminLayout";
+
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ export default function ManageDepartments() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <h1 className="text-2xl font-bold mb-6">Manage Departments</h1>
             <div className="space-y-8">
                 {isLoading ? (
@@ -35,7 +35,7 @@ export default function ManageDepartments() {
                     ))
                 )}
             </div>
-        </AdminLayout>
+        </>
     );
 }
 

@@ -870,19 +870,21 @@ async function PUT(request, props) {
             status: 400
         });
     }
-    const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["auth"])(); // We might need this for admin or self update
-    // Logic from routes.ts: verify session "verifiedRegistrationId" matches id for self-update, OR admin.
-    // We don't have "verifiedRegistrationId" in NextAuth session by default unless we put it there.
-    // For now, let's assume if you have the ID and are calling this, you might be authorized or we rely on OTP session cookie if we implemented it.
-    // In `routes.ts`: `if (req.session.verifiedRegistrationId !== id)` check.
-    // TODO: We need to figure out how to handle the "OTP Verified" state in Next.js without Express session.
-    // Ideally, the OTP verify endpoint sets a secure cookie "verified_reg_id".
-    // For now, let's relax this check or assume the frontend handles it, OR check for a custom header/cookie.
-    // Let's implement Admin check at least.
+    const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["auth"])();
     const isAdmin = session?.user && session.user.isAdmin;
-    // If not admin, we should ideally check generic "is this user allowed".
-    // For the MVP migration, assuming if they passed OTP they are good is risky without server check.
-    // Let's skip the strict "verifiedRegistrationId" check for this step to unblock, but mark for TODO.
+    if (!isAdmin) {
+        // Check for verified cookie
+        const { cookies } = __turbopack_context__.r("[project]/node_modules/next/headers.js [app-route] (ecmascript)");
+        const cookieStore = await cookies();
+        const verifiedId = cookieStore.get("verified_registration_id")?.value;
+        if (verifiedId !== String(id)) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                message: "Unauthorized. Please verify via OTP first."
+            }, {
+                status: 401
+            });
+        }
+    }
     try {
         const body = await request.json();
         const result = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$storage$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["storage"].updateRegistration(id, body);
@@ -944,7 +946,10 @@ async function DELETE(request, props) {
         });
     }
     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["auth"])();
-    if (!session?.user || !session.user.isAdmin) {
+    const isAdmin = session?.user && session.user.isAdmin;
+    // Admins can delete. Users typically cannot delete themselves in this app, but if they could:
+    // strict check: only admin.
+    if (!isAdmin) {
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             message: "Unauthorized"
         }, {

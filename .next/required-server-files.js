@@ -304,7 +304,17 @@ self.__SERVER_FILES_MANIFEST={
     "turbopack": {
       "root": "/Users/KoushikVarakala/Downloads/HRDA-Connect"
     },
-    "distDirRoot": ".next"
+    "distDirRoot": ".next",
+    "_originalRewrites": {
+      "beforeFiles": [],
+      "afterFiles": [
+        {
+          "source": "/index.php/new-registration-2{/}?",
+          "destination": "/register"
+        }
+      ],
+      "fallback": []
+    }
   },
   "appDir": "/Users/KoushikVarakala/Downloads/HRDA-Connect",
   "relativeAppDir": "",

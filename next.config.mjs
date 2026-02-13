@@ -13,12 +13,11 @@ const nextConfig = {
             },
         ],
     },
-    async redirects() {
+    async rewrites() {
         return [
             {
-                source: '/index.php/new-registration-2',
+                source: '/index.php/new-registration-2{/}?',
                 destination: '/register',
-                permanent: true,
             },
         ];
     },

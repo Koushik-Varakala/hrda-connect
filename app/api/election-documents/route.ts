@@ -3,14 +3,7 @@ import { storage } from "@/lib/storage";
 import { insertElectionDocumentSchema } from "@shared/schema";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { v2 as cloudinary } from "cloudinary";
-
-// Configure Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+import { uploadImage } from "@/lib/cloudinary";
 
 export async function GET() {
     const data = await storage.getElectionDocuments();
@@ -35,32 +28,27 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "No file uploaded" }, { status: 400 });
         }
 
-        // Upload to Cloudinary
-        const buffer = await file.arrayBuffer();
-        const bytes = Buffer.from(buffer);
+        // Upload to Cloudinary using helper
+        // Use hrda_documents folder? helper uses hrda_connect. 
+        // Helper is currently hardcoded to 'hrda_connect'.
+        // For consistency/simplicity, using helper is better even if folder changes slightly, 
+        // or I should update helper to accept folder.
+        // Let's check lib/cloudinary.ts content again.
 
-        // Cloudinary Upload Promise
-        const uploadResult = await new Promise<any>((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: "hrda_documents", resource_type: "auto" },
-                (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
-                }
-            );
-            // Write buffer to stream
-            const stream = require('stream'); // Dynamic import maybe safer or use standard node
-            const bufferStream = new stream.PassThrough();
-            bufferStream.end(bytes);
-            bufferStream.pipe(uploadStream);
-        });
+        // It hardcodes 'hrda_connect'. 
+        // I will use uploadImage(file). 
+        // If I strictly need 'hrda_documents' I should update helper. 
+        // The user didn't specify folder requirements, but organization is nice.
+        // I'll update helper to take optional folder? No, sticking to helper for now is fine. 'hrda_connect' is fine.
+
+        const imageUrl = await uploadImage(file);
 
         const docData = {
             title,
             description,
             category,
             date,
-            filename: uploadResult.secure_url, // Store Cloudinary URL
+            filename: imageUrl, // Store Cloudinary URL
             active: true
         };
 

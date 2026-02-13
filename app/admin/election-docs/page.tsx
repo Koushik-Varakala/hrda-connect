@@ -16,7 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { AdminLayout } from "@/components/AdminLayout";
+
 import { ElectionDocument } from "@shared/schema";
 import { format } from "date-fns";
 
@@ -34,6 +34,11 @@ export default function ManageElectionDocs() {
 
     const { data: documents, isLoading } = useQuery<ElectionDocument[]>({
         queryKey: ["/api/election-documents"],
+        queryFn: async () => {
+            const res = await fetch("/api/election-documents");
+            if (!res.ok) throw new Error("Failed to fetch election documents");
+            return res.json();
+        },
     });
 
     const uploadMutation = useMutation({
@@ -97,7 +102,7 @@ export default function ManageElectionDocs() {
     const categories = ["Foundational", "Candidates", "Notices", "Ballots", "Results", "Records"];
 
     return (
-        <AdminLayout>
+        <>
             <div className="space-y-8">
                 <div>
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
@@ -271,6 +276,6 @@ export default function ManageElectionDocs() {
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+        </>
     );
 }

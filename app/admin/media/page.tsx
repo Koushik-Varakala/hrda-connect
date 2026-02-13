@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/AdminLayout";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -92,7 +92,7 @@ export default function ManageMedia() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Manage Media Coverage</h1>
                 <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsDialogOpen(true); }}>
@@ -206,6 +206,6 @@ export default function ManageMedia() {
                     </TableBody>
                 </Table>
             </div>
-        </AdminLayout>
+        </>
     );
 }

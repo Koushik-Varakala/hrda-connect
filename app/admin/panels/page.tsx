@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/AdminLayout";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -126,7 +126,7 @@ export default function ManagePanels() {
     };
 
     return (
-        <AdminLayout>
+        <>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Manage Panels</h1>
                 <Dialog open={isDialogOpen} onOpenChange={(open) => {
@@ -262,6 +262,6 @@ export default function ManagePanels() {
                     </TableBody>
                 </Table>
             </div>
-        </AdminLayout>
+        </>
     );
 }

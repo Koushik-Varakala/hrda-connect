@@ -6,8 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
 import { RegistrationForm } from "@/components/RegistrationForm";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Membership() {
+    const { toast } = useToast();
     const [isSuccess, setIsSuccess] = useState(false);
     return (
         <Layout>
@@ -64,7 +66,14 @@ export default function Membership() {
                             </CardContent>
                         </Card>
                     ) : (
-                        <RegistrationForm onSuccess={() => setIsSuccess(true)} />
+                        <RegistrationForm onSuccess={() => {
+                            setIsSuccess(true);
+                            toast({
+                                title: "Registration Successful",
+                                description: "Welcome to HRDA! Please check your email for confirmation.",
+                                duration: 5000,
+                            });
+                        }} />
                     )}
 
                 </div>

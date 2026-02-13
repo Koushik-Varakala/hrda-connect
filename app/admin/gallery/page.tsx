@@ -13,12 +13,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Loader2, Plus, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AdminLayout } from "@/components/AdminLayout";
+
 
 export default function ManageGallery() {
     const { toast } = useToast();
     const { data: photos, isLoading } = useQuery<GalleryPhoto[]>({
         queryKey: ["/api/gallery"],
+        queryFn: async () => {
+            const res = await fetch("/api/gallery");
+            if (!res.ok) throw new Error("Failed to fetch gallery photos");
+            return res.json();
+        },
     });
 
     const form = useForm<InsertGalleryPhoto>({
@@ -107,7 +112,7 @@ export default function ManageGallery() {
     });
 
     return (
-        <AdminLayout>
+        <>
             <div className="space-y-6">
                 <h1 className="text-3xl font-bold tracking-tight">Manage Gallery</h1>
 
@@ -234,6 +239,6 @@ export default function ManageGallery() {
                     ))}
                 </div>
             </div>
-        </AdminLayout>
+        </>
     );
 }

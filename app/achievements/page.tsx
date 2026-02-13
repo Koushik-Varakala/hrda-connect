@@ -13,6 +13,11 @@ import { Achievement } from "@shared/schema";
 export default function Achievements() {
     const { data: achievements } = useQuery<Achievement[]>({
         queryKey: ["/api/achievements"],
+        queryFn: async () => {
+            const res = await fetch("/api/achievements");
+            if (!res.ok) throw new Error("Failed to fetch achievements");
+            return res.json();
+        }
     });
 
     const legalWins = achievements?.filter(a => a.category === 'legal') || [];

@@ -635,12 +635,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$file$2d$text$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__FileText$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/file-text.js [app-client] (ecmascript) <export default as FileText>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$upload$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Upload$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/upload.js [app-client] (ecmascript) <export default as Upload>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/select.tsx [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$AdminLayout$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/AdminLayout.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$format$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/date-fns/format.mjs [app-client] (ecmascript) <locals>");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
-;
 ;
 ;
 ;
@@ -666,7 +664,14 @@ function ManageElectionDocs() {
     const { data: documents, isLoading } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tanstack$2f$react$2d$query$2f$build$2f$modern$2f$useQuery$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useQuery"])({
         queryKey: [
             "/api/election-documents"
-        ]
+        ],
+        queryFn: {
+            "ManageElectionDocs.useQuery": async ()=>{
+                const res = await fetch("/api/election-documents");
+                if (!res.ok) throw new Error("Failed to fetch election documents");
+                return res.json();
+            }
+        }["ManageElectionDocs.useQuery"]
     });
     const uploadMutation = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tanstack$2f$react$2d$query$2f$build$2f$modern$2f$useMutation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMutation"])({
         mutationFn: {
@@ -762,7 +767,7 @@ function ManageElectionDocs() {
         "Results",
         "Records"
     ];
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$AdminLayout$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AdminLayout"], {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "space-y-8",
             children: [
@@ -773,7 +778,7 @@ function ManageElectionDocs() {
                             children: "Manage Election Documents"
                         }, void 0, false, {
                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                            lineNumber: 103,
+                            lineNumber: 108,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -781,13 +786,13 @@ function ManageElectionDocs() {
                             children: "Upload and manage election-related PDFs."
                         }, void 0, false, {
                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                            lineNumber: 106,
+                            lineNumber: 111,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                    lineNumber: 102,
+                    lineNumber: 107,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -802,20 +807,20 @@ function ManageElectionDocs() {
                                             children: "Upload New Document"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                                            lineNumber: 115,
+                                            lineNumber: 120,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardDescription"], {
                                             children: "Add a new PDF to the election panel."
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                                            lineNumber: 116,
+                                            lineNumber: 121,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                    lineNumber: 114,
+                                    lineNumber: 119,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -831,7 +836,7 @@ function ManageElectionDocs() {
                                                         children: "Document Title"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 121,
+                                                        lineNumber: 126,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -842,13 +847,13 @@ function ManageElectionDocs() {
                                                         required: true
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 122,
+                                                        lineNumber: 127,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                lineNumber: 120,
+                                                lineNumber: 125,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -859,7 +864,7 @@ function ManageElectionDocs() {
                                                         children: "Category"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 132,
+                                                        lineNumber: 137,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Select"], {
@@ -871,12 +876,12 @@ function ManageElectionDocs() {
                                                                     placeholder: "Select Category"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                    lineNumber: 135,
+                                                                    lineNumber: 140,
                                                                     columnNumber: 45
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                lineNumber: 134,
+                                                                lineNumber: 139,
                                                                 columnNumber: 41
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -885,24 +890,24 @@ function ManageElectionDocs() {
                                                                         children: cat
                                                                     }, cat, false, {
                                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                        lineNumber: 139,
+                                                                        lineNumber: 144,
                                                                         columnNumber: 49
                                                                     }, this))
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                lineNumber: 137,
+                                                                lineNumber: 142,
                                                                 columnNumber: 41
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 133,
+                                                        lineNumber: 138,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                lineNumber: 131,
+                                                lineNumber: 136,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -913,7 +918,7 @@ function ManageElectionDocs() {
                                                         children: "Display Date"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 148,
+                                                        lineNumber: 153,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -923,13 +928,13 @@ function ManageElectionDocs() {
                                                         placeholder: "e.g. Jan 11, 2026"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 149,
+                                                        lineNumber: 154,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                lineNumber: 147,
+                                                lineNumber: 152,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -940,7 +945,7 @@ function ManageElectionDocs() {
                                                         children: "Description (Optional)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 158,
+                                                        lineNumber: 163,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -950,13 +955,13 @@ function ManageElectionDocs() {
                                                         placeholder: "Brief description of the document"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 159,
+                                                        lineNumber: 164,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                lineNumber: 157,
+                                                lineNumber: 162,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -967,7 +972,7 @@ function ManageElectionDocs() {
                                                         children: "PDF File"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 168,
+                                                        lineNumber: 173,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -981,7 +986,7 @@ function ManageElectionDocs() {
                                                                 className: "absolute inset-0 opacity-0 cursor-pointer"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                lineNumber: 170,
+                                                                lineNumber: 175,
                                                                 columnNumber: 41
                                                             }, this),
                                                             file ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -991,7 +996,7 @@ function ManageElectionDocs() {
                                                                         className: "h-8 w-8 text-primary mx-auto mb-2"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                        lineNumber: 179,
+                                                                        lineNumber: 184,
                                                                         columnNumber: 49
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -999,7 +1004,7 @@ function ManageElectionDocs() {
                                                                         children: file.name
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                        lineNumber: 180,
+                                                                        lineNumber: 185,
                                                                         columnNumber: 49
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1010,13 +1015,13 @@ function ManageElectionDocs() {
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                        lineNumber: 183,
+                                                                        lineNumber: 188,
                                                                         columnNumber: 49
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                lineNumber: 178,
+                                                                lineNumber: 183,
                                                                 columnNumber: 45
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: "text-center",
@@ -1025,7 +1030,7 @@ function ManageElectionDocs() {
                                                                         className: "h-8 w-8 text-muted-foreground mx-auto mb-2"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                        lineNumber: 189,
+                                                                        lineNumber: 194,
                                                                         columnNumber: 49
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1033,7 +1038,7 @@ function ManageElectionDocs() {
                                                                         children: "Tap to select PDF"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                        lineNumber: 190,
+                                                                        lineNumber: 195,
                                                                         columnNumber: 49
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1041,25 +1046,25 @@ function ManageElectionDocs() {
                                                                         children: "Max 10MB"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                        lineNumber: 193,
+                                                                        lineNumber: 198,
                                                                         columnNumber: 49
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                lineNumber: 188,
+                                                                lineNumber: 193,
                                                                 columnNumber: 45
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 169,
+                                                        lineNumber: 174,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                lineNumber: 167,
+                                                lineNumber: 172,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1072,7 +1077,7 @@ function ManageElectionDocs() {
                                                             className: "mr-2 h-4 w-4 animate-spin"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                            lineNumber: 208,
+                                                            lineNumber: 213,
                                                             columnNumber: 45
                                                         }, this),
                                                         "Uploading..."
@@ -1083,7 +1088,7 @@ function ManageElectionDocs() {
                                                             className: "mr-2 h-4 w-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                            lineNumber: 213,
+                                                            lineNumber: 218,
                                                             columnNumber: 45
                                                         }, this),
                                                         "Upload Document"
@@ -1091,24 +1096,24 @@ function ManageElectionDocs() {
                                                 }, void 0, true)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                lineNumber: 201,
+                                                lineNumber: 206,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                        lineNumber: 119,
+                                        lineNumber: 124,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                    lineNumber: 118,
+                                    lineNumber: 123,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                            lineNumber: 113,
+                            lineNumber: 118,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1119,7 +1124,7 @@ function ManageElectionDocs() {
                                     children: "Existing Documents"
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                    lineNumber: 224,
+                                    lineNumber: 229,
                                     columnNumber: 25
                                 }, this),
                                 isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1128,19 +1133,19 @@ function ManageElectionDocs() {
                                         className: "h-8 w-8 animate-spin text-primary"
                                     }, void 0, false, {
                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                        lineNumber: 227,
+                                        lineNumber: 232,
                                         columnNumber: 33
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                    lineNumber: 226,
+                                    lineNumber: 231,
                                     columnNumber: 29
                                 }, this) : documents?.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                     className: "text-muted-foreground text-center p-8 border rounded-lg bg-slate-50",
                                     children: "No documents uploaded yet."
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                    lineNumber: 230,
+                                    lineNumber: 235,
                                     columnNumber: 29
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "grid gap-4",
@@ -1156,12 +1161,12 @@ function ManageElectionDocs() {
                                                                 className: "h-6 w-6"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                lineNumber: 242,
+                                                                lineNumber: 247,
                                                                 columnNumber: 49
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                            lineNumber: 241,
+                                                            lineNumber: 246,
                                                             columnNumber: 45
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1171,7 +1176,7 @@ function ManageElectionDocs() {
                                                                     children: doc.title
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                    lineNumber: 245,
+                                                                    lineNumber: 250,
                                                                     columnNumber: 49
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1183,7 +1188,7 @@ function ManageElectionDocs() {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                    lineNumber: 246,
+                                                                    lineNumber: 251,
                                                                     columnNumber: 49
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1191,19 +1196,19 @@ function ManageElectionDocs() {
                                                                     children: doc.description || doc.filename
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                                    lineNumber: 249,
+                                                                    lineNumber: 254,
                                                                     columnNumber: 49
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                            lineNumber: 244,
+                                                            lineNumber: 249,
                                                             columnNumber: 45
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                    lineNumber: 240,
+                                                    lineNumber: 245,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1220,48 +1225,44 @@ function ManageElectionDocs() {
                                                         className: "h-4 w-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                        lineNumber: 265,
+                                                        lineNumber: 270,
                                                         columnNumber: 45
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                                    lineNumber: 254,
+                                                    lineNumber: 259,
                                                     columnNumber: 41
                                                 }, this)
                                             ]
                                         }, doc.id, true, {
                                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                                            lineNumber: 236,
+                                            lineNumber: 241,
                                             columnNumber: 37
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                                    lineNumber: 234,
+                                    lineNumber: 239,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/admin/election-docs/page.tsx",
-                            lineNumber: 223,
+                            lineNumber: 228,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/election-docs/page.tsx",
-                    lineNumber: 111,
+                    lineNumber: 116,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/admin/election-docs/page.tsx",
-            lineNumber: 101,
+            lineNumber: 106,
             columnNumber: 13
         }, this)
-    }, void 0, false, {
-        fileName: "[project]/app/admin/election-docs/page.tsx",
-        lineNumber: 100,
-        columnNumber: 9
-    }, this);
+    }, void 0, false);
 }
 _s(ManageElectionDocs, "SNW5NgUGl+B/G3v95zOu48sBT3Q=", false, function() {
     return [

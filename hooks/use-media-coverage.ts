@@ -6,6 +6,11 @@ import { useToast } from "@/hooks/use-toast";
 export function useMediaCoverage() {
     return useQuery<MediaCoverage[]>({
         queryKey: ["/api/media-coverage"],
+        queryFn: async () => {
+            const res = await fetch("/api/media-coverage");
+            if (!res.ok) throw new Error("Failed to fetch media coverage");
+            return res.json();
+        },
     });
 }
 

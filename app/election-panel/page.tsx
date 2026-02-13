@@ -17,6 +17,11 @@ import { Vote, FileText, Eye, FileDown } from "lucide-react";
 export default function ElectionPanel() {
     const { data: panels } = useQuery<Panel[]>({
         queryKey: ["/api/panels"],
+        queryFn: async () => {
+            const res = await fetch("/api/panels");
+            if (!res.ok) throw new Error("Failed to fetch panels");
+            return res.json();
+        }
     });
 
     const electedMembers = panels?.filter(p => p.category === 'elected_member') || [];
@@ -24,6 +29,11 @@ export default function ElectionPanel() {
     // Election Documents
     const { data: documents = [] } = useQuery<any[]>({
         queryKey: ["/api/election-documents"],
+        queryFn: async () => {
+            const res = await fetch("/api/election-documents");
+            if (!res.ok) throw new Error("Failed to fetch election documents");
+            return res.json();
+        }
     });
 
     return (
@@ -92,7 +102,12 @@ export default function ElectionPanel() {
                                             </Button>
                                         </DialogTrigger>
                                         <Button asChild variant="ghost" size="sm" className="px-2 text-slate-400 hover:text-primary">
-                                            <a href={`/documents/${doc.filename}`} download target="_blank" rel="noopener noreferrer">
+                                            <a
+                                                href={doc.filename.startsWith('http') ? doc.filename : `/documents/${doc.filename}`}
+                                                download
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
                                                 <FileDown className="w-4 h-4" />
                                             </a>
                                         </Button>
@@ -104,7 +119,7 @@ export default function ElectionPanel() {
                                     </DialogHeader>
                                     <div className="flex-1 w-full bg-slate-100 overflow-hidden">
                                         <iframe
-                                            src={`/documents/${doc.filename}`}
+                                            src={doc.filename.startsWith('http') ? doc.filename : `/documents/${doc.filename}`}
                                             className="w-full h-full border-none"
                                             title={doc.title}
                                         />

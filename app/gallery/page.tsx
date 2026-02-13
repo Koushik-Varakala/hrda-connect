@@ -9,6 +9,11 @@ import { Layout } from "@/components/Layout";
 export default function GalleryPage() {
     const { data: photos, isLoading } = useQuery<GalleryPhoto[]>({
         queryKey: ["/api/gallery"],
+        queryFn: async () => {
+            const res = await fetch("/api/gallery");
+            if (!res.ok) throw new Error("Failed to fetch gallery photos");
+            return res.json();
+        }
     });
 
     return (

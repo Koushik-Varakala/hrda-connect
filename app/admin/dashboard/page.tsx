@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminLayout } from "@/components/AdminLayout";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRegistrationsList } from "@/hooks/use-registrations";
 import { Users, FileCheck, DollarSign, Activity } from "lucide-react";

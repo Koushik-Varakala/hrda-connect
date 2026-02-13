@@ -671,7 +671,7 @@ function Layout({ children }) {
                                         asChild: true,
                                         className: "bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 shadow-md transition-all hover:shadow-lg font-medium",
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                            href: "/register",
+                                            href: "/index.php/new-registration-2",
                                             children: "Join HRDA"
                                         }, void 0, false, {
                                             fileName: "[project]/components/Layout.tsx",
@@ -813,7 +813,7 @@ function Layout({ children }) {
                                 asChild: true,
                                 className: "w-full justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm mt-2",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                    href: "/register",
+                                    href: "/index.php/new-registration-2",
                                     children: "Join HRDA"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Layout.tsx",
@@ -1391,7 +1391,14 @@ function Achievements() {
     const { data: achievements } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$tanstack$2f$react$2d$query$2f$build$2f$modern$2f$useQuery$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useQuery"])({
         queryKey: [
             "/api/achievements"
-        ]
+        ],
+        queryFn: {
+            "Achievements.useQuery": async ()=>{
+                const res = await fetch("/api/achievements");
+                if (!res.ok) throw new Error("Failed to fetch achievements");
+                return res.json();
+            }
+        }["Achievements.useQuery"]
     });
     const legalWins = achievements?.filter((a)=>a.category === 'legal') || [];
     const associationWins = achievements?.filter((a)=>a.category === 'association') || [];
@@ -1403,28 +1410,28 @@ function Achievements() {
             className: "w-5 h-5 text-primary"
         }, void 0, false, {
             fileName: "[project]/app/achievements/page.tsx",
-            lineNumber: 25,
+            lineNumber: 30,
             columnNumber: 100
         }, this);
         if (title.toLowerCase().includes("covid")) return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$heart$2d$pulse$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__HeartPulse$3e$__["HeartPulse"], {
             className: "w-5 h-5 text-red-500"
         }, void 0, false, {
             fileName: "[project]/app/achievements/page.tsx",
-            lineNumber: 26,
+            lineNumber: 31,
             columnNumber: 59
         }, this);
         if (title.toLowerCase().includes("protest") || title.toLowerCase().includes("legacy")) return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$megaphone$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Megaphone$3e$__["Megaphone"], {
             className: "w-5 h-5 text-orange-500"
         }, void 0, false, {
             fileName: "[project]/app/achievements/page.tsx",
-            lineNumber: 27,
+            lineNumber: 32,
             columnNumber: 103
         }, this);
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle2$3e$__["CheckCircle2"], {
             className: "w-5 h-5 text-green-600"
         }, void 0, false, {
             fileName: "[project]/app/achievements/page.tsx",
-            lineNumber: 28,
+            lineNumber: 33,
             columnNumber: 16
         }, this);
     };
@@ -1437,7 +1444,7 @@ function Achievements() {
                         className: "absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-10"
                     }, void 0, false, {
                         fileName: "[project]/app/achievements/page.tsx",
-                        lineNumber: 35,
+                        lineNumber: 40,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1456,7 +1463,7 @@ function Achievements() {
                                 children: "A Legacy of Struggle & Victory"
                             }, void 0, false, {
                                 fileName: "[project]/app/achievements/page.tsx",
-                                lineNumber: 37,
+                                lineNumber: 42,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].p, {
@@ -1475,19 +1482,19 @@ function Achievements() {
                                 children: "From fighting exploitative fees to reforming the Medical Council, HRDA has consistently stood for the dignity of doctors and the safety of patients."
                             }, void 0, false, {
                                 fileName: "[project]/app/achievements/page.tsx",
-                                lineNumber: 44,
+                                lineNumber: 49,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/achievements/page.tsx",
-                        lineNumber: 36,
+                        lineNumber: 41,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/achievements/page.tsx",
-                lineNumber: 34,
+                lineNumber: 39,
                 columnNumber: 13
             }, this),
             galleryImages.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1503,7 +1510,7 @@ function Achievements() {
                                     children: "Gallery & Highlights"
                                 }, void 0, false, {
                                     fileName: "[project]/app/achievements/page.tsx",
-                                    lineNumber: 60,
+                                    lineNumber: 65,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1511,13 +1518,13 @@ function Achievements() {
                                     children: "Visual evidence of our struggles, protests, and victories."
                                 }, void 0, false, {
                                     fileName: "[project]/app/achievements/page.tsx",
-                                    lineNumber: 61,
+                                    lineNumber: 66,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/achievements/page.tsx",
-                            lineNumber: 59,
+                            lineNumber: 64,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1545,7 +1552,7 @@ function Achievements() {
                                                     className: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 76,
+                                                    lineNumber: 81,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1556,18 +1563,18 @@ function Achievements() {
                                                         children: item.date ? new Date(item.date).getFullYear() : ''
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/achievements/page.tsx",
-                                                        lineNumber: 82,
+                                                        lineNumber: 87,
                                                         columnNumber: 45
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 81,
+                                                    lineNumber: 86,
                                                     columnNumber: 41
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/achievements/page.tsx",
-                                            lineNumber: 75,
+                                            lineNumber: 80,
                                             columnNumber: 37
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1578,7 +1585,7 @@ function Achievements() {
                                                     children: item.title
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 88,
+                                                    lineNumber: 93,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1586,7 +1593,7 @@ function Achievements() {
                                                     children: item.description
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 89,
+                                                    lineNumber: 94,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1597,41 +1604,41 @@ function Achievements() {
                                                             children: item.category.replace('_', ' ')
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/achievements/page.tsx",
-                                                            lineNumber: 92,
+                                                            lineNumber: 97,
                                                             columnNumber: 45
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 90,
+                                                    lineNumber: 95,
                                                     columnNumber: 41
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/achievements/page.tsx",
-                                            lineNumber: 87,
+                                            lineNumber: 92,
                                             columnNumber: 37
                                         }, this)
                                     ]
                                 }, item.id, true, {
                                     fileName: "[project]/app/achievements/page.tsx",
-                                    lineNumber: 68,
+                                    lineNumber: 73,
                                     columnNumber: 33
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/app/achievements/page.tsx",
-                            lineNumber: 66,
+                            lineNumber: 71,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/achievements/page.tsx",
-                    lineNumber: 58,
+                    lineNumber: 63,
                     columnNumber: 21
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/achievements/page.tsx",
-                lineNumber: 57,
+                lineNumber: 62,
                 columnNumber: 17
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1650,7 +1657,7 @@ function Achievements() {
                                                 className: "w-8 h-8 text-primary"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/achievements/page.tsx",
-                                                lineNumber: 110,
+                                                lineNumber: 115,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1658,13 +1665,13 @@ function Achievements() {
                                                 children: "Legal Battles"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/achievements/page.tsx",
-                                                lineNumber: 111,
+                                                lineNumber: 116,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/achievements/page.tsx",
-                                        lineNumber: 109,
+                                        lineNumber: 114,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1672,7 +1679,7 @@ function Achievements() {
                                         children: "HRDA has filed diverse PILs and writs in the High Court, protecting the rights of medical professionals and students."
                                     }, void 0, false, {
                                         fileName: "[project]/app/achievements/page.tsx",
-                                        lineNumber: 113,
+                                        lineNumber: 118,
                                         columnNumber: 29
                                     }, this),
                                     legalWins.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1680,7 +1687,7 @@ function Achievements() {
                                         children: "No legal achievements added yet."
                                     }, void 0, false, {
                                         fileName: "[project]/app/achievements/page.tsx",
-                                        lineNumber: 117,
+                                        lineNumber: 122,
                                         columnNumber: 56
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -1703,7 +1710,7 @@ function Achievements() {
                                                         className: "w-5 h-5 text-green-600 mt-1 shrink-0"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/achievements/page.tsx",
-                                                        lineNumber: 128,
+                                                        lineNumber: 133,
                                                         columnNumber: 41
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1713,7 +1720,7 @@ function Achievements() {
                                                                 children: win.title
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/achievements/page.tsx",
-                                                                lineNumber: 130,
+                                                                lineNumber: 135,
                                                                 columnNumber: 45
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1721,30 +1728,30 @@ function Achievements() {
                                                                 children: win.description
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/achievements/page.tsx",
-                                                                lineNumber: 131,
+                                                                lineNumber: 136,
                                                                 columnNumber: 45
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/achievements/page.tsx",
-                                                        lineNumber: 129,
+                                                        lineNumber: 134,
                                                         columnNumber: 41
                                                     }, this)
                                                 ]
                                             }, win.id, true, {
                                                 fileName: "[project]/app/achievements/page.tsx",
-                                                lineNumber: 121,
+                                                lineNumber: 126,
                                                 columnNumber: 37
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/app/achievements/page.tsx",
-                                        lineNumber: 119,
+                                        lineNumber: 124,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/achievements/page.tsx",
-                                lineNumber: 108,
+                                lineNumber: 113,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1757,14 +1764,14 @@ function Achievements() {
                                                 className: "w-6 h-6 text-orange-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/achievements/page.tsx",
-                                                lineNumber: 141,
+                                                lineNumber: 146,
                                                 columnNumber: 33
                                             }, this),
                                             "Agitations & Association Activities"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/achievements/page.tsx",
-                                        lineNumber: 140,
+                                        lineNumber: 145,
                                         columnNumber: 29
                                     }, this),
                                     associationWins.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1772,7 +1779,7 @@ function Achievements() {
                                         children: "No activities added yet."
                                     }, void 0, false, {
                                         fileName: "[project]/app/achievements/page.tsx",
-                                        lineNumber: 145,
+                                        lineNumber: 150,
                                         columnNumber: 62
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -1784,7 +1791,7 @@ function Achievements() {
                                                         className: "absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-slate-200 border-2 border-white"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/achievements/page.tsx",
-                                                        lineNumber: 150,
+                                                        lineNumber: 155,
                                                         columnNumber: 41
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
@@ -1792,7 +1799,7 @@ function Achievements() {
                                                         children: win.title
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/achievements/page.tsx",
-                                                        lineNumber: 151,
+                                                        lineNumber: 156,
                                                         columnNumber: 41
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1800,40 +1807,40 @@ function Achievements() {
                                                         children: win.description
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/achievements/page.tsx",
-                                                        lineNumber: 152,
+                                                        lineNumber: 157,
                                                         columnNumber: 41
                                                     }, this)
                                                 ]
                                             }, win.id, true, {
                                                 fileName: "[project]/app/achievements/page.tsx",
-                                                lineNumber: 149,
+                                                lineNumber: 154,
                                                 columnNumber: 37
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/app/achievements/page.tsx",
-                                        lineNumber: 147,
+                                        lineNumber: 152,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/achievements/page.tsx",
-                                lineNumber: 139,
+                                lineNumber: 144,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/achievements/page.tsx",
-                        lineNumber: 105,
+                        lineNumber: 110,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/achievements/page.tsx",
-                    lineNumber: 104,
+                    lineNumber: 109,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/achievements/page.tsx",
-                lineNumber: 103,
+                lineNumber: 108,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1849,7 +1856,7 @@ function Achievements() {
                                     children: "TGMC Elections 2023"
                                 }, void 0, false, {
                                     fileName: "[project]/app/achievements/page.tsx",
-                                    lineNumber: 166,
+                                    lineNumber: 171,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1857,13 +1864,13 @@ function Achievements() {
                                     children: "A historic turning point for the medical fraternity in Telangana."
                                 }, void 0, false, {
                                     fileName: "[project]/app/achievements/page.tsx",
-                                    lineNumber: 167,
+                                    lineNumber: 172,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/achievements/page.tsx",
-                            lineNumber: 165,
+                            lineNumber: 170,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1879,7 +1886,7 @@ function Achievements() {
                                                     className: "w-8 h-8 text-primary"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 176,
+                                                    lineNumber: 181,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -1887,13 +1894,13 @@ function Achievements() {
                                                     children: "Election Manifesto"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 177,
+                                                    lineNumber: 182,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/achievements/page.tsx",
-                                            lineNumber: 175,
+                                            lineNumber: 180,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1901,7 +1908,7 @@ function Achievements() {
                                             children: '"A roadmap rooted in years of struggle to restore dignity and modernize the Council."'
                                         }, void 0, false, {
                                             fileName: "[project]/app/achievements/page.tsx",
-                                            lineNumber: 179,
+                                            lineNumber: 184,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -1923,7 +1930,7 @@ function Achievements() {
                                                             children: idx + 1
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/achievements/page.tsx",
-                                                            lineNumber: 194,
+                                                            lineNumber: 199,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1931,24 +1938,24 @@ function Achievements() {
                                                             children: item
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/achievements/page.tsx",
-                                                            lineNumber: 197,
+                                                            lineNumber: 202,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, idx, true, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 193,
+                                                    lineNumber: 198,
                                                     columnNumber: 37
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/achievements/page.tsx",
-                                            lineNumber: 182,
+                                            lineNumber: 187,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/achievements/page.tsx",
-                                    lineNumber: 174,
+                                    lineNumber: 179,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1960,7 +1967,7 @@ function Achievements() {
                                                     className: "w-8 h-8 text-green-600"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 206,
+                                                    lineNumber: 211,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -1968,13 +1975,13 @@ function Achievements() {
                                                     children: "Unprecedented Victory"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 207,
+                                                    lineNumber: 212,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/achievements/page.tsx",
-                                            lineNumber: 205,
+                                            lineNumber: 210,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1985,7 +1992,7 @@ function Achievements() {
                                                     children: "In December 2023, history was written. For the first time in 17 years, elections were held for 13 seats in the Telangana State Medical Council."
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 210,
+                                                    lineNumber: 215,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1996,7 +2003,7 @@ function Achievements() {
                                                             children: "HRDA won every single seat with a staggering majority."
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/achievements/page.tsx",
-                                                            lineNumber: 214,
+                                                            lineNumber: 219,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2004,49 +2011,49 @@ function Achievements() {
                                                             children: "A clean sweep of all 13 elected positions, reiterating the absolute trust of doctors all over Telangana."
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/achievements/page.tsx",
-                                                            lineNumber: 217,
+                                                            lineNumber: 222,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 213,
+                                                    lineNumber: 218,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     children: "This victory was not merely about winning seats; it was a mandate for reform. It validated years of HRDA's struggle and set the stage for a new era of accountability and professional dignity."
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/achievements/page.tsx",
-                                                    lineNumber: 221,
+                                                    lineNumber: 226,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/achievements/page.tsx",
-                                            lineNumber: 209,
+                                            lineNumber: 214,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/achievements/page.tsx",
-                                    lineNumber: 204,
+                                    lineNumber: 209,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/achievements/page.tsx",
-                            lineNumber: 172,
+                            lineNumber: 177,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/achievements/page.tsx",
-                    lineNumber: 164,
+                    lineNumber: 169,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/achievements/page.tsx",
-                lineNumber: 163,
+                lineNumber: 168,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -2062,7 +2069,7 @@ function Achievements() {
                                     children: "Post-Election Reforms"
                                 }, void 0, false, {
                                     fileName: "[project]/app/achievements/page.tsx",
-                                    lineNumber: 234,
+                                    lineNumber: 239,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2070,13 +2077,13 @@ function Achievements() {
                                     children: "Delivering on promises: Key milestones achieved after the historic victory."
                                 }, void 0, false, {
                                     fileName: "[project]/app/achievements/page.tsx",
-                                    lineNumber: 235,
+                                    lineNumber: 240,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/achievements/page.tsx",
-                            lineNumber: 233,
+                            lineNumber: 238,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2090,12 +2097,12 @@ function Achievements() {
                                                 className: "w-6 h-6"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/achievements/page.tsx",
-                                                lineNumber: 245,
+                                                lineNumber: 250,
                                                 columnNumber: 37
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/achievements/page.tsx",
-                                            lineNumber: 243,
+                                            lineNumber: 248,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2103,7 +2110,7 @@ function Achievements() {
                                             children: win.title
                                         }, void 0, false, {
                                             fileName: "[project]/app/achievements/page.tsx",
-                                            lineNumber: 247,
+                                            lineNumber: 252,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2111,18 +2118,18 @@ function Achievements() {
                                             children: win.description
                                         }, void 0, false, {
                                             fileName: "[project]/app/achievements/page.tsx",
-                                            lineNumber: 248,
+                                            lineNumber: 253,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, win.id, true, {
                                     fileName: "[project]/app/achievements/page.tsx",
-                                    lineNumber: 242,
+                                    lineNumber: 247,
                                     columnNumber: 29
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/app/achievements/page.tsx",
-                            lineNumber: 240,
+                            lineNumber: 245,
                             columnNumber: 21
                         }, this),
                         postElectionWins.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2130,24 +2137,24 @@ function Achievements() {
                             children: "No post-election achievements added yet."
                         }, void 0, false, {
                             fileName: "[project]/app/achievements/page.tsx",
-                            lineNumber: 252,
+                            lineNumber: 257,
                             columnNumber: 55
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/achievements/page.tsx",
-                    lineNumber: 232,
+                    lineNumber: 237,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/achievements/page.tsx",
-                lineNumber: 231,
+                lineNumber: 236,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/achievements/page.tsx",
-        lineNumber: 32,
+        lineNumber: 37,
         columnNumber: 9
     }, this);
 }
