@@ -7,25 +7,30 @@ import pgSession from "connect-pg-simple";
 
 const PgSession = pgSession(session);
 
-const secret = process.env.SESSION_SECRET || "dev_secret";
+export function getSession() {
+  const secret = process.env.SESSION_SECRET || "dev_secret";
 
-if (!process.env.DATABASE_URL) {
-  console.warn("DATABASE_URL not set. Falling back to MemoryStore (Sessions will not persist).");
+  if (!process.env.DATABASE_URL) {
+    console.warn("DATABASE_URL not set. Falling back to MemoryStore (Sessions will not persist).");
+    return session({
+      secret,
+      resave: false,
+      saveUninitialized: false,
+      cookie: { secure: false }
+    });
+  }
+
+  console.log("Using Postgres Session Store");
   return session({
+    store: new PgSession({
+      conObject: {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false },
+      },
+    }),
     secret,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }
-  });
-}
-
-console.log("Using Postgres Session Store");
-return session({
-  store: new PgSession({
-    conObject: {
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
-    },
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       secure: process.env.NODE_ENV === "production",
