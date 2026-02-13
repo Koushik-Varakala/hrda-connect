@@ -547,7 +547,59 @@ export async function registerRoutes(
   });
 
   // Achievements
-  // ... (LIST/CREATE/UPDATE kept as is)
+  // Achievements
+  app.get(api.achievements.list.path, async (req, res) => {
+    const data = await storage.getAchievements();
+    res.json(data);
+  });
+
+  app.post(api.achievements.create.path, isAuthenticated, imageUpload.single("image"), async (req, res) => {
+    try {
+      const { insertAchievementSchema } = await import("@shared/schema");
+      const inputData = { ...req.body };
+      if (req.file) {
+        inputData.imageUrl = req.file.path;
+      }
+
+      // Convert boolean/number types
+      if (typeof inputData.active === 'string') inputData.active = inputData.active === 'true';
+
+      const input = insertAchievementSchema.parse(inputData);
+      const result = await storage.createAchievement(input);
+      res.status(201).json(result);
+    } catch (err) {
+      if (err instanceof z.ZodError) res.status(400).json(err);
+      else res.status(500).json({ message: "Failed to create achievement" });
+    }
+  });
+
+  app.put(api.achievements.update.path, isAuthenticated, imageUpload.single("image"), async (req, res) => {
+    try {
+      const { insertAchievementSchema } = await import("@shared/schema");
+      const inputData = { ...req.body };
+      if (req.file) {
+        inputData.imageUrl = req.file.path;
+      }
+
+      // Convert boolean/number types
+      if (typeof inputData.active === 'string') inputData.active = inputData.active === 'true';
+
+      // Use partial schema for updates or just parse as insert and handle partial in storage? 
+      // Storage expects UpdateAchievementRequest which is Partial<InsertAchievement>
+      // But we need to validate. Let's use the insert schema but allow partials if needed, 
+      // or just trust the body since we're mostly updating fields.
+      // Better: Parse with partial insert schema.
+      const updateSchema = insertAchievementSchema.partial();
+      const input = updateSchema.parse(inputData);
+
+      const result = await storage.updateAchievement(Number(req.params.id), input);
+      if (!result) return res.status(404).json({ message: "Not found" });
+      res.json(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Failed to update achievement" });
+    }
+  });
 
   app.delete(api.achievements.delete.path, isAuthenticated, async (req, res) => {
     const id = Number(req.params.id);
@@ -756,18 +808,24 @@ export async function registerRoutes(
     const reg = await storage.getRegistration(registrationId);
     if (!reg) return res.status(404).json({ message: "Registration not found" });
 
+    // Debug Log
+    console.log(`[OTP Verify] ID: ${registrationId}, Input: ${otp}, Stored: ${reg.otpCode}, Attempts: ${reg.otpAttempts}, Expires: ${reg.otpExpiresAt}`);
+
     // Check expiry
     if (!reg.otpExpiresAt || new Date() > new Date(reg.otpExpiresAt)) {
+      console.log(`[OTP Verify] Expired for ID: ${registrationId}`);
       return res.status(400).json({ message: "OTP expired. Please request a new one." });
     }
 
     // Check attempts
     if ((reg.otpAttempts || 0) >= 3) {
+      console.log(`[OTP Verify] Too many attempts for ID: ${registrationId}`);
       return res.status(400).json({ message: "Too many failed attempts. Please request a new code." });
     }
 
     // Check code
     if (reg.otpCode !== otp) {
+      console.log(`[OTP Verify] Mismatch for ID: ${registrationId}. Stored: ${reg.otpCode}, Input: ${otp}`);
       await storage.updateRegistration(registrationId, {
         otpAttempts: (reg.otpAttempts || 0) + 1
       });

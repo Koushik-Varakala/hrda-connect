@@ -1,4 +1,4 @@
-import { pgTable, text, serial, boolean, timestamp, varchar, date, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, boolean, timestamp, varchar, date, json, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 export * from "./models/auth";
@@ -83,7 +83,7 @@ export const registrations = pgTable("registrations", {
   // OTP Verification fields
   otpCode: text("otp_code"),
   otpExpiresAt: timestamp("otp_expires_at"),
-  otpAttempts: serial("otp_attempts"), // default 0
+  otpAttempts: integer("otp_attempts").default(0),
 });
 
 // === SCHEMAS ===
