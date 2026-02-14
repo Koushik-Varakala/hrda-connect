@@ -198,18 +198,65 @@ export class GoogleSheetsService {
             const row = rows.find(r => r.get("MedicalCounselRegistration") === tgmcId);
 
             if (row) {
+                if (newData.firstName || newData.lastName) {
+                    // Start with existing name if only one part is updated, or construct new name
+                    const currentName = row.get("Name") || "";
+                    const newFirst = newData.firstName || "";
+                    // This is a bit tricky if we don't have separated fields in sheet.
+                    // Assuming we pass the FULL name if we update it, or we rely on what's passed.
+                    // Best practice: Pass the full constructed name in `newData.firstName` (as mapped to 'Name' col)
+                    // or handle it in the caller.
+                    // Let's assume the caller passes the full Name in `firstName` field or we mapped it.
+                    // Actually, let's map `firstName` to Name for simplicity in this method's interface usage
+                    if (newData.firstName && newData.lastName) {
+                        row.set("Name", `${newData.firstName} ${newData.lastName}`);
+                    } else if (newData.firstName) {
+                        row.set("Name", newData.firstName);
+                    }
+                }
+
                 if (newData.phone) row.set("ContactNumber", newData.phone);
                 if (newData.email) row.set("MailID", newData.email);
                 if (newData.address) row.set("Address", newData.address);
                 if (newData.district) row.set("District", newData.district);
                 if (newData.anotherMobile) row.set("AnotherMobileNumber", newData.anotherMobile);
+                if (newData.paymentStatus) row.set("PaymentStatus", newData.paymentStatus);
+                if (newData.tgmcId) row.set("MedicalCounselRegistration", newData.tgmcId);
 
                 await row.save();
+                console.log(`Successfully updated row for TGMC: ${tgmcId}`);
                 return true;
             }
+            console.warn(`Row not found for update: ${tgmcId}`);
             return false;
         } catch (error) {
             console.error("Error updating Google Sheet:", error);
+            return false;
+        }
+    }
+
+    async deleteRegistration(tgmcId: string): Promise<boolean> {
+        await this.initPromise;
+
+        if (!this.isConnected || !this.doc) {
+            console.log(`[Mock] Deleting registration for TGMC: ${tgmcId}`);
+            return true;
+        }
+
+        try {
+            const sheet = this.doc.sheetsByIndex[0];
+            const rows = await sheet.getRows();
+            const row = rows.find(r => r.get("MedicalCounselRegistration") === tgmcId);
+
+            if (row) {
+                await row.delete();
+                console.log(`Successfully deleted row for TGMC: ${tgmcId}`);
+                return true;
+            }
+            console.warn(`Row not found for deletion: ${tgmcId}`);
+            return false;
+        } catch (error) {
+            console.error("Error deleting from Google Sheet:", error);
             return false;
         }
     }

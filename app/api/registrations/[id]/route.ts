@@ -44,27 +44,18 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
         const result = await storage.updateRegistration(id, body);
         if (!result) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
-        // Sync Update to Sheets
+        // Sync Update to Sheets (In-Place Update)
         try {
             if (result.tgmcId) {
                 await googleSheetsService.updateRegistration(result.tgmcId, {
-                    updatedAt: new Date().toISOString()
-                });
-
-                await googleSheetsService.appendRegistration({
-                    id: String(result.id),
-                    tgmcId: result.tgmcId || "",
-                    firstName: result.firstName,
+                    firstName: result.firstName, // Logic in service handles concatenation if needed
                     lastName: result.lastName,
                     phone: result.phone,
                     email: result.email || "",
                     address: result.address || "",
-                    membershipType: result.membershipType || "single",
-                    paymentStatus: result.paymentStatus || "unknown",
-                    status: result.status || "pending",
-                    registrationDate: result.createdAt?.toISOString() || new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    rowStatus: "Active"
+                    district: result.district || "",
+                    tgmcId: result.tgmcId, // in case ID changed
+                    updatedAt: new Date().toISOString()
                 });
             }
         } catch (e) {
@@ -85,9 +76,6 @@ export async function DELETE(request: Request, props: { params: Promise<{ id: st
     if (isNaN(id)) {
         return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
     }
-    if (isNaN(id)) {
-        return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
-    }
     const session = await auth();
     const isAdmin = session?.user && (session.user as any).isAdmin;
 
@@ -97,6 +85,22 @@ export async function DELETE(request: Request, props: { params: Promise<{ id: st
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    // Get registration first to get TGMC ID for sheet deletion
+    const registration = await storage.getRegistration(id);
+    if (!registration) {
+        return NextResponse.json({ message: "Not found" }, { status: 404 });
+    }
+
     await storage.deleteRegistration(id);
+
+    // Sync Delete to Sheets
+    try {
+        if (registration.tgmcId) {
+            await googleSheetsService.deleteRegistration(registration.tgmcId);
+        }
+    } catch (e) {
+        console.error("Failed to sync deletion to sheets", e);
+    }
+
     return new NextResponse(null, { status: 204 });
 }

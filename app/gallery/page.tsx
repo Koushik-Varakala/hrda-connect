@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { GalleryPhoto } from "@shared/schema";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { GallerySlideshow } from "@/components/GallerySlideshow";
 import { Layout } from "@/components/Layout";
 
 export default function GalleryPage() {
+    const [selectedPhoto, setSelectedPhoto] = useState<GalleryPhoto | null>(null);
     const { data: photos, isLoading } = useQuery<GalleryPhoto[]>({
         queryKey: ["/api/gallery"],
         queryFn: async () => {
@@ -41,6 +43,7 @@ export default function GalleryPage() {
                                 <div
                                     key={photo.id}
                                     className="group relative overflow-hidden rounded-xl shadow-md cursor-pointer aspect-[4/3] bg-white"
+                                    onClick={() => setSelectedPhoto(photo)}
                                 >
                                     <img
                                         src={photo.url}
@@ -55,6 +58,7 @@ export default function GalleryPage() {
                                             {photo.description && (
                                                 <p className="text-sm text-slate-200">{photo.description}</p>
                                             )}
+                                            <p className="text-xs text-slate-300 mt-2 bg-white/20 inline-block px-3 py-1 rounded-full">Click to View</p>
                                         </div>
                                     </div>
                                 </div>
@@ -62,6 +66,35 @@ export default function GalleryPage() {
                         </div>
                     )}
                 </div>
+
+                {/* Lightbox Overlay */}
+                {selectedPhoto && (
+                    <div
+                        className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                        onClick={() => setSelectedPhoto(null)}
+                    >
+                        <button
+                            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full p-2"
+                            onClick={() => setSelectedPhoto(null)}
+                        >
+                            <X className="h-8 w-8" />
+                        </button>
+
+                        <div className="relative max-w-full max-h-full flex flex-col items-center" onClick={e => e.stopPropagation()}>
+                            <img
+                                src={selectedPhoto.url}
+                                alt={selectedPhoto.title || "Full View"}
+                                className="max-h-[85vh] max-w-full object-contain rounded-md shadow-2xl"
+                            />
+                            {(selectedPhoto.title || selectedPhoto.description) && (
+                                <div className="mt-4 text-center text-white max-w-2xl px-4">
+                                    {selectedPhoto.title && <h3 className="text-2xl font-bold mb-2">{selectedPhoto.title}</h3>}
+                                    {selectedPhoto.description && <p className="text-slate-300">{selectedPhoto.description}</p>}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Slideshow at the bottom as requested */}
                 <GallerySlideshow />

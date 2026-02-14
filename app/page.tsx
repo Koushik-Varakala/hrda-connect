@@ -41,8 +41,8 @@ export default function Home() {
                             <Badge className="mb-4 bg-primary text-white border-none px-3 py-1">
                                 Voice of Telangana Doctors
                             </Badge>
-                            <h1 className="text-4xl text-headline md:text-6xl font-serif font-bold leading-tight mb-6">
-                                Advocating for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Healthcare Reform</span> & Professional Rights
+                            <h1 className="text-3xl text-headline md:text-6xl font-serif font-bold leading-tight mb-6 break-words">
+                                Advocating for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 block md:inline">Healthcare Reform</span> & Professional Rights
                             </h1>
                             <p className="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed max-w-2xl">
                                 HRDA works tirelessly with governments and regulators to improve medical education,

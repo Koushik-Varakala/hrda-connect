@@ -95,26 +95,60 @@ const districts = [
     "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal", "Yadadri Bhuvanagiri"
 ];
 
+// ... imports
+import { IdCard } from "@/components/IdCard";
+import html2canvas from "html2canvas";
+import { Download, Printer } from "lucide-react";
+import { useRef, useEffect } from "react";
+import { api } from "@shared/routes";
+
+// ... existing ResultCard component
+
 function ResultCard({ registration }: { registration: any }) {
+    // Use local state for registration to allow immediate updates
+    const [regData, setRegData] = useState(registration);
+
+    // Sync prop changes to local state (e.g. when search term changes)
+    useEffect(() => {
+        setRegData(registration);
+    }, [registration]);
+
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
-        phone: registration.phone,
-        email: registration.email || "",
-        address: registration.address || "",
-        district: registration.district || ""
+        phone: regData.phone,
+        email: regData.email || "",
+        address: regData.address || "",
+        district: regData.district || ""
     });
+
+    // Update formData when regData changes
+    useEffect(() => {
+        setFormData({
+            phone: regData.phone,
+            email: regData.email || "",
+            address: regData.address || "",
+            district: regData.district || ""
+        });
+    }, [regData]);
+
     const updateMutation = useUpdateRegistration();
     const { toast } = useToast();
 
+    // OTP State
     const [showOtpDialog, setShowOtpDialog] = useState(false);
     const [otp, setOtp] = useState("");
     const [isSendingOtp, setIsSendingOtp] = useState(false);
     const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
+    // ID Card State
+    const [showIdCard, setShowIdCard] = useState(false);
+    const idCardRef = useRef<HTMLDivElement>(null);
+    const downloadRef = useRef<HTMLDivElement>(null);
+
     const handleSendOtp = async () => {
         setIsSendingOtp(true);
         try {
-            await apiRequest("POST", "/api/registrations/send-otp", { registrationId: registration.id });
+            await apiRequest("POST", "/api/registrations/send-otp", { registrationId: regData.id });
             toast({ title: "OTP Sent", description: "Please check your registered email for the code." });
             setIsSendingOtp(false);
             setShowOtpDialog(true);
@@ -136,17 +170,28 @@ function ResultCard({ registration }: { registration: any }) {
 
         setIsVerifyingOtp(true);
         try {
-            await apiRequest("POST", "/api/registrations/verify-otp", {
-                registrationId: registration.id,
+            const response = await apiRequest("POST", "/api/registrations/verify-otp", {
+                registrationId: regData.id,
                 otp
             });
+            const data = await response.json();
 
             toast({ title: "Verified", description: "You can now edit your details." });
             setShowOtpDialog(false);
             setIsVerifyingOtp(false);
 
-            // Refresh data to get unmasked details
-            queryClient.invalidateQueries({ queryKey: ["/api/registrations/search"] });
+            if (data.registration) {
+                // Update local state immediately properly
+                setRegData(data.registration);
+
+                // Also update the cache for good measure
+                queryClient.setQueriesData({ queryKey: [api.registrations.search.path] }, (oldData: any) => {
+                    if (!oldData) return oldData;
+                    return oldData.map((reg: any) =>
+                        reg.id === regData.id ? data.registration : reg
+                    );
+                });
+            }
         } catch (e: any) {
             setIsVerifyingOtp(false);
             toast({
@@ -160,7 +205,7 @@ function ResultCard({ registration }: { registration: any }) {
     const handleSave = async () => {
         try {
             await updateMutation.mutateAsync({
-                id: registration.id,
+                id: regData.id,
                 ...formData
             });
             setIsEditing(false);
@@ -170,9 +215,44 @@ function ResultCard({ registration }: { registration: any }) {
         }
     };
 
+    const handleDownloadIdCard = async () => {
+        // We capture the hidden, unscaled version to ensure perfect quality
+        if (!downloadRef.current) {
+            console.error("Download ref not found");
+            return;
+        }
+
+        try {
+            // Small delay to ensure render
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            const canvas = await html2canvas(downloadRef.current, {
+                scale: 3, // High quality
+                useCORS: true,
+                backgroundColor: "#ffffff",
+                width: 600, // Force dimensions
+                height: 375,
+                windowWidth: 1920, // Ensure desktop context
+            });
+
+            const image = canvas.toDataURL("image/png", 1.0);
+            const link = document.createElement("a");
+            link.href = image;
+            link.download = `HRDA_ID_${regData.hrdaId || "CARD"}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toast({ title: "Downloaded", description: "ID Card saved to your device." });
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Error", description: "Failed to download ID card.", variant: "destructive" });
+        }
+    };
+
     if (isEditing) {
         return (
-            <Card className="border-l-4 border-l-blue-500 shadow-md">
+            <Card className="border-l-4 border-l-primary shadow-md">
                 <CardContent className="p-6">
                     <div className="flex items-center gap-4 mb-6">
                         <div className="bg-blue-100 p-3 rounded-full">
@@ -180,7 +260,7 @@ function ResultCard({ registration }: { registration: any }) {
                         </div>
                         <div>
                             <h3 className="text-xl font-bold">Editing Details</h3>
-                            <p className="text-muted-foreground">{registration.firstName} {registration.lastName} (TGMC: {registration.tgmcId})</p>
+                            <p className="text-muted-foreground">{regData.firstName} {regData.lastName} (TGMC: {regData.tgmcId})</p>
                         </div>
                     </div>
 
@@ -238,65 +318,76 @@ function ResultCard({ registration }: { registration: any }) {
 
     return (
         <Card className="border-l-4 border-l-primary shadow-md">
-            <CardContent className="p-6 flex items-start gap-4">
-                <div className="bg-slate-100 p-3 rounded-full">
-                    <User className="w-8 h-8 text-slate-500" />
-                </div>
-                <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-xl font-bold">{registration.firstName} {registration.lastName}</h3>
-                        <span className={`px-2 py-0.5 rounded text-xs font-medium uppercase ${registration.status === 'verified' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                            }`}>
-                            {registration.status?.replace('_', ' ')}
-                        </span>
+            <CardContent className="p-4 md:p-6 flex flex-col md:flex-row items-start gap-4">
+                <div className="flex w-full md:w-auto items-start gap-4">
+                    <div className="bg-slate-100 p-3 rounded-full flex-shrink-0">
+                        <User className="w-8 h-8 text-slate-500" />
                     </div>
-                    <div className="flex flex-col gap-1 mb-2">
-                        <p className="text-muted-foreground">TGMC ID: <span className="text-foreground font-medium">{registration.tgmcId}</span></p>
-                        {registration.hrdaId && (
-                            <p className="text-muted-foreground">HRDA ID: <span className="text-primary font-bold">{registration.hrdaId}</span></p>
-                        )}
-                    </div>
-                    {registration.membershipType && <p className="text-sm text-slate-500 capitalize">{registration.membershipType} Membership</p>}
-
-                    <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-slate-600">
-                        <div>
-                            <span className="font-medium text-slate-900">Phone:</span> {registration.phone}
+                    <div className="flex-1 md:flex-none">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <h3 className="text-lg md:text-xl font-bold">{regData.firstName} {regData.lastName}</h3>
+                            <span className={`px-2 py-0.5 rounded text-[10px] md:text-xs font-medium uppercase ${regData.status === 'verified' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                }`}>
+                                {regData.status?.replace('_', ' ')}
+                            </span>
                         </div>
-                        <div>
-                            <span className="font-medium text-slate-900">Email:</span> {registration.email || "-"}
+                        <div className="flex flex-col gap-1 mb-2">
+                            <p className="text-sm text-muted-foreground">TGMC ID: <span className="text-foreground font-medium">{regData.tgmcId}</span></p>
+                            {regData.hrdaId && (
+                                <p className="text-sm text-muted-foreground">HRDA ID: <span className="text-primary font-bold">{regData.hrdaId}</span></p>
+                            )}
                         </div>
-                        <div className="col-span-2">
-                            <span className="font-medium text-slate-900">Address:</span> {registration.address || "-"}
-                        </div>
-                        <div className="col-span-2">
-                            <span className="font-medium text-slate-900">District:</span> {registration.district || "-"}
-                        </div>
+                        {regData.membershipType && <p className="text-xs text-slate-500 capitalize">{regData.membershipType} Membership</p>}
                     </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-2">
-                    {registration.isMasked ? (
-                        <Button variant="outline" size="sm" onClick={handleSendOtp} disabled={isSendingOtp}>
+                <div className="w-full md:flex-1 md:ml-4 min-w-0">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm text-slate-600">
+                        <div>
+                            <span className="font-medium text-slate-900 block sm:inline">Phone:</span> {regData.phone}
+                        </div>
+                        <div className="truncate" title={regData.email || ""}>
+                            <span className="font-medium text-slate-900 block sm:inline">Email:</span> {regData.email || "-"}
+                        </div>
+                        <div className="sm:col-span-2 text-wrap break-words">
+                            <span className="font-medium text-slate-900 block sm:inline">Address:</span> {regData.address || "-"}
+                        </div>
+                        <div className="sm:col-span-2">
+                            <span className="font-medium text-slate-900 block sm:inline">District:</span> {regData.district || "-"}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Update Action Buttons Section */}
+                <div className="w-full md:w-[220px] shrink-0 flex flex-col md:items-end gap-3 mt-4 md:mt-0">
+                    {regData.isMasked ? (
+                        <Button variant="outline" size="sm" onClick={handleSendOtp} disabled={isSendingOtp} className="w-full">
                             {isSendingOtp ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
                             Verify to Edit
                         </Button>
                     ) : (
-                        <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                            <Edit2 className="w-4 h-4 mr-2" /> Edit
-                        </Button>
+                        <div className="flex flex-col gap-2 w-full">
+                            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="w-full">
+                                <Edit2 className="w-4 h-4 mr-2" /> Edit Details
+                            </Button>
+                            <Button variant="default" size="sm" onClick={() => setShowIdCard(true)} className="w-full bg-green-600 hover:bg-green-700 text-white">
+                                <Download className="w-4 h-4 mr-2" /> Download ID Card
+                            </Button>
+                        </div>
                     )}
-                    <p className="text-xs text-red-600 font-medium text-right max-w-[150px] leading-tight mt-2">
-                        In case you're facing issues, Contact : 9441568635
+                    <p className="text-xs text-slate-500 md:text-right w-full leading-tight mt-1">
+                        In case you're facing issues,<br />Contact : <span className="whitespace-nowrap font-medium">9441568635</span>
                     </p>
                 </div>
             </CardContent >
 
+            {/* OTP Dialog ... */}
             <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Enter Verification Code</DialogTitle>
                         <DialogDescription>
-                            We've sent a 6-digit code to your registered email <strong>{registration.email}</strong>.
+                            We've sent a 6-digit code to your registered email <strong>{regData.email}</strong>.
                             Enter it below to verify your identity.
                         </DialogDescription>
                     </DialogHeader>
@@ -323,6 +414,70 @@ function ResultCard({ registration }: { registration: any }) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* ID Card Preview Dialog */}
+            <Dialog open={showIdCard} onOpenChange={setShowIdCard}>
+                <DialogContent className="max-w-[700px] w-full bg-slate-50">
+                    <DialogHeader>
+                        <DialogTitle>Your HRDA Identity Card</DialogTitle>
+                        <DialogDescription>
+                            Preview and download your official HRDA Digital ID Card.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="flex justify-center p-4 overflow-auto">
+                        {/* Visible Preview (Scaled) */}
+                        <div className="scale-75 md:scale-90 lg:scale-100 origin-top">
+                            <IdCard ref={idCardRef} registration={regData} />
+                        </div>
+                    </div>
+
+                    <DialogFooter className="flex gap-2 sm:justify-end">
+                        <Button variant="outline" onClick={() => setShowIdCard(false)}>Close</Button>
+                        <Button
+                            onClick={() => window.print()}
+                            className="bg-slate-800 hover:bg-slate-900 text-white"
+                        >
+                            <Printer className="w-4 h-4 mr-2" /> Print Card
+                        </Button>
+                        <Button onClick={handleDownloadIdCard} className="bg-blue-600 hover:bg-blue-700">
+                            <Download className="w-4 h-4 mr-2" /> Download Image
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Hidden Off-Screen Container for Perfect Export & Printing */}
+            {/* Must be visible (not display:none) for html2canvas, but positioned off-screen */}
+            <div id="print-area" className="fixed top-0 left-0 -z-50" style={{ transform: "translate(-9999px, -9999px)" }}>
+                <IdCard ref={downloadRef} registration={regData} />
+            </div>
+
+            {/* Print Styles */}
+            <style jsx global>{`
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    #print-area, #print-area * {
+                        visibility: visible;
+                    }
+                    #print-area {
+                        position: absolute !important;
+                        left: 50% !important;
+                        top: 20% !important;
+                        transform: translate(-50%, 0) !important;
+                        margin: 0;
+                        padding: 0;
+                        width: auto;
+                        height: auto;
+                    }
+                    @page {
+                        size: auto;
+                        margin: 0mm;
+                    }
+                }
+            `}</style>
         </Card >
     );
 }

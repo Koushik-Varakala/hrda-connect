@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Menu, X, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { Menu, X, Facebook, Twitter, Instagram, Youtube, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -17,6 +17,8 @@ import { FloatingInstagram } from "@/components/FloatingInstagram";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isInsightsOpen, setIsInsightsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const { user } = useAuth();
@@ -34,12 +36,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Panels", href: "/panels" },
-    { name: "Gallery", href: "/gallery" },
+  ];
+
+  const notificationLinks = [
+    { name: "Announcements", href: "/announcements", description: "Latest updates and news." },
+    { name: "Elections", href: "/election-panel", description: "Election updates and candidate info." },
   ];
 
   const resourceLinks = [
     { name: "Achievements", href: "/achievements", description: "Our milestones and success stories." },
-    { name: "Election & Notifications", href: "/election-panel", description: "Meet the elected panel members." },
+    { name: "Gallery", href: "/gallery", description: "View our photo gallery." },
     { name: "Media Coverage", href: "/media", description: "News articles and press releases." },
     { name: "Departments", href: "/departments", description: "Various functional committees." },
   ];
@@ -76,34 +82,67 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6">
-            <NavigationMenu>
-              <NavigationMenuList className="gap-1">
-                {mainLinks.map((link) => (
-                  <NavigationMenuItem key={link.href}>
-                    <NavigationMenuLink asChild>
-                      <Link href={link.href}
-                        className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:bg-transparent cursor-pointer ${isActive(link.href) ? "text-primary font-semibold" : "text-slate-700"
-                          }`}
-                      >
-                        <span className="relative">
-                          {link.name}
-                          <span className={`absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100 ${isActive(link.href) ? "scale-x-100" : ""}`} />
-                        </span>
-                      </Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                ))}
+          <nav className="hidden lg:flex items-center gap-1">
+            {/* Standard Main Links */}
+            <div className="flex items-center gap-1">
+              {mainLinks.map((link) => (
+                <Link key={link.href} href={link.href}
+                  className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer ${isActive(link.href) ? "text-primary font-semibold" : "text-slate-700"
+                    }`}
+                >
+                  <span className="relative">
+                    {link.name}
+                    <span className={`absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100 ${isActive(link.href) ? "scale-x-100" : ""}`} />
+                  </span>
+                </Link>
+              ))}
+            </div>
 
+            {/* Notifications Dropdown (Isolated for Alignment) */}
+            <NavigationMenu className="mx-1">
+              <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:bg-transparent data-[state=open]:text-primary text-slate-700`}>
+                  <NavigationMenuTrigger className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:!bg-transparent data-[state=open]:text-primary text-slate-700 shadow-none border-none">
+                    <span className="relative">
+                      Notifications
+                      <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
+                    </span>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[250px] gap-2 p-3 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                      {notificationLinks.map((link) => (
+                        <li key={link.href}>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href={link.href}
+                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50"
+                            >
+                              <div className="text-sm font-semibold leading-none text-slate-800">{link.name}</div>
+                              <p className="line-clamp-2 text-sm leading-snug text-slate-500 mt-1">
+                                {link.description}
+                              </p>
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
+            {/* Insights Dropdown (Isolated for Alignment) */}
+            <NavigationMenu className="mx-1">
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:!bg-transparent data-[state=open]:text-primary text-slate-700 shadow-none border-none">
                     <span className="relative">
                       Insights
                       <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
                     </span>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                    <ul className="grid w-[250px] gap-2 p-3 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                       {resourceLinks.map((link) => (
                         <li key={link.href}>
                           <NavigationMenuLink asChild>
@@ -122,24 +161,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
-
-                {secondaryLinks.map((link) => (
-                  <NavigationMenuItem key={link.href}>
-                    <NavigationMenuLink asChild>
-                      <Link href={link.href}
-                        className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:bg-transparent cursor-pointer ${isActive(link.href) ? "text-primary font-semibold" : "text-slate-700"
-                          }`}
-                      >
-                        <span className="relative">
-                          {link.name}
-                          <span className={`absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100 ${isActive(link.href) ? "scale-x-100" : ""}`} />
-                        </span>
-                      </Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                ))}
               </NavigationMenuList>
             </NavigationMenu>
+
+            {/* Secondary Links */}
+            <div className="flex items-center gap-1">
+              {secondaryLinks.map((link) => (
+                <Link key={link.href} href={link.href}
+                  className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer ${isActive(link.href) ? "text-primary font-semibold" : "text-slate-700"
+                    }`}
+                >
+                  <span className="relative">
+                    {link.name}
+                    <span className={`absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100 ${isActive(link.href) ? "scale-x-100" : ""}`} />
+                  </span>
+                </Link>
+              ))}
+            </div>
           </nav>
 
           {/* Action Buttons */}
@@ -173,7 +211,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="lg:hidden absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl p-4 flex flex-col gap-2 animate-in slide-in-from-top-2">
-            {[...mainLinks, ...secondaryLinks].map((link) => (
+            {mainLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <div
                   className={`p-3 rounded-lg font-medium transition-colors ${isActive(link.href) ? "bg-blue-50 text-blue-700" : "text-slate-700 hover:bg-slate-50"
@@ -185,20 +223,69 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
 
-            <div className="px-3 py-2 text-sm font-bold text-slate-400 uppercase tracking-wider mt-2">Insights</div>
-            <div className="grid grid-cols-1 gap-1">
-              {resourceLinks.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <div
-                    className={`px-3 py-2 rounded-lg text-sm transition-colors ${isActive(link.href) ? "bg-blue-50 text-blue-700 font-medium" : "text-slate-600 hover:bg-slate-50"
-                      }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.name}
-                  </div>
-                </Link>
-              ))}
+            {/* Mobile Notifications Dropdown */}
+            <div className="border border-slate-100 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                className="w-full flex items-center justify-between p-3 font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                Notifications
+                <ChevronDown className={`w-4 h-4 transition-transform ${isNotificationsOpen ? "rotate-180" : ""}`} />
+              </button>
+              {isNotificationsOpen && (
+                <div className="bg-slate-50 p-2 space-y-1">
+                  {notificationLinks.map((link) => (
+                    <Link key={link.href} href={link.href}>
+                      <div
+                        className={`px-3 py-2 rounded-lg text-sm transition-colors ${isActive(link.href) ? "bg-white text-blue-700 font-medium shadow-sm" : "text-slate-600 hover:bg-white hover:shadow-sm"
+                          }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {link.name}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* Mobile Insights Dropdown */}
+            <div className="border border-slate-100 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setIsInsightsOpen(!isInsightsOpen)}
+                className="w-full flex items-center justify-between p-3 font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                Insights
+                <ChevronDown className={`w-4 h-4 transition-transform ${isInsightsOpen ? "rotate-180" : ""}`} />
+              </button>
+              {isInsightsOpen && (
+                <div className="bg-slate-50 p-2 space-y-1">
+                  {resourceLinks.map((link) => (
+                    <Link key={link.href} href={link.href}>
+                      <div
+                        className={`px-3 py-2 rounded-lg text-sm transition-colors ${isActive(link.href) ? "bg-white text-blue-700 font-medium shadow-sm" : "text-slate-600 hover:bg-white hover:shadow-sm"
+                          }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {link.name}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {secondaryLinks.map((link) => (
+              <Link key={link.href} href={link.href}>
+                <div
+                  className={`p-3 rounded-lg font-medium transition-colors ${isActive(link.href) ? "bg-blue-50 text-blue-700" : "text-slate-700 hover:bg-slate-50"
+                    }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </div>
+              </Link>
+            ))}
 
             <div className="h-px bg-gray-100 my-4" />
 

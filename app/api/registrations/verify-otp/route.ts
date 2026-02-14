@@ -48,7 +48,13 @@ export async function POST(request: Request) {
             path: "/",
         });
 
-        return NextResponse.json({ success: true });
+        return NextResponse.json({
+            success: true,
+            registration: {
+                ...reg,
+                isMasked: false // Explicitly return unmasked state
+            }
+        });
 
     } catch (err) {
         console.error("OTP Verify Error:", err);

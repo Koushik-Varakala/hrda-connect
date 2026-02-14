@@ -24,6 +24,7 @@ export async function POST(request: Request) {
             amount: amount * 100,
             currency: currency,
             receipt: `receipt_${Date.now()}`,
+            payment_capture: 1 // Auto-capture payment so it settles immediately
         };
 
         const order = await razorpay.orders.create(options);
