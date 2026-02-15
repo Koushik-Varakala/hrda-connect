@@ -87,7 +87,7 @@ export async function POST(request: Request) {
         // SMS
         try {
             if (newReg.phone) {
-                await smsService.sendRegistrationSuccess(newReg.phone, newReg.firstName, formattedHrdaId);
+                await smsService.sendRegistrationSuccess(newReg.phone, newReg.firstName, formattedHrdaId, newReg.tgmcId || "N/A");
             }
         } catch (e) {
             console.error("Failed to send SMS", e);

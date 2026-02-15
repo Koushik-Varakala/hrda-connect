@@ -45,9 +45,9 @@ export class SmsService {
         }
     }
 
-    async sendRegistrationSuccess(to: string, name: string, hrdaId: number | string) {
-        // Keep it short for SMS
-        const message = `Dear ${name}, Welcome to HRDA! Registration Successful. Member ID: ${hrdaId}. Thank you via HRDA Telangana.`;
+    async sendRegistrationSuccess(to: string, name: string, hrdaId: number | string, tgmcId: string) {
+        // Keep it short for SMS, but include key details
+        const message = `Dear ${name}, Registration Successful. HRDA ID: ${hrdaId}, TGMC Req: ${tgmcId}. Welcome to HRDA Telangana.`;
         return this.sendSms(to, message);
     }
 }
