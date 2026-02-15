@@ -3,8 +3,7 @@ import { NextResponse } from "next/server";
 import { storage } from "@/lib/storage";
 import { auth } from "@/lib/auth";
 import { emailService } from "@/lib/services/email";
-// Not needed for OTP usually, but maybe for rate limiting session logic?
-// Actually OTP is for login/verification without auth.
+import { smsService } from "@/lib/services/sms";
 
 const otpRateLimit = new Map<number, number>(); // userId -> timestamp
 
@@ -38,6 +37,12 @@ export async function POST(request: Request) {
 
         // Send Email
         const emailSent = await emailService.sendOtp(reg.email, otp);
+
+        // Send SMS
+        if (reg.phone) {
+            await smsService.sendOtp(reg.phone, otp);
+        }
+
         if (!emailSent) {
             console.error("Failed to send OTP email");
             // Force log for debugging even if email fails (development only)

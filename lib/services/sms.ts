@@ -50,6 +50,11 @@ export class SmsService {
         const message = `Dear ${name}, Registration Successful. HRDA ID: ${hrdaId}, TGMC Req: ${tgmcId}. Welcome to HRDA Telangana.`;
         return this.sendSms(to, message);
     }
+
+    async sendOtp(to: string, otp: string) {
+        const message = `Your HRDA verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`;
+        return this.sendSms(to, message);
+    }
 }
 
 export const smsService = new SmsService();
