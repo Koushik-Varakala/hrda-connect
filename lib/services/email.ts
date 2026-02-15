@@ -40,7 +40,10 @@ export class EmailService {
                         "content-type": "application/json"
                     },
                     body: JSON.stringify({
-                        sender: { name: "Healthcare Reforms Doctors Association", email: "hrda4people@gmail.com" },
+                        sender: {
+                            name: "Healthcare Reforms Doctors Association",
+                            email: process.env.SMTP_USER || "hrda4people@gmail.com"
+                        },
                         to: [{ email: options.to }],
                         subject: options.subject,
                         textContent: options.text
