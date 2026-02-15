@@ -76,7 +76,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <Link href="/" className="flex items-center group">
             <img
               src="/hrda_full_logo.png"
-              alt="HRDA Logo"
+              alt="Healthcare Reforms Doctors Association Logo"
               className={`object-contain transition-all duration-300 ${isScrolled ? "h-12" : "h-16"}`}
             />
           </Link>

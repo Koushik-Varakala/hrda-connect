@@ -40,6 +40,7 @@ export interface IStorage {
     // Registrations
     searchRegistrations(params: SearchRegistrationParams): Promise<Registration[]>;
     getRegistration(id: number): Promise<Registration | undefined>;
+    getRegistrationByPhone(phone: string): Promise<Registration | undefined>;
     createRegistration(registration: InsertRegistration): Promise<Registration>;
     updateRegistration(id: number, updates: UpdateRegistrationRequest): Promise<Registration | undefined>;
     deleteRegistration(id: number): Promise<void>;
@@ -171,6 +172,11 @@ export class DatabaseStorage implements IStorage {
 
     async getRegistration(id: number): Promise<Registration | undefined> {
         const [registration] = await db.select().from(registrations).where(eq(registrations.id, id));
+        return registration;
+    }
+
+    async getRegistrationByPhone(phone: string): Promise<Registration | undefined> {
+        const [registration] = await db.select().from(registrations).where(eq(registrations.phone, phone));
         return registration;
     }
 

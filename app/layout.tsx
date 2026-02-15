@@ -7,8 +7,12 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "HRDA Connect",
-    description: "Healthcare Reforms Doctors Association",
+    title: "Healthcare Reforms Doctors Association",
+    description: "Healthcare Reforms Doctors Association (HRDA) - Telangana",
+    icons: {
+        icon: '/hrda_logo.png',
+        shortcut: '/hrda_logo.png',
+    }
 };
 
 export default function RootLayout({

@@ -40,7 +40,7 @@ export class EmailService {
                         "content-type": "application/json"
                     },
                     body: JSON.stringify({
-                        sender: { email: process.env.SMTP_USER || "no-reply@hrdaconnect.com", name: "HRDA Telangana" },
+                        sender: { name: "Healthcare Reforms Doctors Association", email: "hrda4people@gmail.com" },
                         to: [{ email: options.to }],
                         subject: options.subject,
                         textContent: options.text
@@ -68,7 +68,7 @@ export class EmailService {
 
         try {
             await this.transporter.sendMail({
-                from: process.env.SMTP_FROM || '"HRDA Connect" <no-reply@hrdaconnect.com>',
+                from: process.env.SMTP_FROM || '"Healthcare Reforms Doctors Association" <no-reply@hrdaconnect.com>',
                 to: options.to,
                 subject: options.subject,
                 text: options.text,
@@ -84,7 +84,7 @@ export class EmailService {
     async sendRegistrationConfirmation(to: string, name: string, tgmcId: string, hrdaId: number | string, phone: string, address: string) {
         return this.sendEmail({
             to,
-            subject: "HRDA Registration Successful - Welcome to the Family",
+            subject: "Registration Successful - Welcome to Healthcare Reforms Doctors Association",
             text: `Dear ${name},
 
 Congratulations! You have successfully registered with HRDA Telangana.
@@ -102,7 +102,7 @@ Address: ${address}
 Thank you for strengthening our voice. We look forward to your active participation.
 
 Regards,
-HRDA Team`
+Healthcare Reforms Doctors Association (HRDA) - Telangana`
         });
     }
 
