@@ -43,7 +43,7 @@ export default function ElectionPanel() {
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-10"></div>
                 <div className="container mx-auto px-4 relative z-10 text-center">
                     <Badge variant="outline" className="text-yellow-400 border-yellow-400 mb-4">January 2026</Badge>
-                    <h1 className="text-4xl text-headline md:text-6xl font-serif font-bold mb-6">Election Panel</h1>
+                    <h1 className="text-4xl text-headline md:text-6xl font-serif font-bold mb-6">Election panel members & notifications</h1>
                 </div>
             </div>
 

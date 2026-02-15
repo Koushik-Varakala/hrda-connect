@@ -43,9 +43,7 @@ export default function Home() {
                             transition={{ duration: 0.6 }}
                             className="flex-1 max-w-3xl lg:max-w-none"
                         >
-                            <Badge className="mb-4 bg-primary text-white border-none px-3 py-1">
-                                Voice of Telangana Doctors
-                            </Badge>
+
                             <h1 className="text-3xl text-headline md:text-6xl font-serif font-bold leading-tight mb-6 break-words">
                                 Advocating for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 block md:inline">Healthcare Reform</span> & Professional Rights
                             </h1>
