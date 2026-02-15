@@ -383,8 +383,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4 md:px-6 lg:px-8 mt-12 pt-8 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Healthcare Reforms Doctors Association. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="#" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-slate-300 transition-colors">Terms of Service</Link>
+            <Link href="/privacy-policy" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="hover:text-slate-300 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </footer>
