@@ -50,20 +50,41 @@ export default function ElectionPanel() {
             <div className="py-16 bg-slate-50">
                 <div className="container mx-auto px-4">
                     {/* Elected Members */}
-                    <div className="bg-gradient-to-br from-blue-900 to-slate-900 text-white p-8 rounded-2xl shadow-xl max-w-4xl mx-auto">
-                        <h3 className="text-2xl font-serif font-bold mb-6 flex items-center gap-2">
-                            <Vote className="w-6 h-6 text-green-400" />
-                            The Elected Panel
+                    <div className="mb-16">
+                        <h3 className="text-2xl font-serif font-bold mb-8 flex items-center gap-2 text-slate-900">
+                            <Vote className="w-6 h-6 text-primary" />
+                            Elected Panel Members
                         </h3>
 
                         {electedMembers.length === 0 ? (
-                            <div className="text-slate-400 italic">No members added yet.</div>
+                            <div className="text-slate-500 italic text-center py-10 bg-white rounded-xl border border-dashed">No members added yet.</div>
                         ) : (
-                            <div className="flex flex-wrap gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {electedMembers.map((member) => (
-                                    <Badge key={member.id} className="bg-white/10 hover:bg-white/20 text-white border-white/20 px-3 py-1.5 text-base whitespace-nowrap">
-                                        {member.name}
-                                    </Badge>
+                                    <div
+                                        key={member.id}
+                                        className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-all hover:border-primary/30 group"
+                                    >
+                                        <div className="flex flex-col items-center text-center">
+                                            <div className="w-32 h-32 rounded-full bg-slate-100 mb-4 flex items-center justify-center overflow-hidden border-4 border-white shadow-md group-hover:scale-105 transition-transform duration-300">
+                                                {member.imageUrl ? (
+                                                    <img
+                                                        src={member.imageUrl}
+                                                        alt={member.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <span className="text-3xl font-bold text-slate-300">
+                                                        {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-primary transition-colors">{member.name}</h3>
+                                            <Badge variant="secondary" className="bg-primary/10 text-primary border-none mb-2">
+                                                {member.role || "Elected Member"}
+                                            </Badge>
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         )}

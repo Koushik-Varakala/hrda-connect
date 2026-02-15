@@ -18,6 +18,11 @@ export default function Home() {
     const { data: announcements, isLoading } = useAnnouncements();
     const { data: panels } = useQuery<Panel[]>({
         queryKey: ["/api/panels"],
+        queryFn: async () => {
+            const res = await fetch("/api/panels");
+            if (!res.ok) throw new Error("Failed to fetch panels");
+            return res.json();
+        }
     });
 
     const electedMembers = panels?.filter(p => p.category === 'elected_member') || [];
