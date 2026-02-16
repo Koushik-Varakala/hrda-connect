@@ -97,8 +97,7 @@ const districts = [
 
 // ... imports
 import { IdCard } from "@/components/IdCard";
-import html2canvas from "html2canvas";
-import { Download, Printer } from "lucide-react";
+import { Printer } from "lucide-react";
 import { useRef, useEffect } from "react";
 import { api } from "@shared/routes";
 
@@ -143,7 +142,8 @@ function ResultCard({ registration }: { registration: any }) {
     // ID Card State
     const [showIdCard, setShowIdCard] = useState(false);
     const idCardRef = useRef<HTMLDivElement>(null);
-    const downloadRef = useRef<HTMLDivElement>(null);
+    // Removed `downloadRef` as we only print now, or reuse it for printing (which we do for `@media print`)
+    const printRef = useRef<HTMLDivElement>(null);
 
     const handleSendOtp = async () => {
         setIsSendingOtp(true);
@@ -212,41 +212,6 @@ function ResultCard({ registration }: { registration: any }) {
             toast({ title: "Success", description: "Details updated successfully." });
         } catch (e) {
             toast({ title: "Error", description: "Failed to update details.", variant: "destructive" });
-        }
-    };
-
-    const handleDownloadIdCard = async () => {
-        // We capture the hidden, unscaled version to ensure perfect quality
-        if (!downloadRef.current) {
-            console.error("Download ref not found");
-            return;
-        }
-
-        try {
-            // Small delay to ensure render
-            await new Promise(resolve => setTimeout(resolve, 100));
-
-            const canvas = await html2canvas(downloadRef.current, {
-                scale: 3, // High quality
-                useCORS: true,
-                backgroundColor: "#ffffff",
-                width: 600, // Force dimensions
-                height: 375,
-                windowWidth: 1920, // Ensure desktop context
-            });
-
-            const image = canvas.toDataURL("image/png", 1.0);
-            const link = document.createElement("a");
-            link.href = image;
-            link.download = `HRDA_ID_${regData.hrdaId || "CARD"}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            toast({ title: "Downloaded", description: "ID Card saved to your device." });
-        } catch (e) {
-            console.error(e);
-            toast({ title: "Error", description: "Failed to download ID card.", variant: "destructive" });
         }
     };
 
@@ -370,8 +335,8 @@ function ResultCard({ registration }: { registration: any }) {
                             <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="w-full">
                                 <Edit2 className="w-4 h-4 mr-2" /> Edit Details
                             </Button>
-                            <Button variant="default" size="sm" onClick={() => setShowIdCard(true)} className="w-full bg-green-600 hover:bg-green-700 text-white">
-                                <Download className="w-4 h-4 mr-2" /> Download ID Card
+                            <Button variant="default" size="sm" onClick={() => setShowIdCard(true)} className="w-full bg-slate-800 hover:bg-slate-900 text-white">
+                                <Printer className="w-4 h-4 mr-2" /> Print ID Card
                             </Button>
                         </div>
                     )}
@@ -440,17 +405,15 @@ function ResultCard({ registration }: { registration: any }) {
                         >
                             <Printer className="w-4 h-4 mr-2" /> Print Card
                         </Button>
-                        <Button onClick={handleDownloadIdCard} className="bg-blue-600 hover:bg-blue-700">
-                            <Download className="w-4 h-4 mr-2" /> Download Image
-                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
 
             {/* Hidden Off-Screen Container for Perfect Export & Printing */}
             {/* Must be visible (not display:none) for html2canvas, but positioned off-screen */}
+            {/* Renamed ref to printRef to be explicit */}
             <div id="print-area" className="fixed top-0 left-0 -z-50" style={{ transform: "translate(-9999px, -9999px)" }}>
-                <IdCard ref={downloadRef} registration={regData} />
+                <IdCard ref={printRef} registration={regData} />
             </div>
 
             {/* Print Styles */}
