@@ -11,6 +11,7 @@ import {
     galleryPhotos, type GalleryPhoto, type InsertGalleryPhoto
 } from "@shared/schema";
 import { eq, desc, and, ilike } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 
 export interface IStorage {
     // Announcements
@@ -41,6 +42,8 @@ export interface IStorage {
     searchRegistrations(params: SearchRegistrationParams): Promise<Registration[]>;
     getRegistration(id: number): Promise<Registration | undefined>;
     getRegistrationByPhone(phone: string): Promise<Registration | undefined>;
+    getRegistrationByHrdaId(hrdaId: string): Promise<Registration | undefined>;
+    getRegistrationByToken(token: string): Promise<Registration | undefined>;
     createRegistration(registration: InsertRegistration): Promise<Registration>;
     updateRegistration(id: number, updates: UpdateRegistrationRequest): Promise<Registration | undefined>;
     deleteRegistration(id: number): Promise<void>;
@@ -180,8 +183,21 @@ export class DatabaseStorage implements IStorage {
         return registration;
     }
 
+    async getRegistrationByHrdaId(hrdaId: string): Promise<Registration | undefined> {
+        const [registration] = await db.select().from(registrations).where(eq(registrations.hrdaId, hrdaId));
+        return registration;
+    }
+
+    async getRegistrationByToken(token: string): Promise<Registration | undefined> {
+        const [registration] = await db.select().from(registrations).where(eq(registrations.verificationToken, token));
+        return registration;
+    }
+
     async createRegistration(insert: InsertRegistration): Promise<Registration> {
-        const [result] = await db.insert(registrations).values(insert).returning();
+        const [result] = await db.insert(registrations).values({
+            ...insert,
+            verificationToken: randomUUID()
+        }).returning();
         return result;
     }
 

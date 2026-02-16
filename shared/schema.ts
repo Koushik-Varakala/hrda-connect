@@ -84,6 +84,8 @@ export const registrations = pgTable("registrations", {
   otpCode: text("otp_code"),
   otpExpiresAt: timestamp("otp_expires_at"),
   otpAttempts: integer("otp_attempts").default(0),
+  // Security Hardening
+  verificationToken: text("verification_token"), // UUID for secure QR codes
 });
 
 // === SCHEMAS ===

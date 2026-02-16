@@ -4,6 +4,7 @@ import { JWT } from "google-auth-library";
 import { db } from "../lib/db";
 import { registrations } from "../shared/schema";
 import { eq, or } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 
 async function importRegistrations() {
     console.log("--- Starting Registration Import from Google Sheets ---");
@@ -110,7 +111,8 @@ async function importRegistrations() {
                     registrationSource: 'google_sheet_import',
                     createdAt,
                     updatedAt: new Date(),
-                    otpAttempts: 0
+                    otpAttempts: 0,
+                    verificationToken: randomUUID(),
                 });
                 added++;
                 // console.log(`✅ Added: ${firstName} ${lastName}`);

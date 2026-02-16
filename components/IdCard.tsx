@@ -10,6 +10,9 @@ interface IdCardProps {
         phone?: string;
         address?: string | null;
         district?: string | null;
+        tgmcId: string | null;
+        membershipType: string | null;
+        verificationToken: string | null; // Added
     };
 }
 
@@ -24,8 +27,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
         const address =
             registration.address || registration.district || "N/A";
 
-        const verifyUrl = `https://hrda-india.org/verify/${registration.hrdaId || registration.id
-            }`;
+        const verifyUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://hrda-connect.in'}/verify/${registration.verificationToken || 'pending'}`;
 
         /* ---------- Dynamic font helpers ---------- */
 
@@ -44,7 +46,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
         return (
             <div
                 ref={ref}
-                className="w-[600px] h-[375px] bg-white p-5 box-border text-black"
+                className="w-[600px] h-[375px] bg-white p-5 box-border text-black relative"
                 style={{
                     border: "18px solid #558B58",
                     fontFamily: '"Times New Roman", Times, serif',
@@ -52,7 +54,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
                 }}
             >
                 {/* ================= Header ================= */}
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-4 relative z-10">
                     <img
                         src="/hrda_id_header.png"
                         alt="HRDA Header"
@@ -62,7 +64,9 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
                         }}
                     />
 
-                    <QRCodeSVG value={verifyUrl} size={90} level="H" />
+                    <div className="bg-white p-1 rounded-sm shadow-sm">
+                        <QRCodeSVG value={verifyUrl} size={90} level="H" includeMargin={false} />
+                    </div>
                 </div>
 
                 {/* ================= Body ================= */}
