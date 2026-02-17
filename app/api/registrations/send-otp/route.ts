@@ -39,17 +39,25 @@ export async function POST(request: Request) {
         const emailSent = await emailService.sendOtp(reg.email, otp);
 
         // Send SMS
+        let smsSent = false;
         if (reg.phone) {
-            await smsService.sendOtp(reg.phone, otp);
+            try {
+                smsSent = await smsService.sendOtp(reg.phone, otp);
+            } catch (smsError) {
+                console.error(`Failed to send SMS to ${reg.phone}:`, smsError);
+                // We do NOT fail the request if SMS fails, but we should probably inform 
+                // debugging or just proceed since Email is primary.
+            }
         }
 
-        if (!emailSent) {
-            console.error("Failed to send OTP email");
-            // Force log for debugging even if email fails (development only)
+        if (!emailSent && !smsSent) {
+            console.error("Failed to send OTP via both Email and SMS");
+            // Force log for debugging (development only)
             console.log(`[DEV ONLY] OTP for ${reg.email}: ${otp}`);
-        } else {
-            console.log(`Sent OTP to ${reg.email}`);
+            return NextResponse.json({ message: "Failed to send OTP. Please try again." }, { status: 500 });
         }
+
+        console.log(`Sent OTP to ${reg.email} (Email: ${emailSent}, SMS: ${smsSent})`);
 
         otpRateLimit.set(registrationId, Date.now());
         return NextResponse.json({ message: "OTP sent successfully" });

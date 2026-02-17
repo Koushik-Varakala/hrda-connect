@@ -9,9 +9,18 @@ export class SmsService {
     async sendSms(to: string, message: string): Promise<boolean> {
         const apiKey = process.env.FAST2SMS_API_KEY;
 
+
         if (!apiKey) {
             console.log(`[Mock SMS] To: ${to} | Message: ${message}`);
             return true;
+        }
+
+        // Clean phone number: remove non-digits and strip leading 91 or +91 if length > 10
+        let cleanPhone = to.replace(/\D/g, "");
+        if (cleanPhone.length > 10 && (cleanPhone.startsWith("91"))) {
+            cleanPhone = cleanPhone.slice(2);
+        } else if (cleanPhone.length > 10 && cleanPhone.startsWith("0")) {
+            cleanPhone = cleanPhone.slice(1);
         }
 
         try {
@@ -26,7 +35,7 @@ export class SmsService {
                     "message": message,
                     "language": "english",
                     "flash": 0,
-                    "numbers": to
+                    "numbers": cleanPhone
                 })
             });
 

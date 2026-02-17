@@ -149,7 +149,7 @@ function ResultCard({ registration }: { registration: any }) {
         setIsSendingOtp(true);
         try {
             await apiRequest("POST", "/api/registrations/send-otp", { registrationId: regData.id });
-            toast({ title: "OTP Sent", description: "Please check your registered email for the code." });
+            toast({ title: "OTP Sent", description: "Please check your registered phone and email for the code." });
             setIsSendingOtp(false);
             setShowOtpDialog(true);
         } catch (e: any) {
@@ -352,7 +352,7 @@ function ResultCard({ registration }: { registration: any }) {
                     <DialogHeader>
                         <DialogTitle>Enter Verification Code</DialogTitle>
                         <DialogDescription>
-                            We've sent a 6-digit code to your registered email <strong>{regData.email}</strong>.
+                            We've sent a 6-digit code to your registered phone number and email <strong>{regData.email}</strong>.
                             Enter it below to verify your identity.
                         </DialogDescription>
                     </DialogHeader>
