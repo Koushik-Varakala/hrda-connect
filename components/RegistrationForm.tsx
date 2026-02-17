@@ -14,12 +14,13 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { appConfig } from "@/lib/app-config";
 
 // Form Schema
 const registrationSchema = z.object({
     firstName: z.string().min(2, "Name is required"),
     lastName: z.string().min(1, "Last name is required"),
-    tgmcId: z.string().min(3, "TGMC ID is required"),
+    tgmcId: z.string().min(3, `${appConfig.medicalCouncilShort} ID is required`),
     email: z.string().email("Invalid email address"),
     phone: z.string().min(10, "Valid phone number required"),
     address: z.string().min(5, "Address is required"),
@@ -89,7 +90,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
 
     const searchDetails = async () => {
         if (!searchTgmcId || searchTgmcId.length < 4) {
-            toast({ title: "Invalid ID", description: "Please enter a valid TGMC ID", variant: "destructive" });
+            toast({ title: "Invalid ID", description: `Please enter a valid ${appConfig.medicalCouncilShort} ID`, variant: "destructive" });
             return;
         }
 
@@ -260,53 +261,57 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 
-                                {/* TGMC Search Section (Search Only) */}
-                                <div className="space-y-4 mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                                    <div className="flex gap-4 items-end">
-                                        <div className="flex-1 space-y-2">
-                                            <FormLabel>Search by Telangana Medical Council Reg. No</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="Enter TGMC ID to fetch details"
-                                                    value={searchTgmcId}
-                                                    onChange={(e) => setSearchTgmcId(e.target.value)}
-                                                />
-                                            </FormControl>
-                                        </div>
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            className="mb-[2px]"
-                                            onClick={searchDetails}
-                                            disabled={isSearching}
-                                        >
-                                            {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : "Fetch Details"}
-                                        </Button>
-                                    </div>
-                                    <p className="text-red-500 text-xs text-muted-foreground -mt-3 mb-2">
-                                        If details are not found, you can still register by filling the form manually.
-                                    </p>
-
-                                    {searchResults.length > 0 && (
-                                        <div className="space-y-2 mt-2 border-t pt-2">
-                                            <p className="text-sm font-medium text-slate-700">Select your profile:</p>
-                                            <div className="max-h-60 overflow-y-auto space-y-2">
-                                                {searchResults.map((doc, idx) => (
-                                                    <div key={idx} className="p-3 bg-white border rounded cursor-pointer hover:border-primary flex justify-between items-center" onClick={() => handleAutoFill(doc)}>
-                                                        <div className="text-sm">
-                                                            <p className="font-bold">{doc.fullname}</p>
-                                                            <p className="text-xs text-muted-foreground">{[doc.address1, doc.address2].filter(Boolean).join(", ")}</p>
-                                                            <p className="text-xs text-muted-foreground">FMR: {doc.original_fmr_no || doc.fmr_no}</p>
-                                                        </div>
-                                                        <Button size="sm" variant="ghost" type="button">Select</Button>
-                                                    </div>
-                                                ))}
+                                {/* Medical Council Search Section (TG Only - TGMC has API, APMC doesn't) */}
+                                {appConfig.region === 'TG' && (
+                                    <>
+                                        <div className="space-y-4 mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                            <div className="flex gap-4 items-end">
+                                                <div className="flex-1 space-y-2">
+                                                    <FormLabel>Search by {appConfig.medicalCouncil} Reg. No</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder={`Enter ${appConfig.medicalCouncilShort} ID to fetch details`}
+                                                            value={searchTgmcId}
+                                                            onChange={(e) => setSearchTgmcId(e.target.value)}
+                                                        />
+                                                    </FormControl>
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    className="mb-[2px]"
+                                                    onClick={searchDetails}
+                                                    disabled={isSearching}
+                                                >
+                                                    {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : "Fetch Details"}
+                                                </Button>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
+                                            <p className="text-red-500 text-xs text-muted-foreground -mt-3 mb-2">
+                                                If details are not found, you can still register by filling the form manually.
+                                            </p>
 
-                                <div className="p-2"> <hr /> </div>
+                                            {searchResults.length > 0 && (
+                                                <div className="space-y-2 mt-2 border-t pt-2">
+                                                    <p className="text-sm font-medium text-slate-700">Select your profile:</p>
+                                                    <div className="max-h-60 overflow-y-auto space-y-2">
+                                                        {searchResults.map((doc, idx) => (
+                                                            <div key={idx} className="p-3 bg-white border rounded cursor-pointer hover:border-primary flex justify-between items-center" onClick={() => handleAutoFill(doc)}>
+                                                                <div className="text-sm">
+                                                                    <p className="font-bold">{doc.fullname}</p>
+                                                                    <p className="text-xs text-muted-foreground">{[doc.address1, doc.address2].filter(Boolean).join(", ")}</p>
+                                                                    <p className="text-xs text-muted-foreground">FMR: {doc.original_fmr_no || doc.fmr_no}</p>
+                                                                </div>
+                                                                <Button size="sm" variant="ghost" type="button">Select</Button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="p-2"> <hr /> </div>
+                                    </>
+                                )}
 
                                 {/* Main Form Fields */}
                                 <div className="space-y-4">
@@ -315,8 +320,8 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                                         name="tgmcId"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>TGMC Registration Number</FormLabel>
-                                                <FormControl><Input placeholder="Confirmation of your TGMC ID" {...field} /></FormControl>
+                                                <FormLabel>{appConfig.medicalCouncilId}</FormLabel>
+                                                <FormControl><Input placeholder={`Confirmation of your ${appConfig.medicalCouncilShort} ID`} {...field} /></FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}

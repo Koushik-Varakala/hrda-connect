@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { FloatingInstagram } from "@/components/FloatingInstagram";
+import { appConfig } from "@/lib/app-config";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -331,7 +332,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
             <p className="text-sm leading-relaxed max-w-sm text-slate-400">
-              Dedicated to improving the healthcare system and protecting the rights of medical professionals in Telangana.
+              Dedicated to improving the healthcare system and protecting the rights of medical professionals in {appConfig.stateName}.
               Join us in our mission to create a better future for healthcare.
             </p>
           </div>
@@ -359,7 +360,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-slate-400">Loc:</span>
-                <span>Hyderabad, Telangana</span>
+                <span>Hyderabad, {appConfig.stateName}</span>
               </li>
               <li>
                 <Link href="/contact" className="text-blue-400 hover:text-blue-300 transition-colors font-medium">Send us a message &rarr;</Link>
