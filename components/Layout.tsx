@@ -314,6 +314,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             <div className="h-px bg-gray-100 my-4" />
 
+            {/* Mobile Region Switcher */}
+            <Button
+              onClick={() => {
+                const targetUrl = appConfig.region === 'TG'
+                  ? (process.env.NODE_ENV === 'production' ? 'https://ap.hrda-india.org' : 'http://localhost:3000')
+                  : (process.env.NODE_ENV === 'production' ? 'https://hrda-india.org' : 'http://localhost:3000');
+                const currentPath = window.location.pathname;
+                window.location.href = `${targetUrl}${currentPath}`;
+              }}
+              variant="outline"
+              className="w-full justify-center border-primary text-primary hover:bg-primary hover:text-white transition-colors"
+            >
+              <span className="text-sm font-semibold">Switch to {appConfig.region === 'TG' ? 'Andhra Pradesh' : 'Telangana'}</span>
+            </Button>
+
             {user ? (
               <Button asChild variant="outline" className="w-full justify-center border-slate-200 text-slate-700 rounded-lg">
                 <Link href="/admin/dashboard">
