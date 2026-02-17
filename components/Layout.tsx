@@ -17,6 +17,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { FloatingInstagram } from "@/components/FloatingInstagram";
 import { appConfig } from "@/lib/app-config";
+import { RegionSelectionModal } from "@/components/RegionSelectionModal";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -62,6 +63,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans">
+      {/* Region Selection Modal - Shows on first visit */}
+      <RegionSelectionModal />
+
       {/* Top Announcement Bar */}
       <div className="bg-[#1a237e] text-white py-2 text-xs md:text-sm text-center font-medium px-4 tracking-wide z-50 relative">
         Healthcare Reforms Doctors Association (HRDA) - Advocating for Doctors & Public Health
@@ -194,6 +198,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 Login
               </Link>
             )}
+
+            {/* Region Switcher Button */}
+            <Button
+              onClick={() => {
+                const targetUrl = appConfig.region === 'TG'
+                  ? (process.env.NODE_ENV === 'production' ? 'https://ap.hrda-india.org' : 'http://localhost:3000')
+                  : (process.env.NODE_ENV === 'production' ? 'https://hrda-india.org' : 'http://localhost:3000');
+                const currentPath = window.location.pathname;
+                window.location.href = `${targetUrl}${currentPath}`;
+              }}
+              variant="outline"
+              size="sm"
+              className="border-primary text-primary hover:bg-primary hover:text-white transition-colors px-3"
+            >
+              <span className="text-xs font-semibold">{appConfig.region}</span>
+              <span className="mx-1">↔</span>
+              <span className="text-xs font-semibold">{appConfig.region === 'TG' ? 'AP' : 'TG'}</span>
+            </Button>
 
             <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 shadow-md transition-all hover:shadow-lg font-medium">
               <Link href="/index.php/new-registration-2/">
