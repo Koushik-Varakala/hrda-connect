@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Achievement } from "@shared/schema";
+import { appConfig } from "@/lib/app-config";
 
 export default function Achievements() {
     const { data: achievements } = useQuery<Achievement[]>({
@@ -164,73 +165,93 @@ export default function Achievements() {
                 </div>
             </section>
 
-            {/* TGMC Elections 2023 Section */}
-            <section className="py-16 md:py-20 bg-blue-50">
-                <div className="container mx-auto px-4 md:px-6 lg:px-8">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">TGMC Elections 2023</h2>
-                        <p className="text-slate-600 max-w-2xl mx-auto">
-                            A historic turning point for the medical fraternity in Telangana.
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-12 items-start">
-                        {/* Manifesto */}
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-                            <div className="flex items-center gap-3 mb-6 border-b pb-4">
-                                <Vote className="w-8 h-8 text-primary" />
-                                <h3 className="text-2xl font-serif font-bold text-slate-800">Election Manifesto</h3>
-                            </div>
-                            <p className="text-slate-600 mb-6 italic">
-                                "A roadmap rooted in years of struggle to restore dignity and modernize the Council."
+            {/* TGMC Elections 2023 Section - TG ONLY */}
+            {appConfig.region === 'TG' && (
+                <section className="py-16 md:py-20 bg-blue-50">
+                    <div className="container mx-auto px-4 md:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">TGMC Elections 2023</h2>
+                            <p className="text-slate-600 max-w-2xl mx-auto">
+                                A historic turning point for the medical fraternity in Telangana.
                             </p>
-                            <ul className="space-y-4">
-                                {[
-                                    "State-of-the-Art TSMC Building",
-                                    "Eradication of Quackery & Crosspathy",
-                                    "Digital Transformation (Online Services)",
-                                    "Affordable Fees (Rationalize charges)",
-                                    "Enforcing Ethics & Professional Dignity",
-                                    "FMGE & Stipend Reforms (Equal stipends)",
-                                    "Professional Development (CPD & CME)",
-                                    "Accountability (Audit last 15 years)"
-                                ].map((item, idx) => (
-                                    <li key={idx} className="flex items-start gap-3">
-                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-                                            {idx + 1}
-                                        </span>
-                                        <span className="text-slate-700 font-medium">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
                         </div>
 
-                        {/* Victory */}
-                        <div>
-                            <div className="flex items-center gap-3 mb-6">
-                                <ShieldCheck className="w-8 h-8 text-green-600" />
-                                <h3 className="text-2xl font-serif font-bold text-slate-900">Unprecedented Victory</h3>
-                            </div>
-                            <div className="prose prose-lg text-slate-600">
-                                <p className="mb-4">
-                                    In December 2023, history was written. For the first time in 17 years, elections were held for 13 seats in the Telangana State Medical Council.
+                        <div className="grid md:grid-cols-2 gap-12 items-start">
+                            {/* Manifesto */}
+                            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex items-center gap-3 mb-6 border-b pb-4">
+                                    <Vote className="w-8 h-8 text-primary" />
+                                    <h3 className="text-2xl font-serif font-bold text-slate-800">Election Manifesto</h3>
+                                </div>
+                                <p className="text-slate-600 mb-6 italic">
+                                    "A roadmap rooted in years of struggle to restore dignity and modernize the Council."
                                 </p>
-                                <div className="bg-green-50 border-l-4 border-green-500 p-6 my-6 rounded-r-lg">
-                                    <p className="font-bold text-green-900 text-lg mb-2">
-                                        HRDA won every single seat with a staggering majority.
+                                <ul className="space-y-4">
+                                    {[
+                                        "State-of-the-Art TSMC Building",
+                                        "Eradication of Quackery & Crosspathy",
+                                        "Digital Transformation (Online Services)",
+                                        "Affordable Fees (Rationalize charges)",
+                                        "Enforcing Ethics & Professional Dignity",
+                                        "FMGE & Stipend Reforms (Equal stipends)",
+                                        "Professional Development (CPD & CME)",
+                                        "Accountability (Audit last 15 years)"
+                                    ].map((item, idx) => (
+                                        <li key={idx} className="flex items-start gap-3">
+                                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                                                {idx + 1}
+                                            </span>
+                                            <span className="text-slate-700 font-medium">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Victory */}
+                            <div>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <ShieldCheck className="w-8 h-8 text-green-600" />
+                                    <h3 className="text-2xl font-serif font-bold text-slate-900">Unprecedented Victory</h3>
+                                </div>
+                                <div className="prose prose-lg text-slate-600">
+                                    <p className="mb-4">
+                                        In December 2023, history was written. For the first time in 17 years, elections were held for 13 seats in the Telangana State Medical Council.
                                     </p>
-                                    <p className="text-green-800 text-sm">
-                                        A clean sweep of all 13 elected positions, reiterating the absolute trust of doctors all over Telangana.
+                                    <div className="bg-green-50 border-l-4 border-green-500 p-6 my-6 rounded-r-lg">
+                                        <p className="font-bold text-green-900 text-lg mb-2">
+                                            HRDA won every single seat with a staggering majority.
+                                        </p>
+                                        <p className="text-green-800 text-sm">
+                                            A clean sweep of all 13 elected positions, reiterating the absolute trust of doctors all over Telangana.
+                                        </p>
+                                    </div>
+                                    <p>
+                                        This victory was not merely about winning seats; it was a mandate for reform. It validated years of HRDA's struggle and set the stage for a new era of accountability and professional dignity.
                                     </p>
                                 </div>
-                                <p>
-                                    This victory was not merely about winning seats; it was a mandate for reform. It validated years of HRDA's struggle and set the stage for a new era of accountability and professional dignity.
-                                </p>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
+
+            {/* AP Placeholder Section */}
+            {appConfig.region === 'AP' && (
+                <section className="py-16 md:py-20 bg-blue-50">
+                    <div className="container mx-auto px-4 md:px-6 lg:px-8">
+                        <div className="text-center max-w-2xl mx-auto">
+                            <Vote className="w-16 h-16 text-primary mx-auto mb-6" />
+                            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">Building Our Legacy</h2>
+                            <p className="text-lg text-slate-600 mb-6">
+                                HRDA Andhra Pradesh is just beginning its journey. As we grow stronger and achieve milestones, this section will showcase our victories and contributions to the medical fraternity in Andhra Pradesh.
+                            </p>
+                            <p className="text-slate-500 italic">
+                                More achievements coming soon!
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* Post Election Impact */}
             <section className="py-16 md:py-20 bg-slate-900 text-slate-100">

@@ -21,6 +21,11 @@ export interface RegionConfig {
     organizationName: string;
     welcomeMessage: string;
     domain: string;
+    districts: string[];
+    capital: string;
+    heroDescription: string;
+    aboutUsDescription: string;
+    registrationTagline: string;
 }
 
 const TG_CONFIG: RegionConfig = {
@@ -32,7 +37,20 @@ const TG_CONFIG: RegionConfig = {
     medicalCouncilId: 'TGMC ID',
     organizationName: 'Healthcare Reforms Doctors Association - Telangana',
     welcomeMessage: 'Welcome to HRDA Telangana',
-    domain: 'hrda-india.org'
+    domain: 'hrda-india.org',
+    districts: [
+        "Adilabad", "Bhadradri Kothagudem", "Hanumakonda", "Hyderabad", "Jagtial",
+        "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy",
+        "Karimnagar", "Khammam", "Kumuram Bheem Asifabad", "Mahabubabad",
+        "Mahabubnagar", "Mancherial", "Medak", "Medchal-Malkajgiri", "Mulugu",
+        "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad",
+        "Peddapalli", "Rajanna Sircilla", "Ranga Reddy", "Sangareddy",
+        "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal", "Yadadri Bhuvanagiri"
+    ],
+    capital: 'Hyderabad',
+    heroDescription: 'HRDA works tirelessly with governments and regulators to improve medical education, strengthen primary healthcare, and protect the interests of doctors across Telangana.',
+    aboutUsDescription: 'The Healthcare Reforms Doctors Association (HRDA) was established with a singular vision: to create a transparent, efficient, and equitable healthcare system in Telangana.',
+    registrationTagline: 'Join the strongest voice for doctors in Telangana. Your support strengthens our cause.',
 };
 
 const AP_CONFIG: RegionConfig = {
@@ -44,7 +62,19 @@ const AP_CONFIG: RegionConfig = {
     medicalCouncilId: 'APMC ID',
     organizationName: 'Healthcare Reforms Doctors Association - Andhra Pradesh',
     welcomeMessage: 'Welcome to HRDA Andhra Pradesh',
-    domain: 'ap.hrda-india.org'
+    domain: 'ap.hrda-india.org',
+    districts: [
+        "Anantapur", "Chittoor", "East Godavari", "Guntur", "Krishna",
+        "Kurnool", "Nellore", "Prakasam", "Srikakulam", "Visakhapatnam",
+        "Vizianagaram", "West Godavari", "YSR Kadapa",
+        "Alluri Sitharama Raju", "Anakapalli", "Annamayya", "Bapatla",
+        "Eluru", "Kakinada", "Konaseema", "Nandyal", "NTR", "Palnadu",
+        "Parvathipuram Manyam", "Tirupati"
+    ],
+    capital: 'Amaravati',
+    heroDescription: 'HRDA works tirelessly with governments and regulators to improve medical education, strengthen primary healthcare, and protect the interests of doctors across Andhra Pradesh.',
+    aboutUsDescription: 'The Healthcare Reforms Doctors Association (HRDA) was established with a singular vision: to create a transparent, efficient, and equitable healthcare system in Andhra Pradesh.',
+    registrationTagline: 'Join the strongest voice for doctors in Andhra Pradesh. Your support strengthens our cause.',
 };
 
 /**

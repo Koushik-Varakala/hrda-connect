@@ -7,6 +7,7 @@ import { CheckCircle } from "lucide-react";
 import { RegistrationForm } from "@/components/RegistrationForm";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { appConfig } from "@/lib/app-config";
 
 export default function Membership() {
     const { toast } = useToast();
@@ -17,7 +18,7 @@ export default function Membership() {
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6">Become a Member</h1>
                     <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-                        Join the strongest voice for doctors in Telangana. Your support strengthens our cause.
+                        {appConfig.registrationTagline}
                     </p>
                 </div>
             </div>

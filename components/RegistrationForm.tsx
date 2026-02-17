@@ -30,15 +30,7 @@ const registrationSchema = z.object({
     spouseTgmcId: z.string().optional(),
 });
 
-const districts = [
-    "Adilabad", "Bhadradri Kothagudem", "Hanumakonda", "Hyderabad", "Jagtial",
-    "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy",
-    "Karimnagar", "Khammam", "Kumuram Bheem Asifabad", "Mahabubabad",
-    "Mahabubnagar", "Mancherial", "Medak", "Medchal-Malkajgiri", "Mulugu",
-    "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad",
-    "Peddapalli", "Rajanna Sircilla", "Ranga Reddy", "Sangareddy",
-    "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal", "Yadadri Bhuvanagiri"
-];
+const districts = appConfig.districts;
 
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
 

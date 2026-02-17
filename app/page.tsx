@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Panel } from "@shared/schema";
 import { Vote } from "lucide-react";
 import { GallerySlideshow } from "@/components/GallerySlideshow";
+import { appConfig } from "@/lib/app-config";
 
 export default function Home() {
     const { data: announcements, isLoading } = useAnnouncements();
@@ -48,8 +49,7 @@ export default function Home() {
                                 Advocating for <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 block md:inline">Healthcare Reform</span> & Professional Rights
                             </h1>
                             <p className="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed max-w-2xl">
-                                HRDA works tirelessly with governments and regulators to improve medical education,
-                                strengthen primary healthcare, and protect the interests of doctors across Telangana.
+                                {appConfig.heroDescription}
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Button asChild size="lg" className="rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-semibold">
@@ -245,7 +245,7 @@ export default function Home() {
                             </CardHeader>
                             <CardContent>
                                 <p className="text-muted-foreground">
-                                    Bringing together doctors from all specialties to create a unified voice for the medical fraternity in Telangana.
+                                    Bringing together doctors from all specialties to create a unified voice for the medical fraternity in {appConfig.stateName}.
                                 </p>
                             </CardContent>
                         </Card>
@@ -287,7 +287,7 @@ export default function Home() {
                 <div className="container mx-auto px-4 md:px-6 lg:px-8 text-center">
                     <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6">Join the Movement for Better Healthcare</h2>
                     <p className="text-blue-100 text-lg max-w-2xl mx-auto mb-10">
-                        Become a member of HRDA today and contribute to the future of the medical profession in Telangana.
+                        Become a member of HRDA today and contribute to the future of the medical profession in {appConfig.stateName}.
                     </p>
                     <Button asChild size="lg" variant="secondary" className="bg-white text-primary hover:bg-slate-100 font-bold px-10 h-14 rounded-full shadow-xl">
                         <Link href="/index.php/new-registration-2/">

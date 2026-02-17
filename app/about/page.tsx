@@ -4,6 +4,7 @@ import { Layout } from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle2 } from "lucide-react";
+import { appConfig } from "@/lib/app-config";
 
 export default function About() {
     return (
@@ -25,7 +26,7 @@ export default function About() {
                             <h2 className="text-3xl font-bold mb-6 text-primary">Our History</h2>
                             <div className="prose prose-slate max-w-none text-muted-foreground">
                                 <p className="mb-4">
-                                    The Healthcare Reforms Doctors Association (HRDA) was established with a singular vision: to create a transparent, efficient, and equitable healthcare system in Telangana.
+                                    {appConfig.aboutUsDescription}
                                 </p>
                                 <p className="mb-4">
                                     Born out of the collective necessity to address systemic gaps in medical education and healthcare delivery, HRDA has grown into a formidable voice for doctors. We have led numerous successful campaigns advocating for better working conditions, fair policies, and the autonomy of medical institutions.

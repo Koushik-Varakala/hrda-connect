@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import { apiRequest } from "@/lib/queryClient";
+import { appConfig } from "@/lib/app-config";
 
 export default function Contact() {
     const { toast } = useToast();
@@ -73,7 +74,7 @@ export default function Contact() {
                                     <div>
                                         <h3 className="font-semibold mb-1">Location</h3>
                                         <p className="text-muted-foreground">
-                                            Hyderabad, Telangana, India
+                                            {appConfig.capital}, {appConfig.stateName}, India
                                         </p>
                                     </div>
                                 </CardContent>
