@@ -26,6 +26,7 @@ export default function Membership() {
             <div className="container mx-auto px-4 py-16">
                 <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-start">
 
+                    {/* Left column: Why Join + HRDA movement block */}
                     <div>
                         <h2 className="text-2xl font-bold mb-6 text-slate-900">Why Join HRDA?</h2>
                         <div className="space-y-4">
@@ -43,9 +44,33 @@ export default function Membership() {
                             ))}
                         </div>
 
-
+                        {/* HRDA Movement Description */}
+                        <div className="mt-8 bg-slate-50 border border-slate-200 rounded-2xl p-6">
+                            <p className="text-sm font-bold text-slate-900 mb-3">
+                                ✅ HRDA (Healthcare Reforms Doctors Association) is a doctor-driven movement working for:
+                            </p>
+                            <ul className="space-y-2 mb-5">
+                                {[
+                                    `Healthcare reforms in ${appConfig.stateName} (Rural & Urban)`,
+                                    "Doctors' rights, dignity & safety",
+                                    "Ethical medical practice",
+                                    "Strict action against quackery & illegal healthcare",
+                                    "Support for medical students & residents",
+                                    "Stronger primary healthcare & public health initiatives",
+                                ].map((point, i) => (
+                                    <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                                        <span className="text-orange-400 flex-shrink-0 mt-0.5">◆</span>
+                                        <span>{point}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                            <p className="text-sm font-bold text-slate-800">
+                                💪 ALONE WE ARE VULNERABLE — TOGETHER AS HRDA, WE ARE STRONGER!
+                            </p>
+                        </div>
                     </div>
 
+                    {/* Right column: Form or Coming Soon */}
                     <div>
                         {appConfig.region === 'AP' ? (
                             // AP Site - Coming Soon Message
