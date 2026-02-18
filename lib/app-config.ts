@@ -26,6 +26,9 @@ export interface RegionConfig {
     heroDescription: string;
     aboutUsDescription: string;
     registrationTagline: string;
+    phone: string;
+    email: string;
+    whatsappOnly: boolean;
 }
 
 const TG_CONFIG: RegionConfig = {
@@ -51,6 +54,9 @@ const TG_CONFIG: RegionConfig = {
     heroDescription: 'HRDA works tirelessly with governments and regulators to improve medical education, strengthen primary healthcare, and protect the interests of doctors across Telangana.',
     aboutUsDescription: 'The Healthcare Reforms Doctors Association (HRDA) was established with a singular vision: to create a transparent, efficient, and equitable healthcare system in Telangana.',
     registrationTagline: 'Join the strongest voice for doctors in Telangana. Your support strengthens our cause.',
+    phone: '+91 98490 00000',
+    email: 'hrda4people@gmail.com',
+    whatsappOnly: false,
 };
 
 const AP_CONFIG: RegionConfig = {
@@ -75,6 +81,9 @@ const AP_CONFIG: RegionConfig = {
     heroDescription: 'HRDA works tirelessly with governments and regulators to improve medical education, strengthen primary healthcare, and protect the interests of doctors across Andhra Pradesh.',
     aboutUsDescription: 'The Healthcare Reforms Doctors Association (HRDA) was established with a singular vision: to create a transparent, efficient, and equitable healthcare system in Andhra Pradesh.',
     registrationTagline: 'Join the strongest voice for doctors in Andhra Pradesh. Your support strengthens our cause.',
+    phone: '+91 77992 88889',
+    email: 'hrdareforms@gmail.com',
+    whatsappOnly: true,
 };
 
 /**
