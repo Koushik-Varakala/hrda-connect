@@ -26,7 +26,6 @@ export default function Achievements() {
     const postElectionWins = achievements?.filter(a => a.category === 'post_election') || [];
     const galleryImages = achievements?.filter(a => a.imageUrl) || [];
 
-    // Helper to get icon for category/title (simplified for dynamic content)
     const getIcon = (title: string) => {
         if (title.toLowerCase().includes("legal") || title.toLowerCase().includes("court")) return <Scale className="w-5 h-5 text-primary" />;
         if (title.toLowerCase().includes("covid")) return <HeartPulse className="w-5 h-5 text-red-500" />;
@@ -45,7 +44,7 @@ export default function Achievements() {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-4xl text-headline md:text-6xl font-serif font-bold mb-6"
                     >
-                        A Legacy of Struggle & Victory
+                        A Legacy of Struggle &amp; Victory
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -63,7 +62,7 @@ export default function Achievements() {
                 <section className="py-16 md:py-20 bg-slate-50 border-b border-slate-200">
                     <div className="container mx-auto px-4 md:px-6 lg:px-8">
                         <div className="text-center mb-12">
-                            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">Gallery & Highlights</h2>
+                            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">Gallery &amp; Highlights</h2>
                             <p className="text-slate-600 max-w-2xl mx-auto">
                                 Visual evidence of our struggles, protests, and victories.
                             </p>
@@ -145,7 +144,7 @@ export default function Achievements() {
                         <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 shadow-sm">
                             <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                                 <Megaphone className="w-6 h-6 text-orange-500" />
-                                Agitations & Association Activities
+                                Agitations &amp; Association Activities
                             </h3>
 
                             {associationWins.length === 0 && <p className="text-slate-500 italic">No activities added yet.</p>}
@@ -235,140 +234,23 @@ export default function Achievements() {
                 </section>
             )}
 
-            {/* AP - APMC Elections 2026 Agenda */}
+            {/* AP Placeholder Section */}
             {appConfig.region === 'AP' && (
-                <section className="py-16 md:py-20 bg-gradient-to-br from-blue-950 to-slate-900 text-white">
+                <section className="py-16 md:py-20 bg-blue-50">
                     <div className="container mx-auto px-4 md:px-6 lg:px-8">
-                        {/* Header */}
-                        <div className="text-center mb-14">
-                            <span className="inline-block bg-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
-                                APMC Elections 2026
-                            </span>
-                            <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-4">
-                                Reforming APMC — The HRDA Way
-                            </h2>
-                            <p className="text-blue-200 max-w-2xl mx-auto text-base">
-                                Our 18-point agenda for a strong, fair &amp; independent Andhra Pradesh Medical Council.
+                        <div className="text-center max-w-2xl mx-auto">
+                            <Vote className="w-16 h-16 text-primary mx-auto mb-6" />
+                            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">Building Our Legacy</h2>
+                            <p className="text-lg text-slate-600 mb-6">
+                                HRDA Andhra Pradesh is just beginning its journey. As we grow stronger and achieve milestones, this section will showcase our victories and contributions to the medical fraternity in Andhra Pradesh.
                             </p>
-                        </div>
-
-                        {/* Agenda Groups */}
-                        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
-
-                            {/* Group 1: Professional Standards */}
-                            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                                <h3 className="text-lg font-bold text-blue-300 mb-5 flex items-center gap-2">
-                                    <span className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm">⚕️</span>
-                                    Professional Standards
-                                </h3>
-                                <ul className="space-y-4">
-                                    {[
-                                        { num: 1, icon: "🛑", title: "End to Quackery", desc: "Only qualified care. No compromise." },
-                                        { num: 2, icon: "⚕️", title: "No Mixopathy", desc: "One system. One science. One standard." },
-                                        { num: 3, icon: "🚫", title: "Zero Violence", desc: "Safe doctors. Safe hospitals." },
-                                        { num: 4, icon: "🧠", title: "Clinical Freedom", desc: "Science guides practice, not politics." },
-                                    ].map(({ num, icon, title, desc }) => (
-                                        <li key={num} className="flex items-start gap-3">
-                                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600/30 flex items-center justify-center text-sm font-bold text-blue-300">{num}</span>
-                                            <div>
-                                                <p className="font-semibold text-white">{icon} {title}</p>
-                                                <p className="text-sm text-slate-400">{desc}</p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* Group 2: Digital & Administrative Reform */}
-                            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                                <h3 className="text-lg font-bold text-blue-300 mb-5 flex items-center gap-2">
-                                    <span className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm">💻</span>
-                                    Digital &amp; Administrative Reform
-                                </h3>
-                                <ul className="space-y-4">
-                                    {[
-                                        { num: 5, icon: "💻", title: "100% Digital APMC", desc: "One-click services. Zero red tape." },
-                                        { num: 6, icon: "💰", title: "Rational APMC Charges", desc: "Transparent, fair, and justified fees." },
-                                        { num: 7, icon: "⚡", title: "Fast Registrations (Including FMGs)", desc: "No delays. No discrimination." },
-                                        { num: 8, icon: "📚", title: "Easy CME & Skill Development", desc: "Continuous learning for better care." },
-                                    ].map(({ num, icon, title, desc }) => (
-                                        <li key={num} className="flex items-start gap-3">
-                                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600/30 flex items-center justify-center text-sm font-bold text-blue-300">{num}</span>
-                                            <div>
-                                                <p className="font-semibold text-white">{icon} {title}</p>
-                                                <p className="text-sm text-slate-400">{desc}</p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* Group 3: Ethics & Legal Protection */}
-                            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                                <h3 className="text-lg font-bold text-blue-300 mb-5 flex items-center gap-2">
-                                    <span className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm">⚖️</span>
-                                    Ethics &amp; Legal Protection
-                                </h3>
-                                <ul className="space-y-4">
-                                    {[
-                                        { num: 9, icon: "🧾", title: "Ethical Prescriptions", desc: "Right diagnosis. Right medicine." },
-                                        { num: 10, icon: "💊", title: "Stop OTC Drug Abuse", desc: "No prescription. No medicine." },
-                                        { num: 11, icon: "⚖️", title: "Legal Support for Doctors", desc: "You heal. We protect." },
-                                        { num: 12, icon: "⚖️", title: "Fair Inquiries — Zero Harassment", desc: "Justice with dignity." },
-                                    ].map(({ num, icon, title, desc }) => (
-                                        <li key={num} className="flex items-start gap-3">
-                                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600/30 flex items-center justify-center text-sm font-bold text-blue-300">{num}</span>
-                                            <div>
-                                                <p className="font-semibold text-white">{icon} {title}</p>
-                                                <p className="text-sm text-slate-400">{desc}</p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* Group 4: Dignity & Representation */}
-                            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                                <h3 className="text-lg font-bold text-blue-300 mb-5 flex items-center gap-2">
-                                    <span className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm">🛡️</span>
-                                    Dignity &amp; Representation
-                                </h3>
-                                <ul className="space-y-4">
-                                    {[
-                                        { num: 13, icon: "🛑", title: "Curtail Derogatory Campaigns", desc: "Protect reputation. Protect the profession." },
-                                        { num: 14, icon: "🛡️", title: "Livelihood Protection & Professional Security", desc: "Stability. Safety. Dignity." },
-                                        { num: 15, icon: "🔬", title: "Research & Innovation Support", desc: "Removing barriers to medical progress." },
-                                        { num: 16, icon: "👩‍⚕️", title: "Women's Safety & POSH Enforcement", desc: "Safe workplaces. Strong professionals." },
-                                        { num: 17, icon: "👨‍⚕️", title: "Senior Expert Advisory Panels", desc: "Experience guides. Youth leads." },
-                                        { num: 18, icon: "🗣️", title: "Every Doctor's Voice in APMC", desc: "Our voice. Our council." },
-                                    ].map(({ num, icon, title, desc }) => (
-                                        <li key={num} className="flex items-start gap-3">
-                                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600/30 flex items-center justify-center text-sm font-bold text-blue-300">{num}</span>
-                                            <div>
-                                                <p className="font-semibold text-white">{icon} {title}</p>
-                                                <p className="text-sm text-slate-400">{desc}</p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-
-                        {/* Call to Action Banner */}
-                        <div className="max-w-3xl mx-auto text-center bg-blue-600/20 border border-blue-500/30 rounded-2xl p-8">
-                            <p className="text-2xl font-bold text-white mb-2">✊ NOW OR NEVER</p>
-                            <p className="text-blue-200 mb-4">
-                                One Vote. One Stand. One Revolution.<br />
-                                For Our Rule. Our Future. Our Dignity.
+                            <p className="text-slate-500 italic">
+                                More achievements coming soon!
                             </p>
-                            <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-full font-bold text-sm">
-                                🗳️ e-Vote on 9th February 2026 — Vote for All 13 Members of HRDA PANEL
-                            </div>
                         </div>
                     </div>
                 </section>
             )}
-
 
             {/* Post Election Impact */}
             <section className="py-16 md:py-20 bg-slate-900 text-slate-100">
@@ -380,11 +262,10 @@ export default function Achievements() {
                         </p>
                     </div>
 
-                    <div className=" grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {postElectionWins.map((win) => (
                             <div key={win.id} className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-xl hover:bg-white/10 transition-colors">
-                                <div className="text-headlinemb-4 bg-blue-500/20 w-12 h-12 rounded-lg flex items-center justify-center text-blue-400">
-                                    {/* Dynamic Icon placeholder or generic */}
+                                <div className="bg-blue-500/20 w-12 h-12 rounded-lg flex items-center justify-center text-blue-400 mb-4">
                                     <CheckCircle2 className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-headline text-lg font-bold mb-2">{win.title}</h3>
