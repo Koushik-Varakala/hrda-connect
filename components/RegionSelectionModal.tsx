@@ -17,6 +17,14 @@ export function RegionSelectionModal() {
 
     useEffect(() => {
         setIsClient(true);
+        // Skip modal if user is on the registration page (direct link)
+        const isRegisterPage = window.location.pathname.includes('register');
+        if (isRegisterPage) {
+            // Auto-mark as visited so modal never shows on this visit
+            localStorage.setItem('regionPreferenceSet', 'true');
+            setIsOpen(false);
+            return;
+        }
         // Check if user has already selected a region
         const hasVisited = localStorage.getItem('regionPreferenceSet');
         if (!hasVisited) {

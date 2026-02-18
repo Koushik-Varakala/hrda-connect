@@ -43,14 +43,7 @@ export default function Membership() {
                             ))}
                         </div>
 
-                        <Card className="mt-8 bg-blue-50 border-blue-200">
-                            <CardContent className="pt-6">
-                                <h3 className="font-bold text-slate-900 mb-2">Membership Fee: ₹500</h3>
-                                <p className="text-sm text-slate-600">
-                                    One-time registration fee includes lifetime membership benefits.
-                                </p>
-                            </CardContent>
-                        </Card>
+
                     </div>
 
                     <div>
