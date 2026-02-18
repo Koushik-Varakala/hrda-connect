@@ -53,6 +53,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { name: "Gallery", href: "/gallery", description: "View our photo gallery." },
     { name: "Media Coverage", href: "/media", description: "News articles and press releases." },
     { name: "Departments", href: "/departments", description: "Various functional committees." },
+    ...(appConfig.region === 'AP' ? [{ name: "Commitment Charter", href: "/manifesto", description: "HRDA's full vision and reform manifesto." }] : []),
   ];
 
   const secondaryLinks = [
