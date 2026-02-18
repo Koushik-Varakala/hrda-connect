@@ -112,4 +112,3 @@ export default function Membership() {
         </Layout>
     );
 }
-```
