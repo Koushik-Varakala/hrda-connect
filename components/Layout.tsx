@@ -397,11 +397,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <ul className="space-y-3 text-sm mb-6">
               <li className="flex items-start gap-2">
                 <span className="text-slate-400">Email:</span>
-                <a href="mailto:hrda4people@gmail.com" className="hover:text-white transition-colors">hrda4people@gmail.com</a>
+                <a href={`mailto:${appConfig.email}`} className="hover:text-white transition-colors break-all">{appConfig.email}</a>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-slate-400">{appConfig.whatsappOnly ? 'WhatsApp:' : 'Phone:'}</span>
+                <a
+                  href={appConfig.whatsappOnly
+                    ? `https://wa.me/${appConfig.phone.replace(/[\s+\-]/g, '')}`
+                    : `tel:${appConfig.phone.replace(/[\s+\-]/g, '')}`}
+                  target={appConfig.whatsappOnly ? '_blank' : undefined}
+                  rel={appConfig.whatsappOnly ? 'noopener noreferrer' : undefined}
+                  className="hover:text-white transition-colors"
+                >
+                  {appConfig.phone}
+                </a>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-slate-400">Loc:</span>
-                <span>Hyderabad, {appConfig.stateName}</span>
+                <span>{appConfig.capital}, {appConfig.stateName}</span>
               </li>
               <li>
                 <Link href="/contact" className="text-blue-400 hover:text-blue-300 transition-colors font-medium">Send us a message &rarr;</Link>
