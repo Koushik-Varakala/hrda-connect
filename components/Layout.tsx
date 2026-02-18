@@ -69,7 +69,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Top Announcement Bar */}
       <div className="bg-[#1a237e] text-white py-2 text-xs md:text-sm text-center font-medium px-4 tracking-wide z-50 relative">
-        Healthcare Reforms Doctors Association (HRDA) - Advocating for Doctors & Public Health
+        <span className="flex flex-col sm:flex-row sm:justify-center sm:gap-1">
+          <span>Healthcare Reforms Doctors Association (HRDA) -</span>
+          <span>Advocating for Doctors &amp; Public Health</span>
+        </span>
       </div>
 
       {/* Development Banner - AP Only */}
