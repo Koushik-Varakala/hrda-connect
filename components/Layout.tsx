@@ -18,6 +18,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { FloatingInstagram } from "@/components/FloatingInstagram";
 import { appConfig } from "@/lib/app-config";
 import { RegionSelectionModal } from "@/components/RegionSelectionModal";
+import { DevelopmentBanner } from "@/components/DevelopmentBanner";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -70,6 +71,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <div className="bg-[#1a237e] text-white py-2 text-xs md:text-sm text-center font-medium px-4 tracking-wide z-50 relative">
         Healthcare Reforms Doctors Association (HRDA) - Advocating for Doctors & Public Health
       </div>
+
+      {/* Development Banner - AP Only */}
+      <DevelopmentBanner />
 
       {/* Main Header */}
       <header
