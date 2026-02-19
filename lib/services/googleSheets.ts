@@ -32,26 +32,38 @@ export class GoogleSheetsService {
     }
 
     private async initialize() {
-        if (!process.env.GOOGLE_SHEETS_ID || !process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
-            console.log("Google Sheets credentials missing. Running in mock mode.");
+        const sheetsId = process.env.GOOGLE_SHEETS_ID;
+        const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+        const rawKey = process.env.GOOGLE_PRIVATE_KEY;
+
+        if (!sheetsId || !email || !rawKey) {
+            console.warn("[GoogleSheets] Missing credentials. Running in mock mode. Check GOOGLE_SHEETS_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY env vars.");
             return;
         }
 
+        // Normalize private key — Vercel can store it as literal \\n or as actual newlines
+        const privateKey = rawKey
+            .replace(/\\\\n/g, '\n')  // double-escaped: \\n → \n
+            .replace(/\\n/g, '\n')    // single-escaped: \n → newline
+            .trim();
+
+        console.log(`[GoogleSheets] Initializing with sheet ID: ${sheetsId}, email: ${email}`);
+
         try {
             const jwt = new JWT({
-                email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-                key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+                email,
+                key: privateKey,
                 scopes: ['https://www.googleapis.com/auth/spreadsheets'],
             });
 
-            this.doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEETS_ID, jwt);
+            this.doc = new GoogleSpreadsheet(sheetsId, jwt);
             await this.doc.loadInfo();
             this.isConnected = true;
-            console.log(`Connected to Google Sheet: ${this.doc.title}`);
+            console.log(`[GoogleSheets] Connected successfully to: "${this.doc.title}"`);
         } catch (error: any) {
-            console.error("Google Sheets connection error DETAILS:", error);
-            if (error.response) {
-                console.error("API Error Response:", error.response.data);
+            console.error("[GoogleSheets] Connection FAILED:", error?.message || error);
+            if (error?.response?.data) {
+                console.error("[GoogleSheets] API error detail:", JSON.stringify(error.response.data));
             }
         }
     }
