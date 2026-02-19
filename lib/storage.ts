@@ -44,6 +44,7 @@ export interface IStorage {
     getRegistrationByPhone(phone: string): Promise<Registration | undefined>;
     getRegistrationByHrdaId(hrdaId: string): Promise<Registration | undefined>;
     getRegistrationByToken(token: string): Promise<Registration | undefined>;
+    getRegistrationByTxnId(txnId: string): Promise<Registration | undefined>;
     createRegistration(registration: InsertRegistration): Promise<Registration>;
     updateRegistration(id: number, updates: UpdateRegistrationRequest): Promise<Registration | undefined>;
     deleteRegistration(id: number): Promise<void>;
@@ -190,6 +191,11 @@ export class DatabaseStorage implements IStorage {
 
     async getRegistrationByToken(token: string): Promise<Registration | undefined> {
         const [registration] = await db.select().from(registrations).where(eq(registrations.verificationToken, token));
+        return registration;
+    }
+
+    async getRegistrationByTxnId(txnId: string): Promise<Registration | undefined> {
+        const [registration] = await db.select().from(registrations).where(eq(registrations.razorpayTxnId, txnId));
         return registration;
     }
 

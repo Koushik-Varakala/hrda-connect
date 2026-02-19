@@ -133,11 +133,12 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         try {
             const amount = 1015;
 
-            // 1. Create Order
+            // 1. Create Order (with userData embedded in notes for webhook recovery)
             const orderRes = await apiRequest("POST", "/api/registrations/order", {
                 amount,
                 currency: "INR",
-                receipt: `rcpt_${Date.now()}`
+                receipt: `rcpt_${Date.now()}`,
+                userData: { ...data, membershipType: 'single' }
             });
             const order = await orderRes.json();
 
