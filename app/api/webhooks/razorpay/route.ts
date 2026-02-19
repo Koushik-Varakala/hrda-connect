@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { storage } from "@/lib/storage";
-import { insertRegistrationSchema } from "@shared/schema";
 import { googleSheetsService } from "@/lib/services/googleSheets";
 import { emailService } from "@/lib/services/email";
 import { smsService } from "@/lib/services/sms";
@@ -95,17 +94,32 @@ export async function POST(request: Request) {
         return NextResponse.json({ status: "no_user_data", paymentId });
     }
 
-    // 4. Save to database
+    // 4. Save to database — update pending record if it exists, otherwise create new
     let newReg: any;
     try {
-        const regInput = insertRegistrationSchema.parse({
-            ...userData,
-            paymentStatus: "success",
-            status: "verified",
-            razorpayTxnId: paymentId,
-        });
-        newReg = await storage.createRegistration(regInput);
-        console.log(`[Webhook] Saved registration ID: ${newReg.id} for ${userData.firstName}`);
+        const pendingRegId = notes.pendingRegId ? Number(notes.pendingRegId) : null;
+
+        if (pendingRegId) {
+            newReg = await storage.updateRegistration(pendingRegId, {
+                paymentStatus: "success",
+                status: "verified",
+                razorpayTxnId: paymentId,
+            });
+            console.log(`[Webhook] Updated pending registration ID: ${pendingRegId}`);
+        }
+
+        // Fallback: create new if no pendingRegId or update returned nothing
+        if (!newReg) {
+            const { insertRegistrationSchema } = await import("@shared/schema");
+            const regInput = insertRegistrationSchema.parse({
+                ...userData,
+                paymentStatus: "success",
+                status: "verified",
+                razorpayTxnId: paymentId,
+            });
+            newReg = await storage.createRegistration(regInput);
+            console.log(`[Webhook] Created new registration ID: ${newReg.id} for ${userData.firstName}`);
+        }
     } catch (err) {
         console.error("[Webhook] Failed to save registration to DB:", err);
         return NextResponse.json({ error: "DB save failed" }, { status: 500 });

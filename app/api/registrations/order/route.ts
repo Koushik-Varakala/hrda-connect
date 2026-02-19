@@ -1,9 +1,31 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
+import { storage } from "@/lib/storage";
+import { insertRegistrationSchema } from "@shared/schema";
 
 export async function POST(request: Request) {
     try {
         const { amount, currency, userData } = await request.json();
+
+        // 1. Save a pending registration BEFORE opening Razorpay
+        //    This ensures we always have the form data regardless of payment outcome.
+        let pendingRegId: number | null = null;
+        if (userData) {
+            try {
+                const regInput = insertRegistrationSchema.parse({
+                    ...userData,
+                    paymentStatus: "pending",
+                    status: "pending",
+                    razorpayTxnId: null,
+                });
+                const pendingReg = await storage.createRegistration(regInput);
+                pendingRegId = pendingReg.id;
+                console.log(`[Order] Saved pending registration ID: ${pendingRegId}`);
+            } catch (e) {
+                // Non-fatal — still proceed with payment even if pre-save fails
+                console.error("[Order] Could not pre-save pending registration:", e);
+            }
+        }
 
         if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
             console.warn("Razorpay keys missing. Using mock order.");
@@ -11,7 +33,8 @@ export async function POST(request: Request) {
                 id: `order_mock_${Date.now()}`,
                 amount: amount * 100,
                 currency: currency,
-                key_id: "rzp_test_mock_key"
+                key_id: "rzp_test_mock_key",
+                pendingRegId,
             });
         }
 
@@ -20,8 +43,8 @@ export async function POST(request: Request) {
             key_secret: process.env.RAZORPAY_KEY_SECRET,
         });
 
-        // Store userData in notes so the webhook can recover it even if
-        // the client-side handler never fires (browser closed, network drop, etc.)
+        // 2. Embed userData + pendingRegId in Razorpay notes so the webhook can
+        //    link back to and update the pending registration.
         const notes: Record<string, string> = userData ? {
             firstName: userData.firstName || "",
             lastName: userData.lastName || "",
@@ -29,8 +52,9 @@ export async function POST(request: Request) {
             phone: userData.phone || "",
             email: userData.email || "",
             district: userData.district || "",
-            address: (userData.address || "").slice(0, 254), // Razorpay notes max 254 chars per field
+            address: (userData.address || "").slice(0, 254),
             membershipType: userData.membershipType || "single",
+            pendingRegId: pendingRegId ? String(pendingRegId) : "",
         } : {};
 
         const orderOptions: Parameters<typeof razorpay.orders.create>[0] = {
@@ -42,8 +66,7 @@ export async function POST(request: Request) {
         };
 
         const order = await razorpay.orders.create(orderOptions);
-
-        return NextResponse.json({ ...order, key_id: process.env.RAZORPAY_KEY_ID });
+        return NextResponse.json({ ...order, key_id: process.env.RAZORPAY_KEY_ID, pendingRegId });
     } catch (error: any) {
         console.error("Razorpay Order Error:", error);
         return NextResponse.json({ message: "Failed to create order" }, { status: 500 });

@@ -133,7 +133,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         try {
             const amount = 1015;
 
-            // 1. Create Order (with userData embedded in notes for webhook recovery)
+            // 1. Create Order + pre-save pending registration
             const orderRes = await apiRequest("POST", "/api/registrations/order", {
                 amount,
                 currency: "INR",
@@ -141,7 +141,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 userData: { ...data, membershipType: 'single' }
             });
             const order = await orderRes.json();
-
+            const pendingRegId = order.pendingRegId ?? null;
 
             // 2. Open Razorpay
             const options = {
@@ -152,22 +152,19 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 description: "Lifetime Membership",
                 order_id: order.id,
                 handler: async function (response: any) {
-                    // 3. Verify & Save Registration
-                    setIsVerifyingPayment(true); // Show verification popup
+                    // 3. Verify & update pending registration to success
+                    setIsVerifyingPayment(true);
                     try {
                         await apiRequest("POST", "/api/registrations/verify", {
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_signature: response.razorpay_signature,
-                            userData: {
-                                ...data,
-                                membershipType: 'single'
-                            }
+                            userData: { ...data, membershipType: 'single' },
+                            pendingRegId,
                         });
-                        const { location } = window;
-                        location.href = "/thank-you";
+                        window.location.href = "/thank-you";
                     } catch (err) {
-                        setIsVerifyingPayment(false); // Hide popup on error
+                        setIsVerifyingPayment(false);
                         toast({
                             title: "Verification Failed",
                             description: "Payment successful but verification failed. Please contact support.",
@@ -180,14 +177,21 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                     email: data.email,
                     contact: data.phone
                 },
-                theme: {
-                    color: "#2563eb"
+                theme: { color: "#2563eb" },
+                modal: {
+                    ondismiss: async function () {
+                        // User closed the modal without paying
+                        if (pendingRegId) {
+                            try {
+                                await apiRequest("POST", "/api/registrations/mark-failed", { pendingRegId, reason: "modal_dismissed" });
+                            } catch (_) { /* best-effort */ }
+                        }
+                    }
                 }
             };
 
             // Handle Mock Mode
             if (order.key_id === "rzp_test_mock_key") {
-                // Bypass Razorpay logic for local dev
                 console.log("Using Mock Payment Flow");
                 options.handler({
                     razorpay_payment_id: `pay_mock_${Date.now()}`,
@@ -197,14 +201,20 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 return;
             }
 
-
             const rzp1 = new window.Razorpay(options);
 
-            rzp1.on('payment.failed', function (response: any) {
+            rzp1.on('payment.failed', async function (response: any) {
                 console.error("Payment Failed Details:", response);
-                alert(`Payment Failed: ${response.error.description} (Code: ${response.error.code})`);
-                // Redirect to failure page with error reason if needed
-                window.location.href = `/payment-failed?reason=${encodeURIComponent(response.error.description)}`;
+                // Mark the pending registration as failed
+                if (pendingRegId) {
+                    try {
+                        await apiRequest("POST", "/api/registrations/mark-failed", {
+                            pendingRegId,
+                            reason: response.error?.description || "payment_failed"
+                        });
+                    } catch (_) { /* best-effort */ }
+                }
+                window.location.href = `/payment-failed?reason=${encodeURIComponent(response.error?.description || "Payment failed")}`;
             });
 
             rzp1.open();
