@@ -5,6 +5,8 @@ import { insertRegistrationSchema } from "@shared/schema";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { googleSheetsService } from "@/lib/services/googleSheets";
+import { emailService } from "@/lib/services/email";
+import { smsService } from "@/lib/services/sms";
 
 // GET /api/registrations/[id]
 export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
@@ -41,25 +43,90 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
 
     try {
         const body = await request.json();
+        const oldRegistration = await storage.getRegistration(id);
+
+        if (!oldRegistration) {
+            return NextResponse.json({ message: "Not found" }, { status: 404 });
+        }
+
+        const wasNotSuccess = oldRegistration.paymentStatus !== "success";
+        const isNowSuccess = body.paymentStatus === "success";
+
+        // If it's becoming successful now, also mark it verified automatically
+        if (wasNotSuccess && isNowSuccess) {
+            body.status = "verified";
+        }
+
         const result = await storage.updateRegistration(id, body);
         if (!result) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
-        // Sync Update to Sheets (In-Place Update)
-        try {
-            if (result.tgmcId) {
-                await googleSheetsService.updateRegistration(result.tgmcId, {
-                    firstName: result.firstName, // Logic in service handles concatenation if needed
+        // If newly successful -> Append to Sheets + Generate HRDA ID + Email + SMS
+        if (wasNotSuccess && isNowSuccess) {
+            let formattedHrdaId: string | number = result.id;
+
+            try {
+                const sheetId = await googleSheetsService.appendRegistration({
+                    id: String(result.id),
+                    tgmcId: result.tgmcId || "",
+                    firstName: result.firstName,
                     lastName: result.lastName,
                     phone: result.phone,
                     email: result.email || "",
                     address: result.address || "",
                     district: result.district || "",
-                    tgmcId: result.tgmcId, // in case ID changed
-                    updatedAt: new Date().toISOString()
+                    membershipType: result.membershipType || "single",
+                    paymentStatus: "success",
+                    status: "verified",
+                    registrationDate: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    rowStatus: "Active"
                 });
+
+                if (sheetId) {
+                    formattedHrdaId = sheetId;
+                    await storage.updateRegistration(result.id, { hrdaId: String(formattedHrdaId) });
+                    result.hrdaId = String(formattedHrdaId);
+                }
+            } catch (e) {
+                console.error("Failed to append to sheets for manual approval:", e);
             }
-        } catch (e) {
-            console.error("Failed to sync update to sheets", e);
+
+            try {
+                if (result.email) {
+                    await emailService.sendRegistrationConfirmation(
+                        result.email,
+                        `${result.firstName} ${result.lastName}`,
+                        result.tgmcId || "N/A",
+                        formattedHrdaId,
+                        result.phone,
+                        result.address || ""
+                    );
+                }
+                if (result.phone) {
+                    await smsService.sendRegistrationSuccess(result.phone, result.firstName, formattedHrdaId, result.tgmcId || "N/A");
+                }
+            } catch (e) {
+                console.error("Failed to send communications for manual approval:", e);
+            }
+
+        } else if (isNowSuccess && !wasNotSuccess) {
+            // Was already success, but admin might be updating other details via edit
+            try {
+                if (result.tgmcId) {
+                    await googleSheetsService.updateRegistration(result.tgmcId, {
+                        firstName: result.firstName,
+                        lastName: result.lastName,
+                        phone: result.phone,
+                        email: result.email || "",
+                        address: result.address || "",
+                        district: result.district || "",
+                        tgmcId: result.tgmcId, // in case ID changed
+                        updatedAt: new Date().toISOString()
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to sync update to sheets", e);
+            }
         }
 
         return NextResponse.json(result);
