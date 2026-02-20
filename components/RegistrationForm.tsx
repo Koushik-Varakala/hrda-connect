@@ -219,10 +219,10 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
 
             rzp1.open();
 
-        } catch (error) {
+        } catch (error: any) {
             toast({
                 title: "Registration Failed",
-                description: "Could not initiate payment. Please try again.",
+                description: error.message || "Could not initiate payment. Please try again.",
                 variant: "destructive",
             });
         } finally {

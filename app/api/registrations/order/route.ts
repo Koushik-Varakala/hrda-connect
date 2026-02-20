@@ -7,6 +7,19 @@ export async function POST(request: Request) {
     try {
         const { amount, currency, userData } = await request.json();
 
+        // 0. Pre-check: Ensure phone number doesn't already have a SUCCESSFUL registration
+        if (userData && userData.phone) {
+            const existingRegistrations = await storage.searchRegistrations({ phone: userData.phone });
+            const hasSuccessfulPayment = existingRegistrations.some(reg => reg.paymentStatus === 'success');
+
+            if (hasSuccessfulPayment) {
+                return NextResponse.json(
+                    { message: "A successful registration with this phone number already exists." },
+                    { status: 400 }
+                );
+            }
+        }
+
         // 1. Save a pending registration BEFORE opening Razorpay
         //    This ensures we always have the form data regardless of payment outcome.
         let pendingRegId: number | null = null;
