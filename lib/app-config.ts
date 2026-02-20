@@ -54,7 +54,7 @@ const TG_CONFIG: RegionConfig = {
     heroDescription: 'HRDA works tirelessly with governments and regulators to improve medical education, strengthen primary healthcare, and protect the interests of doctors across Telangana.',
     aboutUsDescription: 'The Healthcare Reforms Doctors Association (HRDA) was established with a singular vision: to create a transparent, efficient, and equitable healthcare system in Telangana.',
     registrationTagline: 'Join the strongest voice for doctors in Telangana. Your support strengthens our cause.',
-    phone: '+91 98490 00000',
+    phone: '9441568635',
     email: 'hrda4people@gmail.com',
     whatsappOnly: false,
 };
