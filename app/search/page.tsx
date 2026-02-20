@@ -4,9 +4,9 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardTitle, CardFooter } from "@/components/ui/card";
-import { Search as SearchIcon, User, AlertCircle, Edit2, Save, ShieldCheck } from "lucide-react";
+import { Search as SearchIcon, User, AlertCircle, ShieldCheck } from "lucide-react";
 import { useState } from "react";
-import { useSearchRegistration, useUpdateRegistration } from "@/hooks/use-registrations";
+import { useSearchRegistration } from "@/hooks/use-registrations";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -106,25 +106,6 @@ function ResultCard({ registration }: { registration: any }) {
         setRegData(registration);
     }, [registration]);
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({
-        phone: regData.phone,
-        email: regData.email || "",
-        address: regData.address || "",
-        district: regData.district || ""
-    });
-
-    // Update formData when regData changes
-    useEffect(() => {
-        setFormData({
-            phone: regData.phone,
-            email: regData.email || "",
-            address: regData.address || "",
-            district: regData.district || ""
-        });
-    }, [regData]);
-
-    const updateMutation = useUpdateRegistration();
     const { toast } = useToast();
 
     // OTP State
@@ -196,85 +177,6 @@ function ResultCard({ registration }: { registration: any }) {
         }
     };
 
-    const handleSave = async () => {
-        try {
-            await updateMutation.mutateAsync({
-                id: regData.id,
-                ...formData
-            });
-            setIsEditing(false);
-            toast({ title: "Success", description: "Details updated successfully." });
-        } catch (e) {
-            toast({ title: "Error", description: "Failed to update details.", variant: "destructive" });
-        }
-    };
-
-    if (isEditing) {
-        return (
-            <Card className="border-l-4 border-l-primary shadow-md">
-                <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="bg-blue-100 p-3 rounded-full">
-                            <Edit2 className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-bold">Editing Details</h3>
-                            <p className="text-muted-foreground">{regData.firstName} {regData.lastName} (TGMC: {regData.tgmcId})</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="grid gap-2">
-                            <Label>Phone Number</Label>
-                            <Input
-                                value={formData.phone}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label>Email Address</Label>
-                            <Input
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label>Address</Label>
-                            <Input
-                                value={formData.address}
-                                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label>District</Label>
-                            <Select
-                                value={formData.district}
-                                onValueChange={(value) => setFormData({ ...formData, district: value })}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select District" />
-                                </SelectTrigger>
-                                <SelectContent className="max-h-[200px]">
-                                    {districts.map((d) => (
-                                        <SelectItem key={d} value={d}>
-                                            {d}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                </CardContent>
-                <CardFooter className="bg-slate-50 p-4 flex justify-end gap-2">
-                    <Button variant="ghost" onClick={() => setIsEditing(false)}>Cancel</Button>
-                    <Button onClick={handleSave} disabled={updateMutation.isPending}>
-                        {updateMutation.isPending ? "Saving..." : <><Save className="w-4 h-4 mr-2" /> Save Changes</>}
-                    </Button>
-                </CardFooter>
-            </Card>
-        );
-    }
-
     return (
         <Card className="border-l-4 border-l-primary shadow-md">
             <CardContent className="p-4 md:p-6 flex flex-col md:flex-row items-start gap-4">
@@ -322,13 +224,10 @@ function ResultCard({ registration }: { registration: any }) {
                     {regData.isMasked ? (
                         <Button variant="outline" size="sm" onClick={handleSendOtp} disabled={isSendingOtp} className="w-full">
                             {isSendingOtp ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
-                            Verify to Edit
+                            Verify to View
                         </Button>
                     ) : (
                         <div className="flex flex-col gap-2 w-full">
-                            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="w-full">
-                                <Edit2 className="w-4 h-4 mr-2" /> Edit Details
-                            </Button>
                             <Button variant="default" size="sm" onClick={() => setShowIdCard(true)} className="w-full bg-slate-800 hover:bg-slate-900 text-white">
                                 <Printer className="w-4 h-4 mr-2" /> Print ID Card
                             </Button>
