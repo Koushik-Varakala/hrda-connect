@@ -207,17 +207,17 @@ function ResultCard({ registration }: { registration: any }) {
 
     return (
         <Card className="border-l-4 border-l-primary shadow-md">
-            <CardContent className="p-4 md:p-6 flex flex-col md:flex-row items-start gap-4">
-                <div className="flex w-full md:w-auto items-start gap-4">
+            <CardContent className="p-4 md:p-6 flex flex-col md:flex-row items-start gap-4 md:gap-6 lg:gap-8">
+                <div className="flex w-full md:w-[280px] lg:w-[350px] shrink-0 items-start gap-4">
                     <div className="bg-slate-100 p-3 rounded-full flex-shrink-0">
                         <User className="w-8 h-8 text-slate-500" />
                     </div>
                     <div className="flex-1 md:flex-none">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
                             {isEditing ? (
-                                <div className="flex gap-2 w-full mb-2">
-                                    <Input value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} placeholder="First Name" />
-                                    <Input value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} placeholder="Last Name" />
+                                <div className="flex flex-col sm:flex-row gap-2 w-full mb-2">
+                                    <Input value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} placeholder="First Name" className="h-8 sm:h-9" />
+                                    <Input value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} placeholder="Last Name" className="h-8 sm:h-9" />
                                 </div>
                             ) : (
                                 <h3 className="text-lg md:text-xl font-bold">{regData.firstName} {regData.lastName}</h3>
@@ -237,7 +237,7 @@ function ResultCard({ registration }: { registration: any }) {
                     </div>
                 </div>
 
-                <div className="w-full md:flex-1 md:ml-4 min-w-0">
+                <div className="w-full md:flex-1 min-w-0">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm text-slate-600">
                         <div>
                             <span className="font-medium text-slate-900 block sm:inline">Phone:</span> {regData.phone}
@@ -246,14 +246,14 @@ function ResultCard({ registration }: { registration: any }) {
                             <span className="font-medium text-slate-900 block sm:inline">Email:</span> {regData.email || "-"}
                         </div>
                         <div className="sm:col-span-2 text-wrap break-words">
-                            <span className="font-medium text-slate-900 block sm:inline">Address:</span>
+                            <span className="font-medium text-slate-900 mb-1 block sm:inline">Address:</span>
                             {isEditing ? (
-                                <Input value={formData.address || ""} onChange={e => setFormData({ ...formData, address: e.target.value })} placeholder="Address" className="mt-1" />
+                                <Input value={formData.address || ""} onChange={e => setFormData({ ...formData, address: e.target.value })} placeholder="Address" className="w-full mt-1" />
                             ) : (
-                                ` ${regData.address || "-"}`
+                                <span className="block mt-1 sm:mt-0 sm:inline"> {regData.address || "-"}</span>
                             )}
                         </div>
-                        <div className="sm:col-span-2">
+                        <div className="sm:col-span-2 mt-1 sm:mt-0">
                             <span className="font-medium text-slate-900 block sm:inline">District:</span> {regData.district || "-"}
                         </div>
                     </div>
