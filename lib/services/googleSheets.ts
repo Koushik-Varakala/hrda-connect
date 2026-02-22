@@ -176,7 +176,12 @@ export class GoogleSheetsService {
         try {
             const sheet = this.doc.sheetsByIndex[0];
             const rows = await sheet.getRows();
-            const row = rows.reverse().find(r => r.get("ContactNumber") === phone);
+            const normalizedTargetPhone = phone.replace(/\D/g, '').slice(-10);
+
+            const row = rows.reverse().find(r => {
+                const rowPhone = (r.get("ContactNumber") || "").replace(/\D/g, '').slice(-10);
+                return rowPhone === normalizedTargetPhone;
+            });
 
             if (!row) return null;
 
@@ -185,13 +190,14 @@ export class GoogleSheetsService {
                 hrdaId: row.get("HRDAREGISTRATIONNUMBER"),
                 tgmcId: row.get("MedicalCounselRegistration"),
                 firstName: row.get("Name"),
+                lastName: "",
                 phone: row.get("ContactNumber"),
                 email: row.get("MailID"),
                 address: row.get("Address"),
                 district: row.get("District")
             };
         } catch (error) {
-            console.error("Error searching Google Sheet by Phone:", error);
+            console.error("Failed to find row by Phone details:", error);
             return null;
         }
     }

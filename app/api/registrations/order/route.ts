@@ -9,14 +9,42 @@ export async function POST(request: Request) {
 
         // 0. Pre-check: Ensure phone number doesn't already have a SUCCESSFUL registration
         if (userData && userData.phone) {
-            const existingRegistrations = await storage.searchRegistrations({ phone: userData.phone });
+            // Strip any spaces, dashes, or +91 from the input phone for a safer match
+            const normalizedPhone = userData.phone.replace(/\D/g, '').slice(-10);
+
+            // 0a. Check local database first
+            // Let's also search using the raw phone just in case it's stored that way
+            const existingRegistrations = await storage.searchRegistrations({ phone: normalizedPhone });
+
+            // Debugging
+            console.log(`[Order API] Pre-check for phone ${userData.phone} (normalized: ${normalizedPhone}) -> Found ${existingRegistrations.length} existing records.`);
+
             const hasSuccessfulPayment = existingRegistrations.some(reg => reg.paymentStatus === 'success');
 
             if (hasSuccessfulPayment) {
+                console.log(`[Order API] Blocked duplicate order for phone ${normalizedPhone} (Found in DB).`);
                 return NextResponse.json(
                     { message: "A successful registration with this phone number already exists." },
                     { status: 400 }
                 );
+            }
+
+            // 0b. Check Google Sheets (for legacy members who might not be in the database)
+            try {
+                // Import locally to avoid circular dependencies if any, though it should be fine at top level
+                const { googleSheetsService } = require("@/lib/services/googleSheets");
+                const legacyUser = await googleSheetsService.findRegistrationByPhone(normalizedPhone);
+
+                if (legacyUser && legacyUser.hrdaId) {
+                    console.log(`[Order API] Blocked duplicate order for phone ${normalizedPhone} (Found in Google Sheets: ${legacyUser.hrdaId}).`);
+                    return NextResponse.json(
+                        { message: "A legacy registration with this phone number already exists." },
+                        { status: 400 }
+                    );
+                }
+            } catch (e) {
+                console.error("[Order API] Failed to check Google Sheets for legacy members:", e);
+                // Non-fatal, proceed with registration order
             }
         }
 
