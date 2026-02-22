@@ -405,15 +405,15 @@ function ResultCard({ registration }: { registration: any }) {
 
             {/* ID Card Preview Dialog */}
             <Dialog open={showIdCard} onOpenChange={setShowIdCard}>
-                <DialogContent className="max-w-[700px] w-full bg-slate-50">
-                    <DialogHeader>
+                <DialogContent className="max-w-[700px] w-full bg-slate-50 max-h-[95vh] flex flex-col p-0">
+                    <DialogHeader className="p-6 pb-2 shrink-0">
                         <DialogTitle>Your HRDA Identity Card</DialogTitle>
                         <DialogDescription>
                             Preview and download your official HRDA Digital ID Card.
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="flex justify-center p-4 overflow-auto flex-col items-center">
+                    <div className="flex-1 overflow-y-auto px-6 pb-6 flex flex-col items-center">
                         {/* Photo Upload Section */}
                         <div className="mb-6 w-full max-w-sm">
                             <Label className="mb-2 block text-sm font-medium">Add Photo to ID Card (Optional)</Label>
@@ -441,7 +441,7 @@ function ResultCard({ registration }: { registration: any }) {
                         </div>
                     </div>
 
-                    <DialogFooter className="flex gap-2 sm:justify-end">
+                    <DialogFooter className="flex gap-2 sm:justify-end p-6 pt-2 shrink-0 border-t border-slate-100">
                         <Button variant="outline" onClick={() => setShowIdCard(false)}>Close</Button>
                         <Button
                             onClick={() => window.print()}
@@ -472,7 +472,7 @@ function ResultCard({ registration }: { registration: any }) {
                     #print-area {
                         position: absolute !important;
                         left: 50% !important;
-                        top: 20% !important;
+                        top: 2% !important;
                         transform: translate(-50%, 0) !important;
                         margin: 0;
                         padding: 0;
@@ -480,8 +480,8 @@ function ResultCard({ registration }: { registration: any }) {
                         height: auto;
                     }
                     @page {
-                        size: auto;
-                        margin: 0mm;
+                        size: A4 portrait;
+                        margin: 5mm;
                     }
                 }
             `}</style>

@@ -59,7 +59,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
         };
 
         return (
-            <div ref={ref} className="flex flex-col gap-8 print:gap-8 items-center bg-transparent">
+            <div ref={ref} className="flex flex-col gap-6 print:gap-4 items-center bg-transparent">
 
                 {/* ================= FRONT CARD ================= */}
                 <div style={cardStyle} className="p-5 flex flex-col justify-between shadow-sm">
@@ -129,16 +129,16 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
                 </div>
 
                 {/* ================= BACK CARD ================= */}
-                <div style={cardStyle} className="p-6 flex flex-col shadow-sm">
+                <div style={cardStyle} className="p-5 flex flex-col shadow-sm">
                     {/* Organization Banner */}
-                    <div className="w-full text-center border-b-2 border-green-800 pb-2 mb-4 bg-green-50/50 rounded-sm">
-                        <h2 className="text-xl font-bold text-green-900 leading-tight uppercase relative top-1">
+                    <div className="w-full text-center border-b-2 border-green-800 pb-2 mb-3 bg-green-50/50 rounded-sm">
+                        <h2 className="text-xl font-bold text-green-900 leading-tight uppercase relative top-[2px]">
                             {appConfig.organizationName}
                         </h2>
                     </div>
 
                     {/* Back Body Details */}
-                    <div className="flex flex-col gap-3 flex-1 w-full text-slate-800">
+                    <div className="flex flex-col gap-2 flex-1 w-full text-slate-800">
                         <BackRow label="Mobile">
                             <span className="font-bold text-[18px]">{phone}</span>
                         </BackRow>
@@ -172,7 +172,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
                     </div>
 
                     {/* Footer Warning */}
-                    <div className="mt-auto w-full text-center border-t-2 border-slate-200 pt-3">
+                    <div className="mt-auto w-full text-center border-t-2 border-slate-200 pt-2 relative bottom-1">
                         <p className="text-[14px] font-medium text-slate-600 leading-tight">
                             If found, please return to the issuing authority. <br />
                             <span className="text-black font-bold">Contact: {appConfig.phone}</span>
