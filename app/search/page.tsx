@@ -141,9 +141,18 @@ function ResultCard({ registration }: { registration: any }) {
 
     // ID Card State
     const [showIdCard, setShowIdCard] = useState(false);
+    const [photoUrl, setPhotoUrl] = useState<string | null>(null);
     const idCardRef = useRef<HTMLDivElement>(null);
     // Removed `downloadRef` as we only print now, or reuse it for printing (which we do for `@media print`)
     const printRef = useRef<HTMLDivElement>(null);
+
+    const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            setPhotoUrl(url);
+        }
+    };
 
     const handleSendOtp = async () => {
         setIsSendingOtp(true);
@@ -404,10 +413,31 @@ function ResultCard({ registration }: { registration: any }) {
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="flex justify-center p-4 overflow-auto">
+                    <div className="flex justify-center p-4 overflow-auto flex-col items-center">
+                        {/* Photo Upload Section */}
+                        <div className="mb-6 w-full max-w-sm">
+                            <Label className="mb-2 block text-sm font-medium">Add Photo to ID Card (Optional)</Label>
+                            <div className="flex items-center gap-2">
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handlePhotoUpload}
+                                    className="flex-1 cursor-pointer"
+                                />
+                                {photoUrl && (
+                                    <Button variant="outline" size="sm" onClick={() => setPhotoUrl(null)} className="shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50">
+                                        Remove
+                                    </Button>
+                                )}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">Photo is only used for printing and is not saved to our servers.</p>
+                        </div>
+
                         {/* Visible Preview (Scaled) */}
-                        <div className="scale-75 md:scale-90 lg:scale-100 origin-top">
-                            <IdCard ref={idCardRef} registration={regData} />
+                        <div className="scale-75 md:scale-90 lg:scale-100 origin-top bg-slate-200 p-2 rounded-md shadow-inner inline-block relative min-h-[800px] w-[620px] flex justify-center pt-4 overflow-hidden">
+                            <div className="scale-[0.85] origin-top">
+                                <IdCard ref={idCardRef} registration={regData} photoUrl={photoUrl} />
+                            </div>
                         </div>
                     </div>
 
@@ -427,7 +457,7 @@ function ResultCard({ registration }: { registration: any }) {
             {/* Must be visible (not display:none) for html2canvas, but positioned off-screen */}
             {/* Renamed ref to printRef to be explicit */}
             <div id="print-area" className="fixed top-0 left-0 -z-50" style={{ transform: "translate(-9999px, -9999px)" }}>
-                <IdCard ref={printRef} registration={regData} />
+                <IdCard ref={printRef} registration={regData} photoUrl={photoUrl} />
             </div>
 
             {/* Print Styles */}
