@@ -108,11 +108,11 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
                                 </div>
                             </Row>
 
-                            <Row label="P.no">
+                            <Row label="PH.NO">
                                 <div className="font-bold text-[20px] text-slate-800">{phone}</div>
                             </Row>
 
-                            <Row label="State">
+                            <Row label="STATE">
                                 <div className="font-bold text-[20px] text-slate-800">{appConfig.stateName}</div>
                             </Row>
 
