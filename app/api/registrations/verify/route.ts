@@ -6,8 +6,9 @@ import { smsService } from "@/lib/services/sms";
 import Razorpay from "razorpay";
 
 export async function POST(request: Request) {
+    let body: any = {};
     try {
-        const body = await request.json();
+        body = await request.json();
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userData, pendingRegId } = body;
 
         // Fetch payment details to verify status
@@ -80,8 +81,13 @@ export async function POST(request: Request) {
                 formattedHrdaId = sheetId;
                 await storage.updateRegistration(reg.id, { hrdaId: String(formattedHrdaId) });
             }
-        } catch (e) {
-            console.error("Failed to sync to sheets", e);
+        } catch (e: any) {
+            console.error(JSON.stringify({
+                step: "Verify Sync to Sheets",
+                error: e.message || e,
+                stack: e.stack,
+                regId: reg?.id
+            }, null, 2));
         }
 
         // Email
@@ -96,8 +102,13 @@ export async function POST(request: Request) {
                     reg.address || ""
                 );
             }
-        } catch (e) {
-            console.error("Failed to send email", e);
+        } catch (e: any) {
+            console.error(JSON.stringify({
+                step: "Verify Send Email",
+                error: e.message || e,
+                stack: e.stack,
+                regId: reg?.id
+            }, null, 2));
         }
 
         // SMS
@@ -105,14 +116,24 @@ export async function POST(request: Request) {
             if (reg.phone) {
                 await smsService.sendRegistrationSuccess(reg.phone, reg.firstName, formattedHrdaId, reg.tgmcId || "N/A");
             }
-        } catch (e) {
-            console.error("Failed to send SMS", e);
+        } catch (e: any) {
+            console.error(JSON.stringify({
+                step: "Verify Send SMS",
+                error: e.message || e,
+                stack: e.stack,
+                regId: reg?.id
+            }, null, 2));
         }
 
         return NextResponse.json({ success: true, registrationId: reg.id, hrdaId: formattedHrdaId });
 
     } catch (error: any) {
-        console.error("Verification Error:", error);
-        return NextResponse.json({ message: "Verification failed" }, { status: 500 });
+        console.error(JSON.stringify({
+            step: "Verification Flow Catch All",
+            error: error.message || error,
+            stack: error.stack,
+            body
+        }, null, 2));
+        return NextResponse.json({ message: "Verification failed", error: error.message }, { status: 500 });
     }
 }

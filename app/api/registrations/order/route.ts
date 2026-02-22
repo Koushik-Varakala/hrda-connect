@@ -42,8 +42,13 @@ export async function POST(request: Request) {
                         { status: 400 }
                     );
                 }
-            } catch (e) {
-                console.error("[Order API] Failed to check Google Sheets for legacy members:", e);
+            } catch (e: any) {
+                console.error(JSON.stringify({
+                    step: "Order API Pre-check Sheets",
+                    error: e.message || e,
+                    stack: e.stack,
+                    phone: normalizedPhone
+                }, null, 2));
                 // Non-fatal, proceed with registration order
             }
         }
@@ -62,9 +67,14 @@ export async function POST(request: Request) {
                 const pendingReg = await storage.createRegistration(regInput);
                 pendingRegId = pendingReg.id;
                 console.log(`[Order] Saved pending registration ID: ${pendingRegId}`);
-            } catch (e) {
+            } catch (e: any) {
                 // Non-fatal — still proceed with payment even if pre-save fails
-                console.error("[Order] Could not pre-save pending registration:", e);
+                console.error(JSON.stringify({
+                    step: "Order API Pre-save Registration",
+                    error: e.message || e,
+                    stack: e.stack,
+                    userData
+                }, null, 2));
             }
         }
 
@@ -109,7 +119,11 @@ export async function POST(request: Request) {
         const order = await razorpay.orders.create(orderOptions);
         return NextResponse.json({ ...order, key_id: process.env.RAZORPAY_KEY_ID, pendingRegId });
     } catch (error: any) {
-        console.error("Razorpay Order Error:", error);
-        return NextResponse.json({ message: "Failed to create order" }, { status: 500 });
+        console.error(JSON.stringify({
+            step: "Order API Catch All",
+            error: error.message || error,
+            stack: error.stack
+        }, null, 2));
+        return NextResponse.json({ message: "Failed to create order", error: error.message }, { status: 500 });
     }
 }
