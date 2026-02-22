@@ -108,6 +108,12 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
                                 </div>
                             </Row>
 
+                            <Row label={appConfig.medicalCouncilId}>
+                                <div className="font-bold text-[20px] text-slate-800">
+                                    {registration.tgmcId || "N/A"}
+                                </div>
+                            </Row>
+
                             <Row label="PH.NO">
                                 <div className="font-bold text-[20px] text-slate-800">{phone}</div>
                             </Row>

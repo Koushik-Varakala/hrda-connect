@@ -463,25 +463,40 @@ function ResultCard({ registration }: { registration: any }) {
             {/* Print Styles */}
             <style jsx global>{`
                 @media print {
-                    body * {
+                    @page {
+                        margin: 0;
+                    }
+                    html, body {
+                        width: 100%;
+                        height: 100%;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        overflow: hidden !important;
                         visibility: hidden;
                     }
-                    #print-area, #print-area * {
-                        visibility: visible;
+                    /* Force ALL document elements to collapse their layout footprint so they can't create empty pages */
+                    body > * {
+                        position: absolute !important;
+                        top: 0;
+                        left: 0;
                     }
                     #print-area {
-                        position: absolute !important;
-                        left: 50% !important;
-                        top: 2% !important;
-                        transform: translate(-50%, 0) !important;
-                        margin: 0;
-                        padding: 0;
-                        width: auto;
-                        height: auto;
+                        visibility: visible;
+                        position: fixed !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100vw !important;
+                        height: 100vh !important;
+                        transform: none !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                        z-index: 99999 !important;
                     }
-                    @page {
-                        size: A4 portrait;
-                        margin: 5mm;
+                    #print-area * {
+                        visibility: visible;
                     }
                 }
             `}</style>
