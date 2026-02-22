@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardTitle, CardFooter } from "@/components/ui/card";
 import { Search as SearchIcon, User, AlertCircle, ShieldCheck } from "lucide-react";
 import { useState } from "react";
-import { useSearchRegistration } from "@/hooks/use-registrations";
+import { useSearchRegistration, useUpdateRegistration } from "@/hooks/use-registrations";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -107,6 +107,29 @@ function ResultCard({ registration }: { registration: any }) {
     }, [registration]);
 
     const { toast } = useToast();
+    const updateMutation = useUpdateRegistration();
+
+    // Edit State
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({
+        firstName: registration.firstName,
+        lastName: registration.lastName,
+        address: registration.address,
+    });
+
+    const handleSave = () => {
+        updateMutation.mutate({
+            id: regData.id,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            address: formData.address,
+        }, {
+            onSuccess: (data) => {
+                setRegData(data);
+                setIsEditing(false);
+            }
+        });
+    };
 
     // OTP State
     const [showOtpDialog, setShowOtpDialog] = useState(false);
@@ -158,6 +181,11 @@ function ResultCard({ registration }: { registration: any }) {
             if (data.registration) {
                 // Update local state immediately properly
                 setRegData(data.registration);
+                setFormData({
+                    firstName: data.registration.firstName,
+                    lastName: data.registration.lastName,
+                    address: data.registration.address,
+                });
 
                 // Also update the cache for good measure
                 queryClient.setQueriesData({ queryKey: [api.registrations.search.path] }, (oldData: any) => {
@@ -186,7 +214,14 @@ function ResultCard({ registration }: { registration: any }) {
                     </div>
                     <div className="flex-1 md:flex-none">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
-                            <h3 className="text-lg md:text-xl font-bold">{regData.firstName} {regData.lastName}</h3>
+                            {isEditing ? (
+                                <div className="flex gap-2 w-full mb-2">
+                                    <Input value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} placeholder="First Name" />
+                                    <Input value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} placeholder="Last Name" />
+                                </div>
+                            ) : (
+                                <h3 className="text-lg md:text-xl font-bold">{regData.firstName} {regData.lastName}</h3>
+                            )}
                             <span className={`px-2 py-0.5 rounded text-[10px] md:text-xs font-medium uppercase ${regData.status === 'verified' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                                 }`}>
                                 {regData.status?.replace('_', ' ')}
@@ -211,7 +246,12 @@ function ResultCard({ registration }: { registration: any }) {
                             <span className="font-medium text-slate-900 block sm:inline">Email:</span> {regData.email || "-"}
                         </div>
                         <div className="sm:col-span-2 text-wrap break-words">
-                            <span className="font-medium text-slate-900 block sm:inline">Address:</span> {regData.address || "-"}
+                            <span className="font-medium text-slate-900 block sm:inline">Address:</span>
+                            {isEditing ? (
+                                <Input value={formData.address || ""} onChange={e => setFormData({ ...formData, address: e.target.value })} placeholder="Address" className="mt-1" />
+                            ) : (
+                                ` ${regData.address || "-"}`
+                            )}
                         </div>
                         <div className="sm:col-span-2">
                             <span className="font-medium text-slate-900 block sm:inline">District:</span> {regData.district || "-"}
@@ -228,9 +268,25 @@ function ResultCard({ registration }: { registration: any }) {
                         </Button>
                     ) : (
                         <div className="flex flex-col gap-2 w-full">
-                            <Button variant="default" size="sm" onClick={() => setShowIdCard(true)} className="w-full bg-slate-800 hover:bg-slate-900 text-white">
-                                <Printer className="w-4 h-4 mr-2" /> Print ID Card
-                            </Button>
+                            {isEditing ? (
+                                <>
+                                    <Button variant="default" size="sm" onClick={handleSave} disabled={updateMutation.isPending} className="w-full">
+                                        {updateMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : "Save Changes"}
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={() => { setIsEditing(false); setFormData({ firstName: regData.firstName, lastName: regData.lastName, address: regData.address }); }} disabled={updateMutation.isPending} className="w-full">
+                                        Cancel
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="w-full border-primary/20 hover:bg-primary/5 hover:text-primary">
+                                        Edit Details
+                                    </Button>
+                                    <Button variant="default" size="sm" onClick={() => setShowIdCard(true)} className="w-full bg-slate-800 hover:bg-slate-900 text-white">
+                                        <Printer className="w-4 h-4 mr-2" /> Print ID Card
+                                    </Button>
+                                </>
+                            )}
                         </div>
                     )}
                     <p className="text-xs text-slate-500 md:text-right w-full leading-tight mt-1">
