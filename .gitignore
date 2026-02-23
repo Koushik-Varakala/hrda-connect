@@ -9,3 +9,6 @@ vite.config.ts.*
 .vercel.env*
 .env.ap
 .env copy
+
+.env.ap
+.env copy
