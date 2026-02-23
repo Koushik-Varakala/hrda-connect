@@ -20,7 +20,8 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Loader2 } from "lucide-react";
+import { Loader2, Printer } from "lucide-react";
+import { ImageCropper } from "@/components/ImageCropper";
 
 export default function Search() {
     const [phone, setPhone] = useState("");
@@ -91,7 +92,6 @@ const districts = appConfig.districts;
 
 // ... imports
 import { IdCard } from "@/components/IdCard";
-import { Printer } from "lucide-react";
 import { useRef, useEffect } from "react";
 import { api } from "@shared/routes";
 
@@ -142,6 +142,8 @@ function ResultCard({ registration }: { registration: any }) {
     // ID Card State
     const [showIdCard, setShowIdCard] = useState(false);
     const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+    const [rawPhotoFile, setRawPhotoFile] = useState<File | null>(null);
+    const [cropDialogOpen, setCropDialogOpen] = useState(false);
     const idCardRef = useRef<HTMLDivElement>(null);
     // Removed `downloadRef` as we only print now, or reuse it for printing (which we do for `@media print`)
     const printRef = useRef<HTMLDivElement>(null);
@@ -149,8 +151,9 @@ function ResultCard({ registration }: { registration: any }) {
     const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            const url = URL.createObjectURL(file);
-            setPhotoUrl(url);
+            setRawPhotoFile(file);
+            setCropDialogOpen(true);
+            e.target.value = ''; // allow replacing with the same filename
         }
     };
 
@@ -500,6 +503,22 @@ function ResultCard({ registration }: { registration: any }) {
                     }
                 }
             `}</style>
+
+            <ImageCropper
+                open={cropDialogOpen}
+                imageFile={rawPhotoFile}
+                onClose={() => {
+                    setCropDialogOpen(false);
+                    setRawPhotoFile(null);
+                }}
+                onCropComplete={(croppedBlob) => {
+                    if (rawPhotoFile) {
+                        const url = URL.createObjectURL(croppedBlob);
+                        setPhotoUrl(url);
+                        setRawPhotoFile(null);
+                    }
+                }}
+            />
         </Card >
     );
 }

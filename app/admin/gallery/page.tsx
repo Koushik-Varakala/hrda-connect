@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Loader2, Plus, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ImageCropper } from "@/components/ImageCropper";
 
 
 export default function ManageGallery() {
@@ -36,7 +37,9 @@ export default function ManageGallery() {
         },
     });
 
+    const [rawFile, setRawFile] = useState<File | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [cropDialogOpen, setCropDialogOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
     const createMutation = useMutation({
@@ -53,6 +56,7 @@ export default function ManageGallery() {
             queryClient.invalidateQueries({ queryKey: ["/api/gallery"] });
             form.reset();
             setSelectedFile(null);
+            setRawFile(null);
             toast({ title: "Success", description: "Photo added to gallery" });
         },
         onError: (error: Error) => {
@@ -131,12 +135,14 @@ export default function ManageGallery() {
                                             accept="image/*"
                                             onChange={(e) => {
                                                 if (e.target.files && e.target.files[0]) {
-                                                    setSelectedFile(e.target.files[0]);
+                                                    setRawFile(e.target.files[0]);
+                                                    setCropDialogOpen(true);
                                                     form.setValue("url", "");
                                                 }
                                             }}
                                         />
                                     </FormControl>
+                                    {selectedFile && <p className="text-sm text-green-600 font-medium">Image cropped and ready to upload.</p>}
                                 </FormItem>
 
                                 <div className="text-center text-sm text-muted-foreground">- OR -</div>
@@ -239,6 +245,23 @@ export default function ManageGallery() {
                     ))}
                 </div>
             </div>
+
+            {/* Image Cropper Modal */}
+            <ImageCropper
+                open={cropDialogOpen}
+                imageFile={rawFile}
+                onClose={() => {
+                    setCropDialogOpen(false);
+                    setRawFile(null);
+                }}
+                onCropComplete={(croppedBlob) => {
+                    if (rawFile) {
+                        const croppedFile = new File([croppedBlob], rawFile.name, { type: rawFile.type });
+                        setSelectedFile(croppedFile);
+                        setRawFile(null);
+                    }
+                }}
+            />
         </>
     );
 }

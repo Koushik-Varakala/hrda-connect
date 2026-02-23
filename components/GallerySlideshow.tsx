@@ -90,10 +90,10 @@ export function GallerySlideshow() {
                             return (
                                 <div
                                     key={`${photo.id}-${index}`}
-                                    className="flex-[0_0_85%] md:flex-[0_0_60%] lg:flex-[0_0_50%] min-w-0 px-4 transition-all duration-500 ease-out"
+                                    className="flex-[0_0_95%] md:flex-[0_0_80%] lg:flex-[0_0_75%] min-w-0 px-4 transition-all duration-500 ease-out"
                                     style={{
-                                        transform: isActive ? "scale(1)" : "scale(0.9)",
-                                        opacity: isActive ? 1 : 0.4,
+                                        transform: isActive ? "scale(1)" : "scale(0.95)",
+                                        opacity: isActive ? 1 : 0.6,
                                         zIndex: isActive ? 10 : 0
                                     }}
                                 >
@@ -101,9 +101,9 @@ export function GallerySlideshow() {
                                         "relative overflow-hidden rounded-2xl transition-all duration-500",
                                         isActive
                                             ? "border-[4px] border-white shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
-                                            : "border border-slate-700/50 grayscale-[50%]"
+                                            : "border border-slate-700/50 grayscale-[30%]"
                                     )}>
-                                        <div className="aspect-[16/9] md:aspect-[21/9] lg:aspect-[16/8] relative">
+                                        <div className="aspect-square md:aspect-[4/3] lg:aspect-[16/9] relative">
                                             <img
                                                 src={photo.url}
                                                 alt={photo.title || "Gallery"}
