@@ -42,13 +42,13 @@ export default function GalleryPage() {
                             {photos.map((photo) => (
                                 <div
                                     key={photo.id}
-                                    className="group relative overflow-hidden rounded-xl shadow-md cursor-pointer aspect-[4/3] bg-white"
+                                    className="group relative overflow-hidden rounded-xl shadow-md cursor-pointer aspect-[4/3] bg-white flex items-center justify-center"
                                     onClick={() => setSelectedPhoto(photo)}
                                 >
                                     <img
                                         src={photo.url}
                                         alt={photo.title || "Gallery Photo"}
-                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110"
                                     />
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
                                         <div className="text-center text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">

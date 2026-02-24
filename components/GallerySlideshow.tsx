@@ -98,16 +98,16 @@ export function GallerySlideshow() {
                                     }}
                                 >
                                     <div className={cn(
-                                        "relative overflow-hidden rounded-2xl transition-all duration-500",
+                                        "relative overflow-hidden rounded-2xl transition-all duration-500 bg-white",
                                         isActive
                                             ? "border-[4px] border-white shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                                             : "border border-slate-700/50 grayscale-[30%]"
                                     )}>
-                                        <div className="aspect-square md:aspect-[4/3] lg:aspect-[16/9] relative">
+                                        <div className="aspect-[4/3] md:aspect-[21/9] lg:aspect-[24/9] relative flex items-center justify-center">
                                             <img
                                                 src={photo.url}
                                                 alt={photo.title || "Gallery"}
-                                                className="absolute inset-0 w-full h-full object-cover"
+                                                className="absolute inset-0 w-full h-full object-contain"
                                             />
 
                                             {/* Gradient Overlay */}
