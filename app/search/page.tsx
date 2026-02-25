@@ -475,23 +475,28 @@ function ResultCard({ registration }: { registration: any }) {
                         margin: 0 !important;
                         padding: 0 !important;
                         background: white !important;
+                        overflow: hidden !important; /* Forces bounding to exactly 1 page */
                     }
-                    /* Force ALL document elements to collapse their layout footprint so they can't create empty pages */
+                    /* Force ALL document elements to collapse their layout footprint so they can't scroll */
                     body > * {
                         position: absolute !important;
                         top: 0;
                         left: 0;
                         width: 100%;
+                        height: 100vh !important;
+                        overflow: hidden !important;
                     }
                     body * {
                         visibility: hidden;
                     }
                     #print-area {
                         visibility: visible;
-                        position: absolute !important;
+                        position: fixed !important;
                         top: 0 !important;
                         left: 0 !important;
-                        width: 100% !important;
+                        width: 100vw !important;
+                        height: 100vh !important;
+                        transform: none !important;
                         /* Use block & text align because flex-center clips left edges of oversized children in mobile print */
                         display: block !important;
                         text-align: center !important;
@@ -507,17 +512,17 @@ function ResultCard({ registration }: { registration: any }) {
                         margin: 0 auto !important;
                         transform-origin: top center;
                     }
-                    
-                    /* WebKit layout zoom safely shrinks the physical collision box to fit narrow phone paper */
-                    @media screen and (max-width: 650px), print and (max-width: 650px) {
-                        #print-area > div { zoom: 65% !important; }
-                    }
-                    @media screen and (max-width: 450px), print and (max-width: 450px) {
-                        #print-area > div { zoom: 55% !important; }
-                    }
-                    @media screen and (max-width: 380px), print and (max-width: 380px) {
-                        #print-area > div { zoom: 50% !important; }
-                    }
+                }
+                
+                /* WebKit layout zoom safely shrinks the physical collision box to fit narrow phone paper */
+                @media print and (max-width: 650px) {
+                    #print-area > div { zoom: 65% !important; }
+                }
+                @media print and (max-width: 450px) {
+                    #print-area > div { zoom: 55% !important; }
+                }
+                @media print and (max-width: 380px) {
+                    #print-area > div { zoom: 50% !important; }
                 }
             `}</style>
 
