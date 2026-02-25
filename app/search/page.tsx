@@ -22,6 +22,7 @@ import {
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Loader2, Printer } from "lucide-react";
 import { ImageCropper } from "@/components/ImageCropper";
+import { printIdCard } from "@/lib/utils/printIdCard";
 
 export default function Search() {
     const [phone, setPhone] = useState("");
@@ -141,6 +142,7 @@ function ResultCard({ registration }: { registration: any }) {
 
     // ID Card State
     const [showIdCard, setShowIdCard] = useState(false);
+    const [isPrinting, setIsPrinting] = useState(false);
     const [photoUrl, setPhotoUrl] = useState<string | null>(null);
     const [rawPhotoFile, setRawPhotoFile] = useState<File | null>(null);
     const [cropDialogOpen, setCropDialogOpen] = useState(false);
@@ -447,84 +449,35 @@ function ResultCard({ registration }: { registration: any }) {
                     <DialogFooter className="flex gap-2 sm:justify-end p-6 pt-2 shrink-0 border-t border-slate-100">
                         <Button variant="outline" onClick={() => setShowIdCard(false)}>Close</Button>
                         <Button
-                            onClick={() => window.print()}
+                            onClick={async () => {
+                                if (!printRef.current) return;
+                                setIsPrinting(true);
+                                try {
+                                    await printIdCard(printRef.current, {
+                                        mode: 'iframe',
+                                        preset: 'A4',
+                                        timeoutMs: 5000,
+                                        title: `HRDA ID Card - ${regData.firstName}`
+                                    });
+                                } finally {
+                                    setIsPrinting(false);
+                                }
+                            }}
+                            disabled={isPrinting}
                             className="bg-slate-800 hover:bg-slate-900 text-white"
                         >
-                            <Printer className="w-4 h-4 mr-2" /> Print Card
+                            {isPrinting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
+                            {isPrinting ? 'Preparing Print...' : 'Print Card'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
 
             {/* Hidden Off-Screen Container for Perfect Export & Printing */}
-            {/* Must be visible (not display:none) for html2canvas, but positioned off-screen */}
-            {/* Renamed ref to printRef to be explicit */}
+            {/* Must be visible (not display:none) for html2canvas/cloning, but positioned off-screen */}
             <div id="print-area" className="fixed top-0 left-0 -z-50" style={{ transform: "translate(-9999px, -9999px)" }}>
                 <IdCard ref={printRef} registration={regData} photoUrl={photoUrl} />
             </div>
-
-            {/* Print Styles */}
-            <style jsx global>{`
-                @media print {
-                    @page {
-                        margin: 0;
-                    }
-                    html, body {
-                        width: 100%;
-                        height: 100%;
-                        margin: 0 !important;
-                        padding: 0 !important;
-                        background: white !important;
-                        overflow: hidden !important; /* Forces bounding to exactly 1 page */
-                    }
-                    /* Force ALL document elements to collapse their layout footprint so they can't scroll */
-                    body > * {
-                        position: absolute !important;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100vh !important;
-                        overflow: hidden !important;
-                    }
-                    body * {
-                        visibility: hidden;
-                    }
-                    #print-area {
-                        visibility: visible;
-                        position: fixed !important;
-                        top: 0 !important;
-                        left: 0 !important;
-                        width: 100vw !important;
-                        height: 100vh !important;
-                        transform: none !important;
-                        /* Use block & text align because flex-center clips left edges of oversized children in mobile print */
-                        display: block !important;
-                        text-align: center !important;
-                        padding-top: 1.5rem !important;
-                        margin: 0 !important;
-                        z-index: 99999 !important;
-                    }
-                    #print-area * {
-                        visibility: visible;
-                    }
-                    #print-area > div {
-                        display: inline-block !important;
-                        margin: 0 auto !important;
-                        transform-origin: top center;
-                    }
-                }
-                
-                /* WebKit layout zoom safely shrinks the physical collision box to fit narrow phone paper */
-                @media print and (max-width: 650px) {
-                    #print-area > div { zoom: 65% !important; }
-                }
-                @media print and (max-width: 450px) {
-                    #print-area > div { zoom: 55% !important; }
-                }
-                @media print and (max-width: 380px) {
-                    #print-area > div { zoom: 50% !important; }
-                }
-            `}</style>
 
             <ImageCropper
                 open={cropDialogOpen}
