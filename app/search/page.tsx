@@ -474,32 +474,49 @@ function ResultCard({ registration }: { registration: any }) {
                         height: 100%;
                         margin: 0 !important;
                         padding: 0 !important;
-                        overflow: hidden !important;
-                        visibility: hidden;
+                        background: white !important;
                     }
                     /* Force ALL document elements to collapse their layout footprint so they can't create empty pages */
                     body > * {
                         position: absolute !important;
                         top: 0;
                         left: 0;
+                        width: 100%;
+                    }
+                    body * {
+                        visibility: hidden;
                     }
                     #print-area {
                         visibility: visible;
-                        position: fixed !important;
+                        position: absolute !important;
                         top: 0 !important;
                         left: 0 !important;
-                        width: 100vw !important;
-                        height: 100vh !important;
-                        transform: none !important;
-                        display: flex !important;
-                        align-items: center !important;
-                        justify-content: center !important;
-                        padding: 0 !important;
+                        width: 100% !important;
+                        /* Use block & text align because flex-center clips left edges of oversized children in mobile print */
+                        display: block !important;
+                        text-align: center !important;
+                        padding-top: 1.5rem !important;
                         margin: 0 !important;
                         z-index: 99999 !important;
                     }
                     #print-area * {
                         visibility: visible;
+                    }
+                    #print-area > div {
+                        display: inline-block !important;
+                        margin: 0 auto !important;
+                        transform-origin: top center;
+                    }
+                    
+                    /* WebKit layout zoom safely shrinks the physical collision box to fit narrow phone paper */
+                    @media screen and (max-width: 650px), print and (max-width: 650px) {
+                        #print-area > div { zoom: 65% !important; }
+                    }
+                    @media screen and (max-width: 450px), print and (max-width: 450px) {
+                        #print-area > div { zoom: 55% !important; }
+                    }
+                    @media screen and (max-width: 380px), print and (max-width: 380px) {
+                        #print-area > div { zoom: 50% !important; }
                     }
                 }
             `}</style>
