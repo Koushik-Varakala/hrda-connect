@@ -72,7 +72,7 @@ export default function About() {
                         </div>
                         <div className="rounded-2xl overflow-hidden shadow-2xl">
                             <img
-                                src="/HRDA-group.jpeg"
+                                src={appConfig.region === 'AP' ? "/AP-group.jpeg" : "/HRDA-group.jpeg"}
                                 alt="HRDA History"
                                 className="w-full h-auto object-cover"
                             />
