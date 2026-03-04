@@ -37,6 +37,11 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
 
             const file = formData.get("image") as File;
             if (file) {
+                if (!process.env.CLOUDINARY_CLOUD_NAME) {
+                    return NextResponse.json({
+                        message: "Cloudinary credentials missing in Vercel. Please add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET to your AP Vercel Project settings, and then REDEPLOY the deployment to apply them."
+                    }, { status: 500 });
+                }
                 const imageUrl = await uploadImage(file);
                 data.imageUrl = imageUrl;
             }
@@ -48,10 +53,15 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
         const result = await storage.updatePanel(id, parsedData);
         if (!result) return NextResponse.json({ message: "Not found" }, { status: 404 });
         return NextResponse.json(result);
-    } catch (err) {
+    } catch (err: any) {
         console.error("Error updating panel:", err);
         if (err instanceof z.ZodError) return NextResponse.json(err, { status: 400 });
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+
+        // Pass explicit error information up if Cloudinary threw a deeper exception
+        return NextResponse.json({
+            message: err?.message || "Internal Server Error",
+            details: err
+        }, { status: 500 });
     }
 }
 

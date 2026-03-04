@@ -41,6 +41,11 @@ export async function POST(request: Request) {
 
             const file = formData.get("image") as File;
             if (file) {
+                if (!process.env.CLOUDINARY_CLOUD_NAME) {
+                    return NextResponse.json({
+                        message: "Cloudinary credentials missing in Vercel. Please add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET to your AP Vercel Project settings, and then REDEPLOY the deployment to apply them."
+                    }, { status: 500 });
+                }
                 const imageUrl = await uploadImage(file);
                 data.imageUrl = imageUrl;
             }
@@ -51,9 +56,14 @@ export async function POST(request: Request) {
         const parsedData = insertPanelSchema.parse(data);
         const result = await storage.createPanel(parsedData);
         return NextResponse.json(result, { status: 201 });
-    } catch (err) {
+    } catch (err: any) {
         console.error("Error creating panel:", err);
         if (err instanceof z.ZodError) return NextResponse.json(err, { status: 400 });
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+
+        // Pass explicit error information up if Cloudinary threw a deeper exception
+        return NextResponse.json({
+            message: err?.message || "Internal Server Error",
+            details: err
+        }, { status: 500 });
     }
 }
