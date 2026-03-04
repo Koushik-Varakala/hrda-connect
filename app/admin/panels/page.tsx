@@ -64,10 +64,22 @@ export default function ManagePanels() {
         if (data.priority) formData.append("priority", String(data.priority));
         formData.append("active", String(data.active ?? true));
 
+        // Helper to convert Google Drive viewer links into raw image stream links
+        const formatImageUrl = (url: string | undefined) => {
+            if (!url) return url;
+            if (url.includes('drive.google.com/file/d/')) {
+                const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) {
+                    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                }
+            }
+            return url;
+        };
+
         if (selectedFile) {
             formData.append("image", selectedFile);
         } else if (data.imageUrl) {
-            formData.append("imageUrl", data.imageUrl);
+            formData.append("imageUrl", formatImageUrl(data.imageUrl)!);
         }
 
         if (editingItem) {
