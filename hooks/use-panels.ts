@@ -38,8 +38,14 @@ export function useCreatePanel() {
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to create panel member");
+        let errorMsg = "Failed to create panel member";
+        try {
+          const errorData = await res.json();
+          errorMsg = errorData.message || JSON.stringify(errorData) || errorMsg;
+        } catch (e) {
+          errorMsg = `Server returned ${res.status}. Raw response: ${await res.text()}`;
+        }
+        throw new Error(errorMsg);
       }
       return res.json();
     },
@@ -70,8 +76,14 @@ export function useUpdatePanel() {
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to update panel member");
+        let errorMsg = "Failed to update panel member";
+        try {
+          const errorData = await res.json();
+          errorMsg = errorData.message || JSON.stringify(errorData) || errorMsg;
+        } catch (e) {
+          errorMsg = `Server returned ${res.status}. Raw response: ${await res.text()}`;
+        }
+        throw new Error(errorMsg);
       }
       return res.json();
     },
