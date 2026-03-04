@@ -30,10 +30,13 @@ export async function POST(request: Request) {
             data = {
                 name: formData.get("name"),
                 role: formData.get("role"),
+                category: formData.get("category") || 'state_executive',
                 district: formData.get("district") || null,
                 priority: parseInt(formData.get("priority") as string) || 0,
                 isStateLevel: formData.get("isStateLevel") === "true",
                 imageUrl: formData.get("imageUrl") || "",
+                phone: formData.get("phone") || undefined,
+                active: formData.get("active") !== "false" // defaults true
             };
 
             const file = formData.get("image") as File;
