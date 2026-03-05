@@ -26,7 +26,9 @@ export default function Home() {
         }
     });
 
-    const electedMembers = panels?.filter(p => p.category === 'elected_member') || [];
+    const homePageMembers = appConfig.region === 'AP'
+        ? panels?.filter(p => p.category === 'state_executive') || []
+        : panels?.filter(p => p.category === 'elected_member') || [];
 
     return (
         <Layout>
@@ -163,26 +165,26 @@ export default function Home() {
 
 
 
-            {/* Elected Panel Members - Horizontal Scroll */}
+            {/* Panel Members - Horizontal Scroll */}
             {
-                electedMembers.length > 0 && (
+                homePageMembers.length > 0 && (
                     <section className="py-16 md:py-24 bg-slate-900 text-white overflow-hidden">
                         <div className="container mx-auto px-4 md:px-6 lg:px-8">
                             <div className="flex items-center justify-between mb-10">
                                 <div>
                                     <h2 className="text-3xl text-headline font-serif font-bold mb-2 flex items-center gap-2">
                                         <Vote className="w-8 h-8 text-primary" />
-                                        Elected Panel Members
+                                        {appConfig.region === 'AP' ? "State Executive Members" : "Elected Panel Members"}
                                     </h2>
                                     <p className="text-slate-400">Our representatives leading the change.</p>
                                 </div>
                                 <Button asChild variant="outline" className="border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 hidden md:flex">
-                                    <Link href="/panels">View All Members</Link>
+                                    <Link href={appConfig.region === 'AP' ? "/panels" : "/election-panel"}>View All Members</Link>
                                 </Button>
                             </div>
 
                             <div className="flex overflow-x-auto pb-8 gap-6 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                                {electedMembers.map((member) => (
+                                {homePageMembers.map((member) => (
                                     <motion.div
                                         key={member.id}
                                         initial={{ opacity: 0, x: 20 }}
@@ -213,7 +215,7 @@ export default function Home() {
                                 ))}
 
                                 <div className="snap-start shrink-0 w-[100px] flex items-center justify-center">
-                                    <Link href="/election-panel" className="flex flex-col items-center gap-2 text-slate-500 hover:text-primary transition-colors group">
+                                    <Link href={appConfig.region === 'AP' ? "/panels" : "/election-panel"} className="flex flex-col items-center gap-2 text-slate-500 hover:text-primary transition-colors group">
                                         <div className="w-12 h-12 rounded-full border-2 border-slate-700 flex items-center justify-center group-hover:border-primary transition-colors">
                                             <ArrowRight className="w-5 h-5" />
                                         </div>
@@ -224,7 +226,7 @@ export default function Home() {
 
                             <div className="md:hidden mt-4 text-center">
                                 <Button asChild variant="outline" className="w-full border-slate-700 text-slate-300">
-                                    <Link href="/election-panel">View All Members</Link>
+                                    <Link href={appConfig.region === 'AP' ? "/panels" : "/election-panel"}>View All Members</Link>
                                 </Button>
                             </div>
                         </div>
