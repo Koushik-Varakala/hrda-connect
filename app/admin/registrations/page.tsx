@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useRegistrationsList, useUpdateRegistration, useDeleteRegistration } from "@/hooks/use-registrations";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
-import { Pencil, Search, Trash2 } from "lucide-react";
+import { Pencil, Search, Trash2, Download } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -64,6 +64,35 @@ export default function ManageRegistrations() {
         deleteMutation.mutate(id);
     };
 
+    const downloadCSV = () => {
+        if (!filteredRegistrations || filteredRegistrations.length === 0) return;
+
+        const headers = ["First Name", "Last Name", "Email", "Phone", "TGMC ID", "HRDA ID", "District", "Status", "Address"];
+        const csvRows = filteredRegistrations.map(reg => {
+            return [
+                `"${(reg.firstName || '').replace(/"/g, '""')}"`,
+                `"${(reg.lastName || '').replace(/"/g, '""')}"`,
+                `"${(reg.email || '').replace(/"/g, '""')}"`,
+                `"${(reg.phone || '').replace(/"/g, '""')}"`,
+                `"${(reg.tgmcId || '').replace(/"/g, '""')}"`,
+                `"${(reg.hrdaId || '').replace(/"/g, '""')}"`,
+                `"${(reg.district || '').replace(/"/g, '""')}"`,
+                `"${(reg.status || '').replace(/"/g, '""')}"`,
+                `"${(reg.address || '').replace(/"/g, '""')}"`
+            ].join(',');
+        });
+
+        const csvContent = [headers.join(','), ...csvRows].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `hrda-registrations-${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const openEdit = (item: any) => {
         setEditingItem(item);
         form.reset({
@@ -85,6 +114,15 @@ export default function ManageRegistrations() {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Manage Registrations</h1>
                 <div className="flex items-center gap-4">
+                    <Button 
+                        variant="outline" 
+                        onClick={downloadCSV}
+                        disabled={!filteredRegistrations || filteredRegistrations.length === 0}
+                        className="flex items-center gap-2"
+                    >
+                        <Download className="w-4 h-4" />
+                        Export to CSV
+                    </Button>
                     <div className="relative w-72">
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
