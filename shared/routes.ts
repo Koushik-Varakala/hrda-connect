@@ -11,7 +11,10 @@ import {
   achievements,
   departments,
   registrations,
-  mediaCoverage
+  mediaCoverage,
+  nominations,
+  insertNominationSchema,
+  formNominationSchema
 } from './schema';
 
 // === ERROR SCHEMAS ===
@@ -260,6 +263,49 @@ export const api = {
         401: errorSchemas.unauthorized,
       },
     }
+  },
+  nominations: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/nominations',
+      input: z.object({
+        district: z.string().optional(),
+        post: z.string().optional(),
+        status: z.string().optional(),
+      }).optional(),
+      responses: {
+        200: z.array(z.custom<typeof nominations.$inferSelect>()),
+        401: errorSchemas.unauthorized,
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/nominations',
+      input: formNominationSchema,
+      responses: {
+        201: z.custom<typeof nominations.$inferSelect>(),
+        400: errorSchemas.validation,
+      },
+    },
+    update: {
+      method: 'PUT' as const,
+      path: '/api/nominations/:id',
+      input: insertNominationSchema.partial(),
+      responses: {
+        200: z.custom<typeof nominations.$inferSelect>(),
+        404: errorSchemas.notFound,
+        401: errorSchemas.unauthorized,
+      },
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/nominations/:id',
+      responses: {
+        204: z.void(),
+        404: errorSchemas.notFound,
+        401: errorSchemas.unauthorized,
+      },
+    },
   }
 };
 

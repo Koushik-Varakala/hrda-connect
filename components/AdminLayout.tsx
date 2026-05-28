@@ -9,7 +9,8 @@ import {
   FileCheck,
   LogOut,
   Menu,
-  Image
+  Image,
+  Vote
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { name: "Media Coverage", icon: FileCheck, href: "/admin/media" },
     { name: "Departments", icon: Building2, href: "/admin/departments" },
     { name: "Registrations", icon: FileCheck, href: "/admin/registrations" },
+    { name: "Nominations", icon: Vote, href: "/admin/nominations" },
     { name: "Gallery", icon: Image, href: "/admin/gallery" },
   ];
 

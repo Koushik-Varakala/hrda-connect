@@ -176,3 +176,75 @@ export type GalleryPhoto = typeof galleryPhotos.$inferSelect;
 export type InsertGalleryPhoto = z.infer<typeof insertGalleryPhotoSchema>;
 export type CreateGalleryPhotoRequest = InsertGalleryPhoto;
 export type UpdateGalleryPhotoRequest = Partial<InsertGalleryPhoto>;
+
+// === NOMINATIONS (District Elections) ===
+
+/**
+ * Server-authoritative fee map. The ORDER route uses this — the client
+ * amount is IGNORED to prevent amount-tampering attacks.
+ */
+export const NOMINATION_FEE_MAP: Record<string, number> = {
+    "President": 5000,
+    "General Secretary": 5000,
+    "Vice President": 5000,
+    "Treasurer": 5000,
+    "Joint Secretary": 2500,
+    "Executive Committee Member": 2500,
+    "Academic Committee Chairman": 2500,
+    "Sports & Cultural Committee Chairman": 2500,
+};
+
+export const NOMINATION_POSTS = Object.keys(NOMINATION_FEE_MAP);
+
+export const HYDERABAD_ZONES = [
+    "Hyderabad – LB Nagar & Uppal Zone",
+    "Hyderabad – Old City & Rajendranagar Zone",
+    "Hyderabad – Secunderabad & Malkajgiri Zone",
+    "Hyderabad – Khairatabad Zone",
+    "Hyderabad – Kompally Zone",
+    "Hyderabad – Kukatpally & Serilingampally Zone",
+];
+
+/**
+ * Status state machine:
+ * pending_payment → payment_success → submitted
+ *                ↘ payment_failed
+ */
+export const nominations = pgTable("nominations", {
+    id: serial("id").primaryKey(),
+    fullName: text("full_name").notNull(),
+    hrdaMembershipId: text("hrda_membership_id").notNull(),
+    tgmcNumber: text("tgmc_number").notNull(),
+    mobile: text("mobile").notNull(),
+    email: text("email").notNull(),
+    district: text("district").notNull(),
+    postApplied: text("post_applied").notNull(),
+    nominationFee: integer("nomination_fee").notNull(), // in INR, set server-side
+    paymentStatus: text("payment_status").default("pending").notNull(), // pending / success / failed
+    razorpayOrderId: text("razorpay_order_id").unique(),   // unique — idempotency
+    razorpayPaymentId: text("razorpay_payment_id").unique(), // unique — replay protection
+    status: text("status").default("pending_payment").notNull(), // pending_payment / payment_success / submitted / rejected
+    adminNotes: text("admin_notes"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertNominationSchema = createInsertSchema(nominations).omit({
+    id: true, 
+    createdAt: true, 
+    updatedAt: true,
+});
+
+export const formNominationSchema = insertNominationSchema.omit({
+    nominationFee: true,
+    paymentStatus: true,
+    status: true,
+    razorpayOrderId: true,
+    razorpayPaymentId: true,
+    adminNotes: true
+});
+
+export type Nomination = typeof nominations.$inferSelect;
+export type InsertNomination = z.infer<typeof insertNominationSchema>;
+export type UpdateNominationRequest = Partial<InsertNomination>;
+

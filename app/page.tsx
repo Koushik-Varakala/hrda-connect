@@ -14,6 +14,46 @@ import { Panel } from "@shared/schema";
 import { Vote } from "lucide-react";
 import { GallerySlideshow } from "@/components/GallerySlideshow";
 import { appConfig } from "@/lib/app-config";
+import { X } from "lucide-react";
+import { useState, useEffect } from "react";
+
+const FloatingNominationAlert = () => {
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        // Always show the alert after a small delay
+        const timer = setTimeout(() => setIsVisible(true), 1000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (!isVisible) return null;
+
+    return (
+        <div className="fixed top-24 right-4 left-4 md:left-auto md:w-80 bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-4 rounded-xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.3)] z-50 animate-in slide-in-from-top-8 fade-in duration-500">
+            <button 
+                onClick={() => setIsVisible(false)}
+                className="absolute top-2 right-2 text-white/60 hover:text-white transition-colors"
+                aria-label="Close alert"
+            >
+                <X className="w-4 h-4" />
+            </button>
+            <div className="flex gap-3 mb-4 mt-1">
+                <div className="bg-white/20 p-2 rounded-full h-fit flex-shrink-0">
+                    <Megaphone className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                    <h4 className="font-bold text-base leading-tight mb-1">HRDA Elections Open</h4>
+                    <p className="text-xs text-blue-100 leading-relaxed pr-2">
+                        Submit your nomination for the HRDA Telangana District Elections today.
+                    </p>
+                </div>
+            </div>
+            <Button asChild size="sm" variant="secondary" className="w-full font-bold bg-white text-blue-700 hover:bg-slate-100 shadow-sm h-10 transition-transform active:scale-95">
+                <Link href="/nominate">Submit Nomination</Link>
+            </Button>
+        </div>
+    );
+};
 
 export default function Home() {
     const { data: announcements, isLoading } = useAnnouncements();
@@ -298,6 +338,8 @@ export default function Home() {
                     </Button>
                 </div>
             </section>
+            
+            <FloatingNominationAlert />
         </Layout >
     );
 }

@@ -8,7 +8,8 @@ import {
     type Department, type UpdateDepartmentRequest,
     type Registration, type InsertRegistration, type UpdateRegistrationRequest, type SearchRegistrationParams,
     electionDocuments, type ElectionDocument, type InsertElectionDocument,
-    galleryPhotos, type GalleryPhoto, type InsertGalleryPhoto
+    galleryPhotos, type GalleryPhoto, type InsertGalleryPhoto,
+    nominations, type Nomination, type InsertNomination, type UpdateNominationRequest as UpdateNomination
 } from "@shared/schema";
 import { eq, desc, and, ilike } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
@@ -67,6 +68,16 @@ export interface IStorage {
     getGalleryPhoto(id: number): Promise<GalleryPhoto | undefined>;
     createGalleryPhoto(photo: InsertGalleryPhoto): Promise<GalleryPhoto>;
     deleteGalleryPhoto(id: number): Promise<void>;
+
+    // Nominations
+    createNomination(data: InsertNomination): Promise<Nomination>;
+    getNominations(filters?: { district?: string; post?: string; status?: string }): Promise<Nomination[]>;
+    getNominationById(id: number): Promise<Nomination | undefined>;
+    getNominationByOrderId(orderId: string): Promise<Nomination | undefined>;
+    getNominationByPaymentId(paymentId: string): Promise<Nomination | undefined>;
+    updateNomination(id: number, updates: UpdateNomination): Promise<Nomination | undefined>;
+    deleteNomination(id: number): Promise<void>;
+    checkDuplicateNomination(tgmcNumber: string, district: string, post: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -275,6 +286,61 @@ export class DatabaseStorage implements IStorage {
 
     async deleteGalleryPhoto(id: number): Promise<void> {
         await db.delete(galleryPhotos).where(eq(galleryPhotos.id, id));
+    }
+
+    // Nominations
+    async createNomination(data: InsertNomination): Promise<Nomination> {
+        const [result] = await db.insert(nominations).values(data).returning();
+        return result;
+    }
+
+    async getNominations(filters?: { district?: string; post?: string; status?: string }): Promise<Nomination[]> {
+        const conditions = [];
+        if (filters?.district) conditions.push(eq(nominations.district, filters.district));
+        if (filters?.post) conditions.push(eq(nominations.postApplied, filters.post));
+        if (filters?.status) conditions.push(eq(nominations.status, filters.status));
+        let query: any = db.select().from(nominations);
+        if (conditions.length > 0) query = query.where(and(...conditions as any));
+        return await query.orderBy(desc(nominations.createdAt));
+    }
+
+    async getNominationById(id: number): Promise<Nomination | undefined> {
+        const [result] = await db.select().from(nominations).where(eq(nominations.id, id));
+        return result;
+    }
+
+    async getNominationByOrderId(orderId: string): Promise<Nomination | undefined> {
+        const [result] = await db.select().from(nominations).where(eq(nominations.razorpayOrderId, orderId));
+        return result;
+    }
+
+    async getNominationByPaymentId(paymentId: string): Promise<Nomination | undefined> {
+        const [result] = await db.select().from(nominations).where(eq(nominations.razorpayPaymentId, paymentId));
+        return result;
+    }
+
+    async updateNomination(id: number, updates: UpdateNomination): Promise<Nomination | undefined> {
+        const [result] = await db.update(nominations)
+            .set({ ...updates, updatedAt: new Date() })
+            .where(eq(nominations.id, id))
+            .returning();
+        return result;
+    }
+
+    async deleteNomination(id: number): Promise<void> {
+        await db.delete(nominations).where(eq(nominations.id, id));
+    }
+
+    async checkDuplicateNomination(tgmcNumber: string, district: string, post: string): Promise<boolean> {
+        const existing = await db.select().from(nominations).where(
+            and(
+                eq(nominations.tgmcNumber, tgmcNumber),
+                eq(nominations.district, district),
+                eq(nominations.postApplied, post),
+                eq(nominations.paymentStatus, "success")
+            )
+        );
+        return existing.length > 0;
     }
 }
 

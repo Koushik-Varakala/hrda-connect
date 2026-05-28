@@ -4,6 +4,7 @@ export interface EmailOptions {
     to: string;
     subject: string;
     text: string;
+    html?: string;
 }
 
 export class EmailService {
@@ -46,7 +47,8 @@ export class EmailService {
                         },
                         to: [{ email: options.to }],
                         subject: options.subject,
-                        textContent: options.text
+                        textContent: options.text,
+                        ...(options.html && { htmlContent: options.html })
                     })
                 });
 
@@ -75,6 +77,7 @@ export class EmailService {
                 to: options.to,
                 subject: options.subject,
                 text: options.text,
+                ...(options.html && { html: options.html })
             });
             console.log(`[EmailService] Sent email to ${options.to}`);
             return true;
@@ -137,6 +140,110 @@ ${data.message}
 
 ------------------------------------------------
 Please reply directly to ${data.email}
+`
+        });
+    }
+
+    async sendNominationConfirmation(data: {
+        to: string,
+        name: string,
+        hrdaId: string,
+        tgmcNumber: string,
+        district: string,
+        postApplied: string,
+        fee: number,
+        paymentRef: string
+    }) {
+        // Send to Applicant
+        await this.sendEmail({
+            to: data.to,
+            subject: "Nomination Application Successful - HRDA District Elections",
+            text: `Dear ${data.name},
+
+Your nomination application for the HRDA Telangana District Elections has been successfully submitted and your payment has been received.
+
+Nomination Details:
+------------------------------------------------
+Name: ${data.name}
+HRDA ID: ${data.hrdaId}
+TGMC No: ${data.tgmcNumber}
+District/Zone: ${data.district}
+Post Applied For: ${data.postApplied}
+
+Payment Details:
+------------------------------------------------
+Amount Paid: ₹${data.fee}
+Payment Reference: ${data.paymentRef}
+Status: SUCCESS
+
+Thank you for participating in the democratic process of our association.
+Your application is currently under review by the election committee.
+
+                Regards,
+Healthcare Reforms Doctors Association (HRDA) - Telangana`,
+            html: `
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-w-lg mx-auto bg-slate-50 p-6 rounded-xl border border-slate-200">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="color: #1e3a8a; margin: 0; font-size: 24px;">HRDA Telangana</h2>
+        <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">District Elections 2026</p>
+    </div>
+    
+    <div style="background-color: #ffffff; padding: 24px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+        <h3 style="color: #0f172a; margin-top: 0;">Dear ${data.name},</h3>
+        <p style="color: #334155; line-height: 1.6;">
+            Your nomination application for the <strong>HRDA Telangana District Elections</strong> has been successfully submitted and your payment has been received.
+        </p>
+
+        <div style="background-color: #f8fafc; padding: 16px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+            <h4 style="color: #1e40af; margin-top: 0; margin-bottom: 12px; font-size: 16px;">Nomination Details</h4>
+            <table style="width: 100%; color: #475569; font-size: 14px; line-height: 1.8;">
+                <tr><td style="width: 120px;"><strong>Name:</strong></td><td>${data.name}</td></tr>
+                <tr><td><strong>HRDA ID:</strong></td><td>${data.hrdaId}</td></tr>
+                <tr><td><strong>TGMC No:</strong></td><td>${data.tgmcNumber}</td></tr>
+                <tr><td><strong>District/Zone:</strong></td><td>${data.district}</td></tr>
+                <tr><td><strong>Post Applied:</strong></td><td><strong>${data.postApplied}</strong></td></tr>
+            </table>
+        </div>
+
+        <div style="background-color: #f0fdf4; padding: 16px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #22c55e;">
+            <h4 style="color: #166534; margin-top: 0; margin-bottom: 12px; font-size: 16px;">Payment Details</h4>
+            <table style="width: 100%; color: #475569; font-size: 14px; line-height: 1.8;">
+                <tr><td style="width: 120px;"><strong>Amount Paid:</strong></td><td><span style="color: #16a34a; font-weight: bold;">₹${data.fee}</span></td></tr>
+                <tr><td><strong>Reference:</strong></td><td>${data.paymentRef}</td></tr>
+                <tr><td><strong>Status:</strong></td><td><span style="color: #16a34a; font-weight: bold;">SUCCESS</span></td></tr>
+            </table>
+        </div>
+
+        <p style="color: #334155; line-height: 1.6; margin-bottom: 0;">
+            Thank you for participating in the democratic process of our association.<br/>
+            Your application is currently under review by the election committee.
+        </p>
+    </div>
+    
+    <div style="text-align: center; margin-top: 24px; color: #94a3b8; font-size: 12px;">
+        <p>&copy; ${new Date().getFullYear()} Healthcare Reforms Doctors Association (HRDA) - Telangana</p>
+    </div>
+</div>`
+        });
+
+        // Send to Admin
+        const adminEmail = process.env.CONTACT_EMAIL || "hrda4people@gmail.com";
+        await this.sendEmail({
+            to: adminEmail,
+            subject: `[New Nomination] ${data.postApplied} - ${data.district} (${data.name})`,
+            text: `A new nomination has been submitted and paid successfully.
+
+Applicant: ${data.name}
+HRDA ID: ${data.hrdaId}
+TGMC No: ${data.tgmcNumber}
+Phone: ${data.to} (Email)
+District/Zone: ${data.district}
+Post Applied For: ${data.postApplied}
+
+Payment Ref: ${data.paymentRef}
+Amount: ₹${data.fee}
+
+Please check the Admin Dashboard for full details.
 `
         });
     }
