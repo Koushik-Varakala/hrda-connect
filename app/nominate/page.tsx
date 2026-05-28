@@ -103,6 +103,26 @@ export default function NominatePage() {
                     contact: data.mobile
                 },
                 theme: { color: "#2563eb" },
+                modal: {
+                    ondismiss: async function () {
+                        // User closed the Razorpay popup without paying
+                        if (pendingNomId) {
+                            try {
+                                await apiRequest("PUT", `/api/nominations/${pendingNomId}`, {
+                                    status: "payment_failed",
+                                    paymentStatus: "failed",
+                                });
+                            } catch (e) {
+                                console.warn("Could not mark dismissed nomination as failed:", e);
+                            }
+                        }
+                        toast({
+                            title: "Payment Cancelled",
+                            description: "You closed the payment window. You can try again anytime.",
+                        });
+                        setIsProcessing(false);
+                    }
+                },
             };
 
             // Handle Mock Mode
@@ -120,6 +140,19 @@ export default function NominatePage() {
 
             rzp1.on('payment.failed', async function (response: any) {
                 console.error("Payment Failed Details:", response?.error || response);
+
+                // Mark the pending nomination as failed in DB so it doesn't linger
+                if (pendingNomId) {
+                    try {
+                        await apiRequest("PUT", `/api/nominations/${pendingNomId}`, {
+                            status: "payment_failed",
+                            paymentStatus: "failed",
+                        });
+                    } catch (e) {
+                        console.warn("Could not mark nomination as failed:", e);
+                    }
+                }
+
                 toast({
                     title: "Payment Failed",
                     description: response?.error?.description || response?.description || "Your payment could not be processed. Please try again.",
