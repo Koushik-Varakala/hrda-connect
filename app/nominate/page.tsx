@@ -22,7 +22,7 @@ import { Layout } from "@/components/Layout";
 // Form Schema
 const nominationFormSchema = z.object({
     fullName: z.string().min(2, "Full Name is required"),
-    hrdaMembershipId: z.string().regex(/^HRDA(0[1-9]|1[0-2])20\d{2}-\d{4}$/, "Invalid format. Expected: HRDA[MM][YYYY]-[4 digits] (e.g., HRDA042026-2598)"),
+    hrdaMembershipId: z.string().min(1, "HRDA Membership ID is required"),
     tgmcNumber: z.string().min(3, `${appConfig.medicalCouncilShort} ID is required`),
     email: z.string().email("Invalid email address"),
     mobile: z.string().min(10, "Valid phone number required").max(15, "Valid phone number required"),
