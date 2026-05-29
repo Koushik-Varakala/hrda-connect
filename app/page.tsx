@@ -49,7 +49,7 @@ const FloatingNominationAlert = () => {
                 </div>
             </div>
             <Button asChild size="sm" variant="secondary" className="w-full font-bold bg-white text-blue-700 hover:bg-slate-100 shadow-sm h-10 transition-transform active:scale-95">
-                <Link href="/nominate">Submit Nomination</Link>
+                <Link href="/district-elections">Learn More & Apply</Link>
             </Button>
         </div>
     );

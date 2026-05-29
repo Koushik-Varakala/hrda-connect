@@ -256,8 +256,13 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Election Documents
-    async getElectionDocuments(): Promise<ElectionDocument[]> {
-        return await db.select().from(electionDocuments).orderBy(electionDocuments.id);
+    async getElectionDocuments(category?: string): Promise<ElectionDocument[]> {
+        if (category) {
+            return await db.select().from(electionDocuments)
+                .where(eq(electionDocuments.category, category))
+                .orderBy(desc(electionDocuments.id));
+        }
+        return await db.select().from(electionDocuments).orderBy(desc(electionDocuments.id));
     }
 
     async createElectionDocument(insert: InsertElectionDocument): Promise<ElectionDocument> {

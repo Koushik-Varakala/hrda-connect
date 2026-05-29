@@ -46,6 +46,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const notificationLinks = [
     { name: "Announcements", href: "/announcements", description: "Latest updates and news." },
     { name: "Elections", href: "/election-panel", description: "Election updates and candidate info." },
+    { name: "District Elections", href: "/district-elections", description: "Nomination portal & official documents." },
   ];
 
   const resourceLinks = [

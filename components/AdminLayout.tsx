@@ -41,6 +41,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { name: "Departments", icon: Building2, href: "/admin/departments" },
     { name: "Registrations", icon: FileCheck, href: "/admin/registrations" },
     { name: "Nominations", icon: Vote, href: "/admin/nominations" },
+    { name: "District Elections", icon: Vote, href: "/admin/district-elections" },
     { name: "Gallery", icon: Image, href: "/admin/gallery" },
   ];
 
