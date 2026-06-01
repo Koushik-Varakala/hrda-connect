@@ -38,6 +38,8 @@ const allDistrictsAndZones = [...appConfig.districts, ...HYDERABAD_ZONES].sort()
 export default function NominatePage() {
     const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [declarationAgreed, setDeclarationAgreed] = useState(false);
+    const [declarationOpen, setDeclarationOpen] = useState(false);
     const { toast } = useToast();
     const router = useRouter();
 
@@ -343,10 +345,119 @@ export default function NominatePage() {
                                         </div>
                                     )}
 
+                                    {/* Section 3: Declaration & Undertaking */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-slate-800 border-b pb-2">3. Candidate Declaration & Undertaking</h3>
+                                        
+                                        <div className="bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
+                                            <button
+                                                type="button"
+                                                onClick={() => setDeclarationOpen(!declarationOpen)}
+                                                className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-100 transition-colors"
+                                            >
+                                                <span className="font-medium text-slate-700 text-sm">Read Full Declaration & Undertaking</span>
+                                                <svg className={`w-5 h-5 text-slate-400 transition-transform ${declarationOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                            
+                                            {declarationOpen && (
+                                                <div className="px-4 pb-4 text-sm text-slate-600 space-y-4 max-h-[60vh] overflow-y-auto border-t border-slate-200 pt-4">
+                                                    <p className="text-slate-800 font-medium">
+                                                        I, the undersigned candidate, hereby submit my nomination for election to the post applied for in the Healthcare Reforms Doctors Association (HRDA) District Panel / Hyderabad City Zonal Branch Committee for the term 2026–2028 and solemnly declare and undertake as follows:
+                                                    </p>
+
+                                                    <div className="space-y-3">
+                                                        <div>
+                                                            <p className="font-semibold text-slate-800">1. Membership Status</p>
+                                                            <p>I declare that I am a valid, active, and bona fide member of the Healthcare Reforms Doctors Association (HRDA). The membership details furnished by me are true and correct, and I fulfill all eligibility requirements prescribed under the HRDA Constitution, Election Rules, By-laws, and Election Notification.</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="font-semibold text-slate-800">2. Correctness of Information</p>
+                                                            <p>I hereby affirm that all particulars furnished by me in this nomination form, including my name, HRDA Membership ID, TGMC Registration Number, address, mobile number, email address, and all supporting documents uploaded by me, are true, correct, complete, and in accordance with official records.</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="font-semibold text-slate-800">3. Eligibility and Non-Disqualification</p>
+                                                            <p>I declare that I am eligible and qualified to contest for the post for which I have filed this nomination. I further declare that I am not disqualified under any provision of the HRDA Constitution, Rules, By-laws, or Election Guidelines, including but not limited to suspension of membership, disciplinary proceedings, organizational misconduct, financial arrears, or any other disability that may render me ineligible to contest the election.</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="font-semibold text-slate-800">4. Voluntary Consent</p>
+                                                            <p>I am submitting this nomination voluntarily and of my own free will, without any coercion, undue influence, inducement, pressure, or misrepresentation by any individual, group, panel, or organization.</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="font-semibold text-slate-800">5. Compliance with HRDA Constitution and Election Rules</p>
+                                                            <p>I undertake to abide by and faithfully comply with the HRDA Constitution, Election Rules, By-laws, Code of Conduct, policies, resolutions, and all lawful directions issued by the HRDA Election Commission, Returning Officers, District Panels, Hyderabad City Zonal Branch Committees, and HRDA State Panel.</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="font-semibold text-slate-800">6. Professional Ethics and Organizational Discipline</p>
+                                                            <p>I undertake to uphold the highest standards of medical ethics, professionalism, integrity, and organizational discipline expected of a member and office bearer of HRDA.</p>
+                                                            <p className="mt-2">I further declare that I shall not engage in, support, promote, encourage, facilitate, or associate myself with:</p>
+                                                            <ul className="list-disc list-inside ml-2 mt-1 space-y-0.5">
+                                                                <li>Quackery or unqualified medical practice</li>
+                                                                <li>Unethical medical practices</li>
+                                                                <li>Fraudulent healthcare activities</li>
+                                                                <li>Misleading medical advertisements</li>
+                                                                <li>Activities detrimental to patient welfare</li>
+                                                                <li>Activities prejudicial to the interests, reputation, objectives, or principles of HRDA</li>
+                                                            </ul>
+                                                            <p className="mt-2">I understand and agree that if I am found to be involved in or supporting any unethical medical practice, quackery, organizational indiscipline, anti-organizational activities, misconduct, or violation of HRDA rules, I shall be liable for disciplinary action. Such action may include warning, censure, suspension, removal from office, cancellation of candidature, suspension or termination of HRDA membership, or any other action permissible under the HRDA Constitution, Rules, and By-laws.</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="font-semibold text-slate-800">7. Authenticity of Documents</p>
+                                                            <p>I certify that all documents uploaded and submitted by me, including membership proof, identity proof, registration details, declarations, and payment particulars, are genuine and belong to me.</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="font-semibold text-slate-800">8. Consequences of False Declaration</p>
+                                                            <p>I fully understand that any false statement, concealment of facts, suppression of information, forged documents, or misrepresentation made by me may result in:</p>
+                                                            <ul className="list-disc list-inside ml-2 mt-1 space-y-0.5">
+                                                                <li>Rejection of my nomination</li>
+                                                                <li>Cancellation of candidature at any stage of the election process</li>
+                                                                <li>Removal from office if elected</li>
+                                                                <li>Disciplinary action under HRDA Rules</li>
+                                                                <li>Suspension or cancellation of membership</li>
+                                                                <li>Any other action permissible under law</li>
+                                                            </ul>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="font-semibold text-slate-800">9. Acceptance of Election Process</p>
+                                                            <p>I agree to accept and abide by the decisions of the HRDA Election Commission and Returning Officers regarding scrutiny of nominations, conduct of elections, counting of votes, declaration of results, and all election-related matters, subject to the provisions of the HRDA Constitution and Election Rules.</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="border-t border-slate-200 pt-3 mt-3">
+                                                        <p className="font-medium text-slate-800">DECLARATION</p>
+                                                        <p>I hereby declare that I have carefully read and understood the above declaration and undertaking. I affirm that all information furnished by me is true and correct to the best of my knowledge and belief, and I voluntarily submit my nomination for election under the Healthcare Reforms Doctors Association (HRDA).</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Checkbox */}
+                                        <label className="flex items-start gap-3 cursor-pointer group">
+                                            <input
+                                                type="checkbox"
+                                                checked={declarationAgreed}
+                                                onChange={e => setDeclarationAgreed(e.target.checked)}
+                                                className="mt-1 h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                            />
+                                            <span className="text-sm text-slate-700 group-hover:text-slate-900 leading-relaxed">
+                                                I have read and agree to the <strong>Candidate Declaration & Undertaking</strong>. I affirm that all information furnished by me is true and correct. Fees once paid are non-refundable.
+                                            </span>
+                                        </label>
+                                    </div>
+
                                     <Button 
                                         type="submit" 
                                         className="w-full h-12 text-lg" 
-                                        disabled={isProcessing || isVerifyingPayment || !selectedPost}
+                                        disabled={isProcessing || isVerifyingPayment || !selectedPost || !declarationAgreed}
                                     >
                                         {isProcessing ? (
                                             <>
@@ -357,11 +468,6 @@ export default function NominatePage() {
                                             `Pay ₹${currentFee} & Submit Nomination`
                                         )}
                                     </Button>
-
-                                    <p className="text-xs text-center text-slate-500 mt-4">
-                                        By submitting this form, you agree to the terms and conditions of HRDA Telangana.
-                                        Fees once paid are non-refundable.
-                                    </p>
                                 </form>
                             </Form>
                         </CardContent>
