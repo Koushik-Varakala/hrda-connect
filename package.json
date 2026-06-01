@@ -61,6 +61,7 @@
     "google-spreadsheet": "^5.0.2",
     "html2canvas": "^1.4.1",
     "input-otp": "^1.4.2",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.453.0",
     "memoizee": "^0.4.17",
     "next": "^16.1.6",

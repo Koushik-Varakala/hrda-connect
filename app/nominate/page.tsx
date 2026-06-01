@@ -51,6 +51,9 @@ const compressImage = (file: File, maxW = 400, maxH = 500, quality = 0.8): Promi
             canvas.width = w;
             canvas.height = h;
             const ctx = canvas.getContext("2d")!;
+            // Fill white background (prevents transparent PNGs from going black in JPEG)
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, w, h);
             ctx.drawImage(img, 0, 0, w, h);
             canvas.toBlob(
                 (blob) => {
@@ -73,6 +76,8 @@ export default function NominatePage() {
     const [declarationOpen, setDeclarationOpen] = useState(false);
     const [photoFile, setPhotoFile] = useState<File | null>(null);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    const [signatureFile, setSignatureFile] = useState<File | null>(null);
+    const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
     const { toast } = useToast();
     const router = useRouter();
 
@@ -97,6 +102,10 @@ export default function NominatePage() {
             toast({ title: "Photo Required", description: "Please upload your passport-size photo.", variant: "destructive" });
             return;
         }
+        if (!signatureFile) {
+            toast({ title: "Signature Required", description: "Please upload your signature.", variant: "destructive" });
+            return;
+        }
         setIsProcessing(true);
         try {
             // 1. Create Order + pre-save pending nomination (send as FormData for photo)
@@ -109,6 +118,7 @@ export default function NominatePage() {
             fd.append("district", data.district);
             fd.append("postApplied", data.postApplied);
             fd.append("photo", photoFile);
+            fd.append("signature", signatureFile);
 
             const orderRes = await fetch("/api/nominations/order", { method: "POST", body: fd });
             if (!orderRes.ok) {
@@ -383,6 +393,58 @@ export default function NominatePage() {
                                         </div>
                                     </div>
 
+                                    {/* Signature Upload */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">Signature <span className="text-red-500">*</span></label>
+                                        <div className="flex items-start gap-4">
+                                            <div className="relative w-48 h-24 border-2 border-dashed border-slate-300 rounded-xl overflow-hidden bg-white flex items-center justify-center shrink-0 hover:border-blue-400 transition-colors">
+                                                {signaturePreview ? (
+                                                    <>
+                                                        <img src={signaturePreview} alt="Signature" className="w-full h-full object-contain p-2" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { setSignatureFile(null); setSignaturePreview(null); }}
+                                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 shadow-md hover:bg-red-600 transition-colors"
+                                                        >
+                                                            <XIcon className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-center p-2">
+                                                        <svg className="w-8 h-8 text-slate-300 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                                                        <p className="text-xs text-slate-400">Upload Signature</p>
+                                                    </div>
+                                                )}
+                                                <input
+                                                    type="file"
+                                                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    onChange={async (e) => {
+                                                        const f = e.target.files?.[0];
+                                                        if (f) {
+                                                            if (f.size > 3 * 1024 * 1024) {
+                                                                toast({ title: "File too large", description: "Signature must be under 3MB.", variant: "destructive" });
+                                                                return;
+                                                            }
+                                                            try {
+                                                                const compressed = await compressImage(f, 600, 200, 0.85);
+                                                                setSignatureFile(compressed);
+                                                                setSignaturePreview(URL.createObjectURL(compressed));
+                                                            } catch {
+                                                                toast({ title: "Error", description: "Could not process image. Try again.", variant: "destructive" });
+                                                            }
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="text-xs text-slate-500 mt-1 space-y-1">
+                                                <p>• Sign on white paper and photograph it</p>
+                                                <p>• Formats: JPG, PNG, or WebP</p>
+                                                <p>• Max size: 3MB</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {/* Section 2: Election Details */}
                                     <div className="space-y-4">
                                         <h3 className="text-lg font-semibold text-slate-800 border-b pb-2">2. Election Details</h3>
@@ -551,7 +613,7 @@ export default function NominatePage() {
                                                 className="mt-1 h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                                             />
                                             <span className="text-sm text-slate-700 group-hover:text-slate-900 leading-relaxed">
-                                                I have read and agree to the <strong>Candidate Declaration & Undertaking</strong>. I affirm that all information furnished by me is true and correct. Fees once paid are non-refundable.
+                                                I have read and agree to the <strong>Candidate Declaration & Undertaking</strong> by the HRDA State Panel. I affirm that all information furnished by me is true and correct to the best of my knowledge and belief. Fees once paid are non-refundable.
                                             </span>
                                         </label>
                                     </div>

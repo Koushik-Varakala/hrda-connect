@@ -20,6 +20,7 @@ export async function POST(request: Request) {
         };
 
         const photoFile = formData.get("photo") as File | null;
+        const signatureFile = formData.get("signature") as File | null;
 
         // 1. Validate Input Data
         const validatedData = formNominationSchema.parse(userData);
@@ -47,7 +48,6 @@ export async function POST(request: Request) {
         // 4. Upload Photo to Vercel Blob (if provided)
         let photoUrl: string | null = null;
         if (photoFile && photoFile.size > 0) {
-            // Validate file type and size
             const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
             if (!validTypes.includes(photoFile.type)) {
                 return NextResponse.json({ message: "Invalid photo format. Use JPG, PNG, or WebP." }, { status: 400 });
@@ -55,16 +55,25 @@ export async function POST(request: Request) {
             if (photoFile.size > 5 * 1024 * 1024) {
                 return NextResponse.json({ message: "Photo must be under 5MB." }, { status: 400 });
             }
-
-            const blob = await put(
-                `nominations/photos/${Date.now()}-${photoFile.name}`,
-                photoFile,
-                { access: "public" }
-            );
+            const blob = await put(`nominations/photos/${Date.now()}-${photoFile.name}`, photoFile, { access: "public" });
             photoUrl = blob.url;
         }
 
-        // 5. Create Pending Nomination Record
+        // 5. Upload Signature to Vercel Blob (if provided)
+        let signatureUrl: string | null = null;
+        if (signatureFile && signatureFile.size > 0) {
+            const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+            if (!validTypes.includes(signatureFile.type)) {
+                return NextResponse.json({ message: "Invalid signature format. Use JPG, PNG, or WebP." }, { status: 400 });
+            }
+            if (signatureFile.size > 3 * 1024 * 1024) {
+                return NextResponse.json({ message: "Signature must be under 3MB." }, { status: 400 });
+            }
+            const blob = await put(`nominations/signatures/${Date.now()}-${signatureFile.name}`, signatureFile, { access: "public" });
+            signatureUrl = blob.url;
+        }
+
+        // 6. Create Pending Nomination Record
         let pendingNomId: number | null = null;
         try {
             const pendingNom = await storage.createNomination({
@@ -73,6 +82,7 @@ export async function POST(request: Request) {
                 paymentStatus: "pending",
                 status: "pending_payment",
                 photoUrl,
+                signatureUrl,
             });
             pendingNomId = pendingNom.id;
             console.log(`[Nomination Order] Created pending nomination ID: ${pendingNomId}`);

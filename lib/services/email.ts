@@ -1,10 +1,17 @@
 import nodemailer from "nodemailer";
 
+export interface EmailAttachment {
+    filename: string;
+    content: Buffer | string;
+    contentType?: string;
+}
+
 export interface EmailOptions {
     to: string;
     subject: string;
     text: string;
     html?: string;
+    attachments?: EmailAttachment[];
 }
 
 export class EmailService {
@@ -48,7 +55,13 @@ export class EmailService {
                         to: [{ email: options.to }],
                         subject: options.subject,
                         textContent: options.text,
-                        ...(options.html && { htmlContent: options.html })
+                        ...(options.html && { htmlContent: options.html }),
+                        ...(options.attachments && options.attachments.length > 0 && {
+                            attachment: options.attachments.map(a => ({
+                                name: a.filename,
+                                content: Buffer.isBuffer(a.content) ? a.content.toString("base64") : a.content,
+                            }))
+                        })
                     })
                 });
 
@@ -77,7 +90,14 @@ export class EmailService {
                 to: options.to,
                 subject: options.subject,
                 text: options.text,
-                ...(options.html && { html: options.html })
+                ...(options.html && { html: options.html }),
+                ...(options.attachments && {
+                    attachments: options.attachments.map(a => ({
+                        filename: a.filename,
+                        content: a.content,
+                        contentType: a.contentType || "application/pdf",
+                    }))
+                })
             });
             console.log(`[EmailService] Sent email to ${options.to}`);
             return true;
@@ -149,102 +169,192 @@ Please reply directly to ${data.email}
         name: string,
         hrdaId: string,
         tgmcNumber: string,
+        mobile: string,
         district: string,
         postApplied: string,
         fee: number,
-        paymentRef: string
+        paymentRef: string,
+        photoUrl?: string,
+        signatureUrl?: string,
+        pdfBuffer?: Buffer
     }) {
+        const pdfAttachment = data.pdfBuffer ? [{
+            filename: `HRDA_Nomination_${data.name.replace(/\s+/g, '_')}.pdf`,
+            content: data.pdfBuffer,
+            contentType: "application/pdf" as const,
+        }] : [];
+
+        const siteUrl = "https://hrda-india.org";
+        const logoUrl = `${siteUrl}/hrda_full_logo.png`;
+        const now = new Date();
+        const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
+        const timeStr = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+
+        const photoBlock = data.photoUrl
+            ? `<td width="90" style="vertical-align:top;padding-left:16px;"><img src="${data.photoUrl}" alt="Photo" width="80" height="100" style="width:80px;height:100px;object-fit:cover;border-radius:10px;border:2px solid #e2e8f0;" /></td>`
+            : '';
+
+        const signatureBlock = data.signatureUrl
+            ? `<tr><td style="padding:16px 32px 0 32px;"><table width="100%" cellpadding="0" cellspacing="0" style="background-color:#fefce8;border-radius:12px;border:1px solid #fde68a;overflow:hidden;"><tr><td style="padding:12px 16px;"><span style="color:#92400e;font-size:12px;font-weight:700;">CANDIDATE SIGNATURE</span></td></tr><tr><td style="padding:0 16px 12px 16px;"><img src="${data.signatureUrl}" alt="Signature" height="50" style="height:50px;max-width:200px;object-fit:contain;" /></td></tr></table></td></tr>`
+            : '';
+
+        const pdfNotice = data.pdfBuffer
+            ? `<tr><td style="padding:16px 32px 0 32px;"><table width="100%" cellpadding="0" cellspacing="0" style="background-color:#eff6ff;border-radius:12px;border:1px solid #bfdbfe;"><tr><td style="padding:14px 16px;"><span style="color:#1e40af;font-size:13px;">&#128206; <strong>Your complete nomination application is attached as a PDF.</strong> Please save it for your records.</span></td></tr></table></td></tr>`
+            : '';
+
+        const year = now.getFullYear();
+
+        const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:24px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+<!-- Header -->
+<tr><td style="background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 50%,#2563eb 100%);padding:28px 32px;text-align:center;">
+  <img src="${logoUrl}" alt="HRDA" width="200" style="max-width:200px;height:auto;margin-bottom:12px;" />
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td style="height:1px;background-color:rgba(255,255,255,0.2);"></td></tr></table>
+  <p style="color:#93c5fd;font-size:13px;margin:12px 0 0 0;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;">District Elections 2026</p>
+</td></tr>
+
+<!-- Success Badge -->
+<tr><td style="padding:24px 32px 0 32px;text-align:center;">
+  <table cellpadding="0" cellspacing="0" align="center"><tr>
+    <td style="background-color:#f0fdf4;border:1px solid #bbf7d0;border-radius:24px;padding:8px 20px;">
+      <span style="color:#16a34a;font-size:14px;font-weight:700;">&#10003; NOMINATION SUBMITTED SUCCESSFULLY</span>
+    </td>
+  </tr></table>
+</td></tr>
+
+<!-- Greeting + Photo -->
+<tr><td style="padding:24px 32px 0 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr>
+    <td style="vertical-align:top;">
+      <h2 style="color:#0f172a;margin:0 0 8px 0;font-size:20px;">Dear ${data.name},</h2>
+      <p style="color:#475569;font-size:14px;line-height:1.7;margin:0;">Your nomination for the <strong style="color:#1e40af;">HRDA Telangana District Elections 2026</strong> has been successfully submitted. Your payment has been received and verified.</p>
+    </td>
+    ${photoBlock}
+  </tr></table>
+</td></tr>
+
+<!-- Personal Details -->
+<tr><td style="padding:24px 32px 0 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;">
+    <tr><td style="background-color:#1e3a8a;padding:10px 16px;"><span style="color:#ffffff;font-size:13px;font-weight:700;letter-spacing:0.5px;">PERSONAL DETAILS</span></td></tr>
+    <tr><td style="padding:16px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:#334155;">
+        <tr><td style="padding:6px 0;width:140px;color:#64748b;font-weight:600;">Full Name</td><td style="padding:6px 0;font-weight:700;color:#0f172a;">${data.name}</td></tr>
+        <tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;"></td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">HRDA Membership ID</td><td style="padding:6px 0;">${data.hrdaId}</td></tr>
+        <tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;"></td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">TGMC/TSMC Number</td><td style="padding:6px 0;">${data.tgmcNumber}</td></tr>
+        <tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;"></td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">Mobile Number</td><td style="padding:6px 0;">${data.mobile}</td></tr>
+        <tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;"></td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">Email Address</td><td style="padding:6px 0;">${data.to}</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</td></tr>
+
+<!-- Election Details -->
+<tr><td style="padding:16px 32px 0 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;">
+    <tr><td style="background-color:#7c3aed;padding:10px 16px;"><span style="color:#ffffff;font-size:13px;font-weight:700;letter-spacing:0.5px;">ELECTION DETAILS</span></td></tr>
+    <tr><td style="padding:16px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:#334155;">
+        <tr><td style="padding:6px 0;width:140px;color:#64748b;font-weight:600;">District / Zone</td><td style="padding:6px 0;font-weight:700;color:#0f172a;">${data.district}</td></tr>
+        <tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;"></td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">Post Applied For</td><td style="padding:6px 0;font-weight:700;color:#7c3aed;">${data.postApplied}</td></tr>
+        <tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;"></td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">Nomination Fee</td><td style="padding:6px 0;font-weight:700;">&#8377;${data.fee}/-</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</td></tr>
+
+<!-- Payment Details -->
+<tr><td style="padding:16px 32px 0 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;overflow:hidden;">
+    <tr><td style="background-color:#16a34a;padding:10px 16px;"><span style="color:#ffffff;font-size:13px;font-weight:700;letter-spacing:0.5px;">PAYMENT CONFIRMATION</span></td></tr>
+    <tr><td style="padding:16px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:#334155;">
+        <tr><td style="padding:6px 0;width:140px;color:#64748b;font-weight:600;">Amount Paid</td><td style="padding:6px 0;font-weight:700;color:#16a34a;font-size:16px;">&#8377;${data.fee}</td></tr>
+        <tr><td colspan="2" style="border-bottom:1px solid #bbf7d0;"></td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">Payment Reference</td><td style="padding:6px 0;font-family:monospace;font-size:12px;">${data.paymentRef}</td></tr>
+        <tr><td colspan="2" style="border-bottom:1px solid #bbf7d0;"></td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">Payment Status</td><td style="padding:6px 0;"><span style="background-color:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:12px;font-weight:700;font-size:12px;">&#10003; PAID</span></td></tr>
+        <tr><td colspan="2" style="border-bottom:1px solid #bbf7d0;"></td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">Date &amp; Time</td><td style="padding:6px 0;">${dateStr}, ${timeStr}</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</td></tr>
+
+${signatureBlock}
+${pdfNotice}
+
+<!-- Note -->
+<tr><td style="padding:20px 32px 0 32px;">
+  <p style="color:#475569;font-size:13px;line-height:1.7;margin:0;">Your application is currently <strong>under review</strong> by the HRDA Election Commission. You will be notified of any updates regarding your nomination status.</p>
+  <p style="color:#475569;font-size:13px;line-height:1.7;margin:12px 0 0 0;">Thank you for participating in the democratic process. For queries, contact us at <a href="mailto:hrda4people@gmail.com" style="color:#2563eb;text-decoration:none;font-weight:600;">hrda4people@gmail.com</a>.</p>
+</td></tr>
+
+<!-- Footer -->
+<tr><td style="padding:28px 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td style="border-top:1px solid #e2e8f0;padding-top:20px;text-align:center;">
+    <p style="color:#94a3b8;font-size:11px;margin:0;line-height:1.6;">Healthcare Reforms Doctors Association (HRDA) &#8212; Telangana<br/>&#169; ${year} HRDA. All rights reserved.<br/><a href="${siteUrl}" style="color:#2563eb;text-decoration:none;">hrda-india.org</a></p>
+  </td></tr></table>
+</td></tr>
+
+</table>
+</td></tr></table>
+</body></html>`;
+
+        const plainText = `Dear ${data.name},
+
+Your nomination for HRDA Telangana District Elections 2026 has been submitted.
+
+Personal Details:
+- Name: ${data.name}
+- HRDA ID: ${data.hrdaId}
+- TGMC No: ${data.tgmcNumber}
+- Mobile: ${data.mobile}
+- Email: ${data.to}
+
+Election Details:
+- District/Zone: ${data.district}
+- Post: ${data.postApplied}
+- Fee: Rs.${data.fee}/-
+
+Payment:
+- Amount: Rs.${data.fee}
+- Reference: ${data.paymentRef}
+- Status: PAID
+- Date: ${dateStr}, ${timeStr}
+
+Your application is under review by the HRDA Election Commission.
+
+Regards,
+HRDA Telangana | hrda-india.org`;
+
         // Send to Applicant
         await this.sendEmail({
             to: data.to,
-            subject: "Nomination Application Successful - HRDA District Elections",
-            text: `Dear ${data.name},
-
-Your nomination application for the HRDA Telangana District Elections has been successfully submitted and your payment has been received.
-
-Nomination Details:
-------------------------------------------------
-Name: ${data.name}
-HRDA ID: ${data.hrdaId}
-TGMC No: ${data.tgmcNumber}
-District/Zone: ${data.district}
-Post Applied For: ${data.postApplied}
-
-Payment Details:
-------------------------------------------------
-Amount Paid: ₹${data.fee}
-Payment Reference: ${data.paymentRef}
-Status: SUCCESS
-
-Thank you for participating in the democratic process of our association.
-Your application is currently under review by the election committee.
-
-                Regards,
-Healthcare Reforms Doctors Association (HRDA) - Telangana`,
-            html: `
-<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-w-lg mx-auto bg-slate-50 p-6 rounded-xl border border-slate-200">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="color: #1e3a8a; margin: 0; font-size: 24px;">HRDA Telangana</h2>
-        <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">District Elections 2026</p>
-    </div>
-    
-    <div style="background-color: #ffffff; padding: 24px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-        <h3 style="color: #0f172a; margin-top: 0;">Dear ${data.name},</h3>
-        <p style="color: #334155; line-height: 1.6;">
-            Your nomination application for the <strong>HRDA Telangana District Elections</strong> has been successfully submitted and your payment has been received.
-        </p>
-
-        <div style="background-color: #f8fafc; padding: 16px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #3b82f6;">
-            <h4 style="color: #1e40af; margin-top: 0; margin-bottom: 12px; font-size: 16px;">Nomination Details</h4>
-            <table style="width: 100%; color: #475569; font-size: 14px; line-height: 1.8;">
-                <tr><td style="width: 120px;"><strong>Name:</strong></td><td>${data.name}</td></tr>
-                <tr><td><strong>HRDA ID:</strong></td><td>${data.hrdaId}</td></tr>
-                <tr><td><strong>TGMC No:</strong></td><td>${data.tgmcNumber}</td></tr>
-                <tr><td><strong>District/Zone:</strong></td><td>${data.district}</td></tr>
-                <tr><td><strong>Post Applied:</strong></td><td><strong>${data.postApplied}</strong></td></tr>
-            </table>
-        </div>
-
-        <div style="background-color: #f0fdf4; padding: 16px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #22c55e;">
-            <h4 style="color: #166534; margin-top: 0; margin-bottom: 12px; font-size: 16px;">Payment Details</h4>
-            <table style="width: 100%; color: #475569; font-size: 14px; line-height: 1.8;">
-                <tr><td style="width: 120px;"><strong>Amount Paid:</strong></td><td><span style="color: #16a34a; font-weight: bold;">₹${data.fee}</span></td></tr>
-                <tr><td><strong>Reference:</strong></td><td>${data.paymentRef}</td></tr>
-                <tr><td><strong>Status:</strong></td><td><span style="color: #16a34a; font-weight: bold;">SUCCESS</span></td></tr>
-            </table>
-        </div>
-
-        <p style="color: #334155; line-height: 1.6; margin-bottom: 0;">
-            Thank you for participating in the democratic process of our association.<br/>
-            Your application is currently under review by the election committee.
-        </p>
-    </div>
-    
-    <div style="text-align: center; margin-top: 24px; color: #94a3b8; font-size: 12px;">
-        <p>&copy; ${new Date().getFullYear()} Healthcare Reforms Doctors Association (HRDA) - Telangana</p>
-    </div>
-</div>`
+            subject: "Nomination Submitted Successfully - HRDA District Elections 2026",
+            text: plainText,
+            html: html,
+            attachments: pdfAttachment,
         });
 
-        // Send to Admin
+        // Send same professional email to Admin (hrda4people@gmail.com)
         const adminEmail = process.env.CONTACT_EMAIL || "hrda4people@gmail.com";
         await this.sendEmail({
             to: adminEmail,
             subject: `[New Nomination] ${data.postApplied} - ${data.district} (${data.name})`,
-            text: `A new nomination has been submitted and paid successfully.
-
-Applicant: ${data.name}
-HRDA ID: ${data.hrdaId}
-TGMC No: ${data.tgmcNumber}
-Phone: ${data.to} (Email)
-District/Zone: ${data.district}
-Post Applied For: ${data.postApplied}
-
-Payment Ref: ${data.paymentRef}
-Amount: ₹${data.fee}
-
-Please check the Admin Dashboard for full details.
-`
+            text: `New nomination received.\n\nCandidate: ${data.name}\nHRDA ID: ${data.hrdaId}\nTGMC: ${data.tgmcNumber}\nMobile: ${data.mobile}\nEmail: ${data.to}\nDistrict: ${data.district}\nPost: ${data.postApplied}\nFee: Rs.${data.fee}\nPayment Ref: ${data.paymentRef}\nDate: ${dateStr}`,
+            html: html,
+            attachments: pdfAttachment,
         });
     }
 }

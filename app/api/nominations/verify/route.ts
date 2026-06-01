@@ -62,17 +62,31 @@ export async function POST(request: Request) {
              throw new Error("Failed to update nomination status");
         }
 
-        // 5. Send Email Notifications
+        // 5. Generate Nomination PDF
+        let pdfBuffer: Buffer | undefined;
+        try {
+            const { generateNominationPDF } = await import("@/lib/services/nomination-pdf");
+            pdfBuffer = await generateNominationPDF(updatedNomination);
+            console.log(`[Nomination Verify] Generated PDF (${(pdfBuffer.length / 1024).toFixed(1)}KB)`);
+        } catch (pdfError) {
+            console.error("[Nomination Verify] PDF generation failed (non-fatal):", pdfError);
+        }
+
+        // 6. Send Email Notifications (with PDF attachment)
         try {
             await emailService.sendNominationConfirmation({
                 to: updatedNomination.email,
                 name: updatedNomination.fullName,
                 hrdaId: updatedNomination.hrdaMembershipId,
                 tgmcNumber: updatedNomination.tgmcNumber,
+                mobile: updatedNomination.mobile,
                 district: updatedNomination.district,
                 postApplied: updatedNomination.postApplied,
                 fee: updatedNomination.nominationFee,
-                paymentRef: razorpay_payment_id
+                paymentRef: razorpay_payment_id,
+                photoUrl: updatedNomination.photoUrl || undefined,
+                signatureUrl: updatedNomination.signatureUrl || undefined,
+                pdfBuffer,
             });
         } catch (emailError) {
              console.error("[Nomination Verify] Error sending confirmation emails:", emailError);

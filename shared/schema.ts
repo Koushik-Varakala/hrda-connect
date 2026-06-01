@@ -226,6 +226,7 @@ export const nominations = pgTable("nominations", {
     status: text("status").default("pending_payment").notNull(), // pending_payment / payment_success / submitted / rejected
     adminNotes: text("admin_notes"),
     photoUrl: text("photo_url"),
+    signatureUrl: text("signature_url"),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
 });

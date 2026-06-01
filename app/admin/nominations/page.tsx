@@ -356,6 +356,12 @@ export default function ManageNominations() {
                                     <p><strong>District:</strong> {editingItem.district}</p>
                                     <p><strong>Email:</strong> {editingItem.email}</p>
                                     <p><strong>Payment Ref:</strong> {editingItem.razorpayPaymentId || 'N/A'}</p>
+                                    {editingItem.signatureUrl && (
+                                        <div>
+                                            <p><strong>Signature:</strong></p>
+                                            <img src={editingItem.signatureUrl} alt="Signature" className="h-12 mt-1 border border-slate-200 rounded bg-white p-1" />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             
