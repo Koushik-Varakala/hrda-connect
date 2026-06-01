@@ -184,14 +184,14 @@ export type UpdateGalleryPhotoRequest = Partial<InsertGalleryPhoto>;
  * amount is IGNORED to prevent amount-tampering attacks.
  */
 export const NOMINATION_FEE_MAP: Record<string, number> = {
-    "President": 5000,
-    "General Secretary": 5000,
-    "Vice President": 5000,
-    "Treasurer": 5000,
-    "Joint Secretary": 2500,
-    "Executive Committee Member": 2500,
-    "Academic Committee Chairman": 2500,
-    "Sports & Cultural Committee Chairman": 2500,
+    "President": 4000,
+    "General Secretary": 4000,
+    "Vice President": 4000,
+    "Treasurer": 4000,
+    "Joint Secretary": 2000,
+    "Executive Committee Member": 2000,
+    "Academic Committee Chairman": 2000,
+    "Sports & Cultural Committee Chairman": 2000,
 };
 
 export const NOMINATION_POSTS = Object.keys(NOMINATION_FEE_MAP);
