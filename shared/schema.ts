@@ -188,7 +188,7 @@ export const NOMINATION_FEE_MAP: Record<string, number> = {
     "General Secretary": 4000,
     "Vice President": 4000,
     "Treasurer": 4000,
-    "Joint Secretary": 2000,
+    "Joint Secretary": 4000,
     "Executive Committee Member": 2000,
     "Academic Committee Chairman": 2000,
     "Sports & Cultural Committee Chairman": 2000,
