@@ -1,11 +1,25 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
+import { put } from "@vercel/blob";
 import { storage } from "@/lib/storage";
 import { formNominationSchema, NOMINATION_FEE_MAP } from "@shared/schema";
 
 export async function POST(request: Request) {
     try {
-        const { userData } = await request.json();
+        const formData = await request.formData();
+
+        // Extract fields from FormData
+        const userData = {
+            fullName: formData.get("fullName") as string,
+            hrdaMembershipId: formData.get("hrdaMembershipId") as string,
+            tgmcNumber: formData.get("tgmcNumber") as string,
+            email: formData.get("email") as string,
+            mobile: formData.get("mobile") as string,
+            district: formData.get("district") as string,
+            postApplied: formData.get("postApplied") as string,
+        };
+
+        const photoFile = formData.get("photo") as File | null;
 
         // 1. Validate Input Data
         const validatedData = formNominationSchema.parse(userData);
@@ -17,7 +31,6 @@ export async function POST(request: Request) {
         }
 
         // 3. Duplicate Prevention
-        // Check if there's already a successful nomination for this user + post + district
         const isDuplicate = await storage.checkDuplicateNomination(
             validatedData.tgmcNumber,
             validatedData.district,
@@ -31,14 +44,35 @@ export async function POST(request: Request) {
             );
         }
 
-        // 4. Create Pending Nomination Record
+        // 4. Upload Photo to Vercel Blob (if provided)
+        let photoUrl: string | null = null;
+        if (photoFile && photoFile.size > 0) {
+            // Validate file type and size
+            const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+            if (!validTypes.includes(photoFile.type)) {
+                return NextResponse.json({ message: "Invalid photo format. Use JPG, PNG, or WebP." }, { status: 400 });
+            }
+            if (photoFile.size > 5 * 1024 * 1024) {
+                return NextResponse.json({ message: "Photo must be under 5MB." }, { status: 400 });
+            }
+
+            const blob = await put(
+                `nominations/photos/${Date.now()}-${photoFile.name}`,
+                photoFile,
+                { access: "public" }
+            );
+            photoUrl = blob.url;
+        }
+
+        // 5. Create Pending Nomination Record
         let pendingNomId: number | null = null;
         try {
             const pendingNom = await storage.createNomination({
                 ...validatedData,
-                nominationFee: expectedFee, // Force server-side fee — never trust client
+                nominationFee: expectedFee,
                 paymentStatus: "pending",
                 status: "pending_payment",
+                photoUrl,
             });
             pendingNomId = pendingNom.id;
             console.log(`[Nomination Order] Created pending nomination ID: ${pendingNomId}`);
@@ -47,7 +81,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "Database error" }, { status: 500 });
         }
 
-        // 5. Razorpay Configuration
+        // 6. Razorpay Configuration
         if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
             console.warn("Razorpay keys missing. Using mock order.");
             return NextResponse.json({
@@ -64,7 +98,7 @@ export async function POST(request: Request) {
             key_secret: process.env.RAZORPAY_KEY_SECRET,
         });
 
-        // 6. Create Razorpay Order
+        // 7. Create Razorpay Order
         const notes: Record<string, string> = {
             nominationId: String(pendingNomId),
             fullName: validatedData.fullName.slice(0, 50),
@@ -73,7 +107,7 @@ export async function POST(request: Request) {
         };
 
         const orderOptions = {
-            amount: expectedFee * 100, // amount in paise
+            amount: expectedFee * 100,
             currency: "INR",
             receipt: `rcpt_nom_${Date.now()}`,
             payment_capture: true,
@@ -82,7 +116,7 @@ export async function POST(request: Request) {
 
         const order = await razorpay.orders.create(orderOptions);
 
-        // 7. Update pending nomination with order ID
+        // 8. Update pending nomination with order ID
         await storage.updateNomination(pendingNomId, {
             razorpayOrderId: order.id
         });

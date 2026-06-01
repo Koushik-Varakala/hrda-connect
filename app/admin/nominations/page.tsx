@@ -251,9 +251,24 @@ export default function ManageNominations() {
                                 filteredNominations?.map((nom) => (
                                     <TableRow key={nom.id}>
                                         <TableCell>
-                                            <div className="font-medium">{nom.fullName}</div>
-                                            <div className="text-xs text-slate-500">{nom.hrdaMembershipId} | {nom.tgmcNumber}</div>
-                                            <div className="text-xs text-slate-500">{nom.mobile}</div>
+                                            <div className="flex items-center gap-3">
+                                                {nom.photoUrl ? (
+                                                    <img
+                                                        src={nom.photoUrl}
+                                                        alt={nom.fullName}
+                                                        className="w-10 h-12 rounded-lg object-cover border border-slate-200 shrink-0"
+                                                    />
+                                                ) : (
+                                                    <div className="w-10 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+                                                        <span className="text-xs text-slate-400">N/A</span>
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <div className="font-medium">{nom.fullName}</div>
+                                                    <div className="text-xs text-slate-500">{nom.hrdaMembershipId} | {nom.tgmcNumber}</div>
+                                                    <div className="text-xs text-slate-500">{nom.mobile}</div>
+                                                </div>
+                                            </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="font-medium text-sm">{nom.postApplied}</div>
@@ -327,10 +342,21 @@ export default function ManageNominations() {
                     </DialogHeader>
                     {editingItem && (
                         <div className="space-y-4 py-4">
-                            <div className="bg-slate-50 p-3 rounded-lg border text-sm space-y-1">
-                                <p><strong>Candidate:</strong> {editingItem.fullName}</p>
-                                <p><strong>Post:</strong> {editingItem.postApplied}</p>
-                                <p><strong>District:</strong> {editingItem.district}</p>
+                            <div className="bg-slate-50 p-3 rounded-lg border text-sm space-y-1 flex gap-4">
+                                {editingItem.photoUrl && (
+                                    <img
+                                        src={editingItem.photoUrl}
+                                        alt={editingItem.fullName}
+                                        className="w-20 h-24 rounded-lg object-cover border border-slate-200 shrink-0"
+                                    />
+                                )}
+                                <div className="space-y-1">
+                                    <p><strong>Candidate:</strong> {editingItem.fullName}</p>
+                                    <p><strong>Post:</strong> {editingItem.postApplied}</p>
+                                    <p><strong>District:</strong> {editingItem.district}</p>
+                                    <p><strong>Email:</strong> {editingItem.email}</p>
+                                    <p><strong>Payment Ref:</strong> {editingItem.razorpayPaymentId || 'N/A'}</p>
+                                </div>
                             </div>
                             
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

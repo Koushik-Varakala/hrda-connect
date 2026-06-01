@@ -225,6 +225,7 @@ export const nominations = pgTable("nominations", {
     razorpayPaymentId: text("razorpay_payment_id").unique(), // unique — replay protection
     status: text("status").default("pending_payment").notNull(), // pending_payment / payment_success / submitted / rejected
     adminNotes: text("admin_notes"),
+    photoUrl: text("photo_url"),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
 });

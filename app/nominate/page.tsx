@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, Camera, X as XIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -35,11 +35,44 @@ type NominationFormValues = z.infer<typeof nominationFormSchema>;
 // Combine districts and zones, sort them alphabetically
 const allDistrictsAndZones = [...appConfig.districts, ...HYDERABAD_ZONES].sort();
 
+// Compress and resize photo client-side before upload (saves ~98% storage)
+const compressImage = (file: File, maxW = 400, maxH = 500, quality = 0.8): Promise<File> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+            let w = img.width, h = img.height;
+            // Scale down to fit within maxW x maxH while keeping aspect ratio
+            if (w > maxW || h > maxH) {
+                const ratio = Math.min(maxW / w, maxH / h);
+                w = Math.round(w * ratio);
+                h = Math.round(h * ratio);
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d")!;
+            ctx.drawImage(img, 0, 0, w, h);
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob) return reject(new Error("Compression failed"));
+                    resolve(new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" }));
+                },
+                "image/jpeg",
+                quality
+            );
+        };
+        img.onerror = () => reject(new Error("Failed to load image"));
+        img.src = URL.createObjectURL(file);
+    });
+};
+
 export default function NominatePage() {
     const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [declarationAgreed, setDeclarationAgreed] = useState(false);
     const [declarationOpen, setDeclarationOpen] = useState(false);
+    const [photoFile, setPhotoFile] = useState<File | null>(null);
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
     const { toast } = useToast();
     const router = useRouter();
 
@@ -60,12 +93,28 @@ export default function NominatePage() {
     const currentFee = selectedPost ? NOMINATION_FEE_MAP[selectedPost] : 0;
 
     const onSubmit = async (data: NominationFormValues) => {
+        if (!photoFile) {
+            toast({ title: "Photo Required", description: "Please upload your passport-size photo.", variant: "destructive" });
+            return;
+        }
         setIsProcessing(true);
         try {
-            // 1. Create Order + pre-save pending nomination
-            const orderRes = await apiRequest("POST", "/api/nominations/order", {
-                userData: data
-            });
+            // 1. Create Order + pre-save pending nomination (send as FormData for photo)
+            const fd = new FormData();
+            fd.append("fullName", data.fullName);
+            fd.append("hrdaMembershipId", data.hrdaMembershipId);
+            fd.append("tgmcNumber", data.tgmcNumber);
+            fd.append("email", data.email);
+            fd.append("mobile", data.mobile);
+            fd.append("district", data.district);
+            fd.append("postApplied", data.postApplied);
+            fd.append("photo", photoFile);
+
+            const orderRes = await fetch("/api/nominations/order", { method: "POST", body: fd });
+            if (!orderRes.ok) {
+                const err = await orderRes.json();
+                throw new Error(err.message || "Failed to create order");
+            }
             const order = await orderRes.json();
             const pendingNomId = order.nominationId ?? null;
 
@@ -278,6 +327,59 @@ export default function NominatePage() {
                                                     </FormItem>
                                                 )}
                                             />
+                                        </div>
+                                    </div>
+
+                                    {/* Photo Upload */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">Passport Size Photo <span className="text-red-500">*</span></label>
+                                        <div className="flex items-start gap-4">
+                                            <div className="relative w-32 h-40 border-2 border-dashed border-slate-300 rounded-xl overflow-hidden bg-slate-50 flex items-center justify-center shrink-0 hover:border-blue-400 transition-colors">
+                                                {photoPreview ? (
+                                                    <>
+                                                        <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { setPhotoFile(null); setPhotoPreview(null); }}
+                                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 shadow-md hover:bg-red-600 transition-colors"
+                                                        >
+                                                            <XIcon className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-center p-2">
+                                                        <Camera className="w-8 h-8 text-slate-300 mx-auto mb-1" />
+                                                        <p className="text-xs text-slate-400">Upload Photo</p>
+                                                    </div>
+                                                )}
+                                                <input
+                                                    type="file"
+                                                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    onChange={async (e) => {
+                                                        const f = e.target.files?.[0];
+                                                        if (f) {
+                                                            if (f.size > 5 * 1024 * 1024) {
+                                                                toast({ title: "File too large", description: "Photo must be under 5MB.", variant: "destructive" });
+                                                                return;
+                                                            }
+                                                            try {
+                                                                const compressed = await compressImage(f);
+                                                                setPhotoFile(compressed);
+                                                                setPhotoPreview(URL.createObjectURL(compressed));
+                                                            } catch {
+                                                                toast({ title: "Error", description: "Could not process image. Try another photo.", variant: "destructive" });
+                                                            }
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="text-xs text-slate-500 mt-1 space-y-1">
+                                                <p>• Recent passport-size photograph</p>
+                                                <p>• Formats: JPG, PNG, or WebP</p>
+                                                <p>• Max size: 5MB</p>
+                                                <p>• Clear face, white background preferred</p>
+                                            </div>
                                         </div>
                                     </div>
 
