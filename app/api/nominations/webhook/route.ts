@@ -87,10 +87,13 @@ export async function POST(request: Request) {
                         name: updatedNomination.fullName,
                         hrdaId: updatedNomination.hrdaMembershipId,
                         tgmcNumber: updatedNomination.tgmcNumber,
+                        mobile: updatedNomination.mobile,
                         district: updatedNomination.district,
                         postApplied: updatedNomination.postApplied,
                         fee: updatedNomination.nominationFee,
-                        paymentRef: paymentId
+                        paymentRef: paymentId,
+                        photoUrl: updatedNomination.photoUrl || undefined,
+                        signatureUrl: updatedNomination.signatureUrl || undefined,
                     });
                 } catch (emailError) {
                     console.error("[Nomination Webhook] Error sending confirmation emails:", emailError);
