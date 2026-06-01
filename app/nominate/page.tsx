@@ -569,7 +569,7 @@ export default function NominatePage() {
                                                                 <li>Activities detrimental to patient welfare</li>
                                                                 <li>Activities prejudicial to the interests, reputation, objectives, or principles of HRDA</li>
                                                             </ul>
-                                                            <p className="mt-2">I understand and agree that if I am found to be involved in or supporting any unethical medical practice, quackery, organizational indiscipline, anti-organizational activities, misconduct, or violation of HRDA rules, I shall be liable for disciplinary action. Such action may include warning, censure, suspension, removal from office, cancellation of candidature, suspension or termination of HRDA membership, or any other action permissible under the HRDA Constitution, Rules, and By-laws.</p>
+                                                            <p className="mt-2">I understand and agree that if I am found to be involved in or supporting any unethical medical practice, quackery, organizational indiscipline, anti-organizational activities, misconduct, or violation of HRDA rules, I shall be liable for disciplinary action by the HRDA State Panel. Such action may include warning, censure, suspension, removal from office, cancellation of candidature, suspension or termination of HRDA membership, or any other action permissible under the HRDA Constitution, Rules, and By-laws.</p>
                                                         </div>
 
                                                         <div>
@@ -584,7 +584,7 @@ export default function NominatePage() {
                                                                 <li>Rejection of my nomination</li>
                                                                 <li>Cancellation of candidature at any stage of the election process</li>
                                                                 <li>Removal from office if elected</li>
-                                                                <li>Disciplinary action under HRDA Rules</li>
+                                                                <li>Disciplinary action by the HRDA State Panel</li>
                                                                 <li>Suspension or cancellation of membership</li>
                                                                 <li>Any other action permissible under law</li>
                                                             </ul>
