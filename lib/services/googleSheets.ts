@@ -71,7 +71,13 @@ export class GoogleSheetsService {
     private formatDate(isoString: string): string {
         try {
             const date = new Date(isoString);
-            return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+            // Format in IST (Indian Standard Time) to avoid UTC date mismatch
+            return date.toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                timeZone: "Asia/Kolkata",
+            });
         } catch {
             return isoString;
         }

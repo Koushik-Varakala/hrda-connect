@@ -70,7 +70,13 @@ export default function ManageNominations() {
 
     const onSubmit = (data: any) => {
         if (editingItem) {
-            updateMutation.mutate({ id: editingItem.id, ...data }, {
+            // Auto-sync paymentStatus when status implies payment was received
+            const paidStatuses = ['payment_success', 'approved', 'submitted'];
+            const updateData = { ...data };
+            if (paidStatuses.includes(data.status)) {
+                updateData.paymentStatus = 'success';
+            }
+            updateMutation.mutate({ id: editingItem.id, ...updateData }, {
                 onSuccess: () => { 
                     setIsDialogOpen(false); 
                     setEditingItem(null); 
@@ -143,8 +149,10 @@ export default function ManageNominations() {
     const approvedCount = nominations?.filter(n => n.status === "approved").length || 0;
     const paidCount = nominations?.filter(n => n.status === "payment_success" || n.status === "approved" || n.status === "submitted").length || 0;
     const totalRevenue = nominations?.reduce((sum, nom) => {
-        // Only count paid ones
-        if (nom.paymentStatus === 'success') {
+        // Count as paid if paymentStatus is success OR status indicates payment received
+        const isPaid = nom.paymentStatus === 'success' || 
+            nom.status === 'payment_success' || nom.status === 'approved' || nom.status === 'submitted';
+        if (isPaid) {
             return sum + (nom.nominationFee || 0);
         }
         return sum;
@@ -300,7 +308,7 @@ export default function ManageNominations() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="font-medium">₹{nom.nominationFee}</div>
-                                            {nom.paymentStatus === 'success' ? (
+                                            {(nom.paymentStatus === 'success' || nom.status === 'payment_success' || nom.status === 'approved' || nom.status === 'submitted') ? (
                                                 <div className="text-xs text-green-600 bg-green-50 inline-block px-1 rounded border border-green-200">Paid</div>
                                             ) : (
                                                 <div className="text-xs text-yellow-600 bg-yellow-50 inline-block px-1 rounded border border-yellow-200">Pending</div>
