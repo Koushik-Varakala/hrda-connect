@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNominationsList, useUpdateNomination, useDeleteNomination } from "@/hooks/use-nominations";
-import { Pencil, Search, Trash2, Download } from "lucide-react";
+import { Pencil, Search, Trash2, Download, Mail, Loader2 } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -23,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm, Controller } from "react-hook-form";
 import { NOMINATION_POSTS } from "@shared/schema";
 import { appConfig } from "@/lib/app-config";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ManageNominations() {
     const [filterDistrict, setFilterDistrict] = useState<string>("all");
@@ -41,6 +42,8 @@ export default function ManageNominations() {
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
+    const [resendingId, setResendingId] = useState<number | null>(null);
+    const { toast } = useToast();
 
     const form = useForm({
         defaultValues: {
@@ -79,6 +82,27 @@ export default function ManageNominations() {
 
     const handleDelete = (id: number) => {
         deleteMutation.mutate(id);
+    };
+
+    const handleResendEmail = async (nom: any) => {
+        setResendingId(nom.id);
+        try {
+            const res = await fetch("/api/nominations/resend-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nominationId: nom.id }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast({ title: "Email Sent", description: `Confirmation email sent to ${data.email}` });
+            } else {
+                toast({ title: "Failed", description: data.message || "Could not send email", variant: "destructive" });
+            }
+        } catch {
+            toast({ title: "Error", description: "Network error sending email", variant: "destructive" });
+        } finally {
+            setResendingId(null);
+        }
     };
 
     const downloadCSV = () => {
@@ -299,6 +323,16 @@ export default function ManageNominations() {
                                             <div className="flex justify-end gap-2">
                                                 <Button variant="outline" size="icon" onClick={() => openEdit(nom)}>
                                                     <Pencil className="w-4 h-4" />
+                                                </Button>
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="icon" 
+                                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                    onClick={() => handleResendEmail(nom)}
+                                                    disabled={resendingId === nom.id}
+                                                    title="Resend confirmation email"
+                                                >
+                                                    {resendingId === nom.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
                                                 </Button>
                                                 <AlertDialog>
                                                     <AlertDialogTrigger asChild>
