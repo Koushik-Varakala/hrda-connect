@@ -71,13 +71,18 @@ export class GoogleSheetsService {
     private formatDate(isoString: string): string {
         try {
             const date = new Date(isoString);
-            // Format in IST (Indian Standard Time) to avoid UTC date mismatch
-            return date.toLocaleDateString("en-IN", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                timeZone: "Asia/Kolkata",
+            // Format as DD-MMM-YYYY (e.g. 07-Jun-2026) so Google Sheets doesn't confuse MM/DD and DD/MM
+            const formatter = new Intl.DateTimeFormat('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                timeZone: 'Asia/Kolkata'
             });
+            const parts = formatter.formatToParts(date);
+            const day = parts.find(p => p.type === 'day')?.value;
+            const month = parts.find(p => p.type === 'month')?.value;
+            const year = parts.find(p => p.type === 'year')?.value;
+            return `${day}-${month}-${year}`;
         } catch {
             return isoString;
         }
