@@ -1,3 +1,5 @@
+import { appConfig } from "@/lib/app-config";
+
 export class SmsService {
     private isConfigured = false;
 
@@ -7,6 +9,11 @@ export class SmsService {
     }
 
     async sendSms(to: string, message: string): Promise<boolean> {
+        if (appConfig.region === 'AP') {
+            console.log(`[Fast2SMS] SMS disabled for AP region (no DLT template). Skipping: ${message}`);
+            return true;
+        }
+
         const apiKey = process.env.FAST2SMS_API_KEY;
 
 

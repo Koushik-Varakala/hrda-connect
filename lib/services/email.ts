@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { appConfig } from "@/lib/app-config";
 
 export interface EmailAttachment {
     filename: string;
@@ -50,7 +51,7 @@ export class EmailService {
                     body: JSON.stringify({
                         sender: {
                             name: "Healthcare Reforms Doctors Association",
-                            email: process.env.SMTP_USER || "hrda4people@gmail.com"
+                            email: process.env.SMTP_USER || appConfig.email
                         },
                         to: [{ email: options.to }],
                         subject: options.subject,
@@ -113,13 +114,13 @@ export class EmailService {
             subject: "Registration Successful - Welcome to Healthcare Reforms Doctors Association",
             text: `Dear ${name},
 
-Congratulations! You have successfully registered with HRDA Telangana.
+Congratulations! You have successfully registered with ${appConfig.organizationName}.
 
 Here are your membership details:
 ------------------------------------------------
 Name: ${name}
 HRDA Membership ID: ${hrdaId}
-TGMC Registration ID: ${tgmcId}
+${appConfig.medicalCouncilShort} Registration ID: ${tgmcId}
 Mobile Number: ${phone}
 Email Address: ${to}
 Address: ${address}
@@ -128,7 +129,7 @@ Address: ${address}
 Thank you for strengthening our voice. We look forward to your active participation.
 
 Regards,
-Healthcare Reforms Doctors Association (HRDA) - Telangana`
+${appConfig.organizationName}`
         });
     }
 
@@ -144,7 +145,7 @@ If you did not request this code, please ignore this email.`
         });
     }
     async sendContactMessage(data: { firstName: string, lastName: string, email: string, subject: string, message: string }) {
-        const adminEmail = process.env.CONTACT_EMAIL || "hrda4people@gmail.com";
+        const adminEmail = process.env.CONTACT_EMAIL || appConfig.email;
 
         return this.sendEmail({
             to: adminEmail,
@@ -184,7 +185,7 @@ Please reply directly to ${data.email}
             contentType: "application/pdf" as const,
         }] : [];
 
-        const siteUrl = "https://hrda-india.org";
+        const siteUrl = "https://" + appConfig.domain;
         const logoUrl = `${siteUrl}/hrda_full_logo.png`;
         const now = new Date();
         const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
@@ -231,7 +232,7 @@ Please reply directly to ${data.email}
   <table width="100%" cellpadding="0" cellspacing="0"><tr>
     <td style="vertical-align:top;">
       <h2 style="color:#0f172a;margin:0 0 8px 0;font-size:20px;">Dear ${data.name},</h2>
-      <p style="color:#475569;font-size:14px;line-height:1.7;margin:0;">Your nomination for the <strong style="color:#1e40af;">HRDA Telangana District Elections 2026</strong> has been successfully submitted. Your payment has been received and verified.</p>
+      <p style="color:#475569;font-size:14px;line-height:1.7;margin:0;">Your nomination for the <strong style="color:#1e40af;">HRDA ${appConfig.stateName} District Elections 2026</strong> has been successfully submitted. Your payment has been received and verified.</p>
     </td>
     ${photoBlock}
   </tr></table>
@@ -247,7 +248,7 @@ Please reply directly to ${data.email}
         <tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;"></td></tr>
         <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">HRDA Membership ID</td><td style="padding:6px 0;">${data.hrdaId}</td></tr>
         <tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;"></td></tr>
-        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">TGMC/TSMC Number</td><td style="padding:6px 0;">${data.tgmcNumber}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">${appConfig.medicalCouncilShort} Number</td><td style="padding:6px 0;">${data.tgmcNumber}</td></tr>
         <tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;"></td></tr>
         <tr><td style="padding:6px 0;color:#64748b;font-weight:600;">Mobile Number</td><td style="padding:6px 0;">${data.mobile}</td></tr>
         <tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;"></td></tr>
@@ -297,13 +298,13 @@ ${pdfNotice}
 <!-- Note -->
 <tr><td style="padding:20px 32px 0 32px;">
   <p style="color:#475569;font-size:13px;line-height:1.7;margin:0;">Your application is currently <strong>under review</strong> by the HRDA Election Commission. You will be notified of any updates regarding your nomination status.</p>
-  <p style="color:#475569;font-size:13px;line-height:1.7;margin:12px 0 0 0;">Thank you for participating in the democratic process. For queries, contact us at <a href="mailto:hrda4people@gmail.com" style="color:#2563eb;text-decoration:none;font-weight:600;">hrda4people@gmail.com</a>.</p>
+  <p style="color:#475569;font-size:13px;line-height:1.7;margin:12px 0 0 0;">Thank you for participating in the democratic process. For queries, contact us at <a href="mailto:${appConfig.email}" style="color:#2563eb;text-decoration:none;font-weight:600;">${appConfig.email}</a>.</p>
 </td></tr>
 
 <!-- Footer -->
 <tr><td style="padding:28px 32px;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td style="border-top:1px solid #e2e8f0;padding-top:20px;text-align:center;">
-    <p style="color:#94a3b8;font-size:11px;margin:0;line-height:1.6;">Healthcare Reforms Doctors Association (HRDA) &#8212; Telangana<br/>&#169; ${year} HRDA. All rights reserved.<br/><a href="${siteUrl}" style="color:#2563eb;text-decoration:none;">hrda-india.org</a></p>
+    <p style="color:#94a3b8;font-size:11px;margin:0;line-height:1.6;">Healthcare Reforms Doctors Association (HRDA) &#8212; ${appConfig.stateName}<br/>&#169; ${year} HRDA. All rights reserved.<br/><a href="${siteUrl}" style="color:#2563eb;text-decoration:none;">${appConfig.domain}</a></p>
   </td></tr></table>
 </td></tr>
 
@@ -313,12 +314,12 @@ ${pdfNotice}
 
         const plainText = `Dear ${data.name},
 
-Your nomination for HRDA Telangana District Elections 2026 has been submitted.
+Your nomination for HRDA ${appConfig.stateName} District Elections 2026 has been submitted.
 
 Personal Details:
 - Name: ${data.name}
 - HRDA ID: ${data.hrdaId}
-- TGMC No: ${data.tgmcNumber}
+- ${appConfig.medicalCouncilShort} No: ${data.tgmcNumber}
 - Mobile: ${data.mobile}
 - Email: ${data.to}
 
@@ -336,7 +337,7 @@ Payment:
 Your application is under review by the HRDA Election Commission.
 
 Regards,
-HRDA Telangana | hrda-india.org`;
+${appConfig.organizationName} | ${appConfig.domain}`;
 
         // Send to Applicant
         await this.sendEmail({
@@ -348,7 +349,7 @@ HRDA Telangana | hrda-india.org`;
         });
 
         // Send same professional email to Admin (hrda4people@gmail.com)
-        const adminEmail = process.env.CONTACT_EMAIL || "hrda4people@gmail.com";
+        const adminEmail = process.env.CONTACT_EMAIL || appConfig.email;
         await this.sendEmail({
             to: adminEmail,
             subject: `[New Nomination] ${data.postApplied} - ${data.district} (${data.name})`,

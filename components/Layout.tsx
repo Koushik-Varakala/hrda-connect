@@ -46,7 +46,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const notificationLinks = [
     { name: "Announcements", href: "/announcements", description: "Latest updates and news." },
     { name: "Elections", href: "/election-panel", description: "Election updates and candidate info." },
-    { name: "District Elections", href: "/district-elections", description: "Nomination portal & official documents." },
+    ...(appConfig.region === 'TG' ? [{ name: "District Elections", href: "/district-elections", description: "Nomination portal & official documents." }] : []),
   ];
 
   const resourceLinks = [
@@ -433,7 +433,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <a href="https://www.facebook.com/hrda4people/" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-blue-700 transition-all text-white hover:scale-110" aria-label="Facebook">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="https://www.instagram.com/hrda4people/" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-pink-600 transition-all text-white hover:scale-110" aria-label="Instagram">
+              <a href={appConfig.instagramUrl} target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-pink-600 transition-all text-white hover:scale-110" aria-label="Instagram">
                 <Instagram className="w-4 h-4" />
               </a>
               <a href="https://www.youtube.com/@healthcarereformsdoctorsas6094" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-red-600 transition-all text-white hover:scale-110" aria-label="YouTube">

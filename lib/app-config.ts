@@ -29,6 +29,9 @@ export interface RegionConfig {
     phone: string;
     email: string;
     whatsappOnly: boolean;
+    registrationFee: number;
+    instagramUrl: string;
+    capitalZones: string[];
 }
 
 const TG_CONFIG: RegionConfig = {
@@ -83,6 +86,16 @@ const TG_CONFIG: RegionConfig = {
     phone: '9441568635',
     email: 'hrda4people@gmail.com',
     whatsappOnly: false,
+    registrationFee: 1015,
+    instagramUrl: 'https://www.instagram.com/hrda4people/',
+    capitalZones: [
+        "Hyderabad – LB Nagar & Uppal Zone",
+        "Hyderabad – Old City & Rajendranagar Zone",
+        "Hyderabad – Secunderabad & Malkajgiri Zone",
+        "Hyderabad – Khairatabad Zone",
+        "Hyderabad – Kompally Zone",
+        "Hyderabad – Kukatpally & Serilingampally Zone",
+    ],
 };
 
 const AP_CONFIG: RegionConfig = {
@@ -110,6 +123,9 @@ const AP_CONFIG: RegionConfig = {
     phone: '+91 77992 88889',
     email: 'hrdareforms@gmail.com',
     whatsappOnly: true,
+    registrationFee: 1015,
+    instagramUrl: 'https://www.instagram.com/hrda.ap/',
+    capitalZones: [], // AP doesn't have capital zones for elections currently
 };
 
 /**

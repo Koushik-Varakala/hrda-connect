@@ -131,7 +131,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
     const onSubmit = async (data: RegistrationFormValues) => {
         setIsProcessing(true);
         try {
-            const amount = 1015;
+            const amount = appConfig.registrationFee;
 
             // 1. Create Order + pre-save pending registration
             const orderRes = await apiRequest("POST", "/api/registrations/order", {
@@ -148,7 +148,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 key: order.key_id,
                 amount: order.amount,
                 currency: order.currency,
-                name: "HRDA Telangana",
+                name: appConfig.organizationName,
                 description: "Lifetime Membership",
                 order_id: order.id,
                 handler: async function (response: any) {
@@ -258,7 +258,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                     <div className="w-full">
 
                         <div className="bg-primary/5 p-4 rounded-lg mb-8 text-center border border-primary/20">
-                            <p className="font-semibold text-primary">Lifetime Membership: ₹1015</p>
+                            <p className="font-semibold text-primary">Lifetime Membership: ₹{appConfig.registrationFee}</p>
                         </div>
 
                         <Form {...form}>
@@ -429,7 +429,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                                         </>
                                     ) : (
                                         <>
-                                            Pay & Register ₹1015
+                                            Pay & Register ₹{appConfig.registrationFee}
                                         </>
                                     )}
                                 </Button>

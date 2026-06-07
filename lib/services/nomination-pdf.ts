@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import { Nomination } from "@shared/schema";
+import { appConfig } from "@/lib/app-config";
 
 export async function generateNominationPDF(nom: Nomination): Promise<Buffer> {
     const doc = new jsPDF({ unit: "mm", format: "a4" });
@@ -34,7 +35,7 @@ export async function generateNominationPDF(nom: Nomination): Promise<Buffer> {
     // ---- Header ----
     centerText("Healthcare Reforms Doctors Association (HRDA)", 14, true);
     y += 2;
-    centerText("Telangana State", 11, false);
+    centerText(appConfig.stateNameFull, 11, false);
     y += 2;
     centerText("DISTRICT ELECTIONS 2026 - NOMINATION APPLICATION", 12, true);
     y += 3;
@@ -61,7 +62,7 @@ export async function generateNominationPDF(nom: Nomination): Promise<Buffer> {
 
     addField("Full Name", nom.fullName);
     addField("HRDA Membership ID", nom.hrdaMembershipId);
-    addField("TGMC/TSMC Number", nom.tgmcNumber);
+    addField(`${appConfig.medicalCouncilShort} Number`, nom.tgmcNumber);
     addField("Mobile", nom.mobile);
     addField("Email", nom.email);
     y += 3;
@@ -100,10 +101,11 @@ export async function generateNominationPDF(nom: Nomination): Promise<Buffer> {
 
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
+    const branchText = appConfig.capitalZones.length > 0 ? "District Panel / Hyderabad City Zonal Branch Committee" : "District Panel";
     const declarationText = 
         "I, the undersigned candidate, hereby submit my nomination for election to the post applied for " +
-        "in the Healthcare Reforms Doctors Association (HRDA) District Panel / Hyderabad City Zonal Branch " +
-        "Committee for the term 2026-2028. I solemnly declare that all information furnished by me is true " +
+        `in the Healthcare Reforms Doctors Association (HRDA) ${branchText} ` +
+        "for the term 2026-2028. I solemnly declare that all information furnished by me is true " +
         "and correct. I agree to abide by the HRDA Constitution, Election Rules, By-laws, and Code of Conduct. " +
         "I understand that any false statement may result in rejection of my nomination, cancellation of " +
         "candidature, or disciplinary action under HRDA Rules.";
@@ -151,7 +153,7 @@ export async function generateNominationPDF(nom: Nomination): Promise<Buffer> {
     doc.line(margin, footerY - 3, pageW - margin, footerY - 3);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(120, 120, 120);
-    doc.text("This is a system-generated document from hrda-india.org", pageW / 2, footerY, { align: "center" });
+    doc.text(`This is a system-generated document from ${appConfig.domain}`, pageW / 2, footerY, { align: "center" });
     doc.text(`Generated on: ${new Date().toLocaleString("en-IN")}`, pageW / 2, footerY + 4, { align: "center" });
 
     // Return as Buffer

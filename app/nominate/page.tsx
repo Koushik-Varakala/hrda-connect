@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { appConfig } from "@/lib/app-config";
-import { NOMINATION_FEE_MAP, NOMINATION_POSTS, HYDERABAD_ZONES } from "@shared/schema";
+import { NOMINATION_FEE_MAP, NOMINATION_POSTS } from "@shared/schema";
 import { Layout } from "@/components/Layout";
 
 // Form Schema
@@ -33,7 +33,7 @@ const nominationFormSchema = z.object({
 type NominationFormValues = z.infer<typeof nominationFormSchema>;
 
 // Combine districts and zones, sort them alphabetically
-const allDistrictsAndZones = [...appConfig.districts, ...HYDERABAD_ZONES].sort();
+const allDistrictsAndZones = [...appConfig.districts, ...appConfig.capitalZones].sort();
 
 // Compress and resize photo client-side before upload (saves ~98% storage)
 const compressImage = (file: File, maxW = 400, maxH = 500, quality = 0.8): Promise<File> => {
@@ -133,7 +133,7 @@ export default function NominatePage() {
                 key: order.key_id,
                 amount: order.amount,
                 currency: order.currency,
-                name: "HRDA Telangana",
+                name: appConfig.organizationName,
                 description: `Nomination Fee for ${data.postApplied}`,
                 order_id: order.id,
                 handler: async function (response: any) {
@@ -255,7 +255,7 @@ export default function NominatePage() {
 
                 <div className="max-w-3xl mx-auto space-y-6">
                     <div className="text-center space-y-2">
-                        <h1 className="text-3xl font-bold text-slate-900 font-serif">HRDA Telangana District Elections</h1>
+                        <h1 className="text-3xl font-bold text-slate-900 font-serif">HRDA {appConfig.stateName} District Elections</h1>
                         <p className="text-slate-600">Nomination Application Form</p>
                     </div>
 

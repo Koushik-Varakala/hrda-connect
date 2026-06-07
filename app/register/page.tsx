@@ -70,59 +70,36 @@ export default function Membership() {
                         </div>
                     </div>
 
-                    {/* Right column: Form or Coming Soon */}
+                    {/* Right column: Form */}
                     <div>
-                        {appConfig.region === 'AP' ? (
-                            // AP Site - Coming Soon Message
-                            <Card className="border-2 border-amber-200 bg-amber-50">
+                        {isSuccess ? (
+                            <Card className="border-2 border-green-200 bg-green-50">
                                 <CardContent className="pt-6">
                                     <div className="text-center py-8">
-                                        <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <CheckCircle className="w-8 h-8 text-amber-600" />
-                                        </div>
-                                        <h3 className="text-2xl font-bold text-amber-900 mb-3">Coming Soon!</h3>
-                                        <p className="text-amber-800 mb-4">
-                                            HRDA Andhra Pradesh registration is currently being set up. Please check back soon or contact us for more information.
+                                        <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+                                        <h3 className="text-2xl font-bold text-green-900 mb-3">Registration Successful!</h3>
+                                        <p className="text-green-800 mb-4">
+                                            Your membership application has been received. You will receive a confirmation email shortly.
                                         </p>
-                                        <p className="text-sm text-amber-700">
-                                            For urgent membership inquiries, please reach out via our <a href="/contact" className="underline font-medium">contact page</a>.
-                                        </p>
+                                        <Button
+                                            onClick={() => setIsSuccess(false)}
+                                            variant="outline"
+                                            className="border-green-600 text-green-700 hover:bg-green-100"
+                                        >
+                                            Register Another Member
+                                        </Button>
                                     </div>
                                 </CardContent>
                             </Card>
                         ) : (
-                            // TG Site - Normal Registration Form
-                            <>
-                                {isSuccess ? (
-                                    <Card className="border-2 border-green-200 bg-green-50">
-                                        <CardContent className="pt-6">
-                                            <div className="text-center py-8">
-                                                <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                                                <h3 className="text-2xl font-bold text-green-900 mb-3">Registration Successful!</h3>
-                                                <p className="text-green-800 mb-4">
-                                                    Your membership application has been received. You will receive a confirmation email shortly.
-                                                </p>
-                                                <Button
-                                                    onClick={() => setIsSuccess(false)}
-                                                    variant="outline"
-                                                    className="border-green-600 text-green-700 hover:bg-green-100"
-                                                >
-                                                    Register Another Member
-                                                </Button>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ) : (
-                                    <RegistrationForm onSuccess={() => {
-                                        setIsSuccess(true);
-                                        toast({
-                                            title: "Registration Successful",
-                                            description: "Welcome to HRDA! Please check your email for confirmation.",
-                                            duration: 5000,
-                                        });
-                                    }} />
-                                )}
-                            </>
+                            <RegistrationForm onSuccess={() => {
+                                setIsSuccess(true);
+                                toast({
+                                    title: "Registration Successful",
+                                    description: "Welcome to HRDA! Please check your email for confirmation.",
+                                    duration: 5000,
+                                });
+                            }} />
                         )}
                     </div>
                 </div>

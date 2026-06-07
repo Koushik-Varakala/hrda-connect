@@ -196,14 +196,7 @@ export const NOMINATION_FEE_MAP: Record<string, number> = {
 
 export const NOMINATION_POSTS = Object.keys(NOMINATION_FEE_MAP);
 
-export const HYDERABAD_ZONES = [
-    "Hyderabad – LB Nagar & Uppal Zone",
-    "Hyderabad – Old City & Rajendranagar Zone",
-    "Hyderabad – Secunderabad & Malkajgiri Zone",
-    "Hyderabad – Khairatabad Zone",
-    "Hyderabad – Kompally Zone",
-    "Hyderabad – Kukatpally & Serilingampally Zone",
-];
+// Zones are now managed in appConfig.capitalZones
 
 /**
  * Status state machine:

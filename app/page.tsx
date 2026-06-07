@@ -339,7 +339,7 @@ export default function Home() {
                 </div>
             </section>
             
-            <FloatingNominationAlert />
+            {appConfig.region === 'TG' && <FloatingNominationAlert />}
         </Layout >
     );
 }

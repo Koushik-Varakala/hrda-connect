@@ -1,4 +1,5 @@
 import { Layout } from "@/components/Layout";
+import { appConfig } from "@/lib/app-config";
 
 export default function TermsOfService() {
     return (
@@ -27,7 +28,7 @@ export default function TermsOfService() {
                             </p>
                             <ul className="list-disc pl-5 space-y-2 mt-2">
                                 <li>All registration information you submit will be true, accurate, current, and complete.</li>
-                                <li>You maintain a valid registration with the Telangana Medical Council (or appropriate medical council as required).</li>
+                                <li>You maintain a valid registration with the {appConfig.medicalCouncil} (or appropriate medical council as required).</li>
                                 <li>You will maintain the accuracy of such information and promptly update such registration information as necessary.</li>
                                 <li>You have the legal capacity and you agree to comply with these Terms of Service.</li>
                             </ul>
@@ -57,7 +58,7 @@ export default function TermsOfService() {
                         <section>
                             <h2 className="text-xl font-bold text-slate-900 mb-3">6. Governing Law</h2>
                             <p>
-                                These Terms shall be governed by and defined following the laws of India and the state of Telangana. Healthcare Reforms Doctors Association and yourself irrevocably consent that the courts of Telangana shall have exclusive jurisdiction to resolve any dispute which may arise in connection with these terms.
+                                These Terms shall be governed by and defined following the laws of India and the state of {appConfig.stateNameFull}. Healthcare Reforms Doctors Association and yourself irrevocably consent that the courts of {appConfig.stateNameFull} shall have exclusive jurisdiction to resolve any dispute which may arise in connection with these terms.
                             </p>
                         </section>
 
@@ -67,9 +68,9 @@ export default function TermsOfService() {
                                 In order to resolve a complaint regarding the Site or to receive further information regarding use of the Site, please contact us at:
                             </p>
                             <div className="mt-4 p-4 bg-slate-50 rounded-lg">
-                                <p className="font-bold">Healthcare Reforms Doctors Association</p>
-                                <p>Hyderabad, Telangana</p>
-                                <p>Email: hrda4people@gmail.com</p>
+                                <p className="font-bold">{appConfig.organizationName}</p>
+                                <p>{appConfig.capital}, {appConfig.stateNameFull}</p>
+                                <p>Email: {appConfig.email}</p>
                             </div>
                         </section>
                     </div>

@@ -1,4 +1,5 @@
 import { Layout } from "@/components/Layout";
+import { appConfig } from "@/lib/app-config";
 
 export default function PrivacyPolicy() {
     return (
@@ -21,7 +22,7 @@ export default function PrivacyPolicy() {
                             <h2 className="text-xl font-bold text-slate-900 mb-3">2. Information We Collect</h2>
                             <p className="mb-2">We may collect information about you in a variety of ways. The information we may collect includes:</p>
                             <ul className="list-disc pl-5 space-y-2">
-                                <li><strong>Personal Data:</strong> Personally identifiable information, such as your name, email address, telephone number, medical registration number (TGMC ID), and professional details that you voluntarily give to us when you register for membership.</li>
+                                <li><strong>Personal Data:</strong> Personally identifiable information, such as your name, email address, telephone number, medical registration number ({appConfig.medicalCouncilShort} ID), and professional details that you voluntarily give to us when you register for membership.</li>
                                 <li><strong>Payment Data:</strong> Financial information, such as data related to your payment method (e.g., valid credit card number, card brand, expiration date) that we may collect when you pay for membership. Note that we store only very limited, if any, financial information that we collect. Otherwise, all financial information is stored by our payment processor (Razorpay).</li>
                             </ul>
                         </section>
@@ -62,9 +63,9 @@ export default function PrivacyPolicy() {
                                 If you have questions or comments about this Privacy Policy, please contact us at:
                             </p>
                             <div className="mt-4 p-4 bg-slate-50 rounded-lg">
-                                <p className="font-bold">Healthcare Reforms Doctors Association</p>
-                                <p>Hyderabad, Telangana</p>
-                                <p>Email: hrda4people@gmail.com</p>
+                                <p className="font-bold">{appConfig.organizationName}</p>
+                                <p>{appConfig.capital}, {appConfig.stateNameFull}</p>
+                                <p>Email: {appConfig.email}</p>
                             </div>
                         </section>
                     </div>
