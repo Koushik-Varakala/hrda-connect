@@ -325,7 +325,7 @@ export default function ManageNominations() {
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-sm text-slate-500">
-                                            {new Date(nom.createdAt!).toLocaleDateString()}
+                                            {new Date(nom.createdAt!).toLocaleDateString('en-GB')}
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
