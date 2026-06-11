@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, BrainCircuit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -36,8 +36,20 @@ type RegistrationFormValues = z.infer<typeof registrationSchema>;
 
 interface RegistrationFormProps {
     onSuccess: () => void;
-    assessmentProfile?: string;
 }
+
+const QUESTIONS = [
+    { id: 1, section: "Justice", text: "When faced with a difficult decision, I prioritize fairness and ethical conduct even if it makes the situation more complicated." },
+    { id: 2, section: "Justice", text: "I am comfortable raising concerns about policies or rules when they seem to be applied inconsistently." },
+    { id: 3, section: "Leadership", text: "I naturally take charge and begin organizing tasks when a team or committee lacks clear direction." },
+    { id: 4, section: "Leadership", text: "I find it rewarding to take responsibility for important decisions that affect my colleagues or practice." },
+    { id: 5, section: "Leadership", text: "I frequently notice opportunities to improve administrative or organizational workflows that others overlook." },
+    { id: 6, section: "Independence", text: "I am willing to continue advocating for a necessary change or goal, even if my peers are initially skeptical." },
+    { id: 7, section: "Independence", text: "I am comfortable making critical decisions based on my own judgment without always waiting for full consensus." },
+    { id: 8, section: "Guidance", text: "I actively seek out feedback and advice from more experienced professionals before making major decisions." },
+    { id: 9, section: "Guidance", text: "I believe that having strong mentors and structured guidance is crucial to reaching one's full potential quickly." },
+    { id: 10, section: "Guidance", text: "I value studying how successful leaders approach systemic challenges." }
+];
 
 declare global {
     interface Window {
@@ -45,9 +57,10 @@ declare global {
     }
 }
 
-export function RegistrationForm({ onSuccess, assessmentProfile }: RegistrationFormProps) {
+export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
     const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [assessmentAnswers, setAssessmentAnswers] = useState<Record<number, number>>({});
     const { toast } = useToast();
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -132,6 +145,47 @@ export function RegistrationForm({ onSuccess, assessmentProfile }: RegistrationF
     const onSubmit = async (data: RegistrationFormValues) => {
         setIsProcessing(true);
         try {
+            let finalAssessmentProfile: string | undefined = undefined;
+
+            if (appConfig.region === 'AP') {
+                const answeredCount = Object.keys(assessmentAnswers).length;
+                if (answeredCount < QUESTIONS.length) {
+                    toast({
+                        title: "Incomplete Assessment",
+                        description: "Please answer all 10 assessment questions at the bottom of the form before submitting.",
+                        variant: "destructive"
+                    });
+                    setIsProcessing(false);
+                    return;
+                }
+
+                // Calculate archetype
+                let justice = 0;
+                let leadership = 0;
+                let independence = 0;
+                let guidance = 0;
+
+                QUESTIONS.forEach(q => {
+                    const val = assessmentAnswers[q.id] || 3;
+                    if (q.section === "Justice") justice += val;
+                    if (q.section === "Leadership") leadership += val;
+                    if (q.section === "Independence") independence += val;
+                    if (q.section === "Guidance") guidance += val;
+                });
+
+                let archetype = "Collaborator";
+                const maxScore = Math.max(justice, leadership, independence, guidance);
+                
+                if (justice === maxScore && independence >= 8) archetype = "Rebel";
+                else if (justice === maxScore && leadership >= 10) archetype = "Guardian";
+                else if (leadership === maxScore) archetype = "Leader";
+                else if (guidance === maxScore && justice >= 8) archetype = "Disciple";
+                else if (independence === maxScore) archetype = "Lone Wolf";
+                else if (leadership >= 12 && independence >= 8) archetype = "Strategist";
+
+                finalAssessmentProfile = archetype;
+            }
+
             const amount = appConfig.registrationFee;
 
             // 1. Create Order + pre-save pending registration
@@ -139,7 +193,7 @@ export function RegistrationForm({ onSuccess, assessmentProfile }: RegistrationF
                 amount,
                 currency: "INR",
                 receipt: `rcpt_${Date.now()}`,
-                userData: { ...data, membershipType: 'single', assessmentProfile }
+                userData: { ...data, membershipType: 'single', assessmentProfile: finalAssessmentProfile }
             });
             const order = await orderRes.json();
             const pendingRegId = order.pendingRegId ?? null;
@@ -421,6 +475,61 @@ export function RegistrationForm({ onSuccess, assessmentProfile }: RegistrationF
 
 
                                 </div>
+
+                                {appConfig.region === 'AP' && (
+                                    <div className="space-y-6 pt-6 border-t border-slate-200 mt-6 bg-slate-50 p-6 rounded-xl">
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mt-0.5 flex-shrink-0">
+                                                <BrainCircuit className="w-5 h-5 animate-pulse" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-base font-bold text-slate-900">Membership Profile Assessment</h3>
+                                                <p className="text-xs text-slate-500">
+                                                    For each statement, please select a rating from 1 to 5. <br />
+                                                    <strong>1 = Strongly Disagree, 5 = Strongly Agree</strong>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-6 pt-2">
+                                            {QUESTIONS.map((q) => (
+                                                <div key={q.id} className="space-y-3">
+                                                    <label className="text-sm font-medium text-slate-700 block leading-relaxed">
+                                                        <span className="text-primary font-bold mr-1">{q.id}.</span> {q.text}
+                                                    </label>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex gap-2">
+                                                            {[1, 2, 3, 4, 5].map((score) => {
+                                                                const isSelected = assessmentAnswers[q.id] === score;
+                                                                return (
+                                                                    <button
+                                                                        key={score}
+                                                                        type="button"
+                                                                        onClick={() => setAssessmentAnswers(prev => ({ ...prev, [q.id]: score }))}
+                                                                        className={`w-9 h-9 rounded-full text-xs font-semibold flex items-center justify-center transition-all ${
+                                                                            isSelected
+                                                                                ? "bg-primary text-white scale-110 shadow-md ring-2 ring-primary/20"
+                                                                                : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-100"
+                                                                        }`}
+                                                                    >
+                                                                        {score}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                        <span className="text-xs text-slate-400 font-medium">
+                                                            {assessmentAnswers[q.id] === 1 && "Strongly Disagree"}
+                                                            {assessmentAnswers[q.id] === 2 && "Disagree"}
+                                                            {assessmentAnswers[q.id] === 3 && "Neutral"}
+                                                            {assessmentAnswers[q.id] === 4 && "Agree"}
+                                                            {assessmentAnswers[q.id] === 5 && "Strongly Agree"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
                                 <Button type="submit" className="w-full mt-6" size="lg" disabled={isProcessing}>
                                     {isProcessing ? (
