@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
 import { RegistrationForm } from "@/components/RegistrationForm";
+import { PreRegistrationQuestionnaire } from "@/components/PreRegistrationQuestionnaire";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { appConfig } from "@/lib/app-config";
@@ -12,6 +13,7 @@ import { appConfig } from "@/lib/app-config";
 export default function Membership() {
     const { toast } = useToast();
     const [isSuccess, setIsSuccess] = useState(false);
+    const [assessmentProfile, setAssessmentProfile] = useState<string | null>(null);
     return (
         <Layout>
             <div className="bg-primary py-20 text-white text-center">
@@ -82,7 +84,10 @@ export default function Membership() {
                                             Your membership application has been received. You will receive a confirmation email shortly.
                                         </p>
                                         <Button
-                                            onClick={() => setIsSuccess(false)}
+                                            onClick={() => {
+                                                setIsSuccess(false);
+                                                setAssessmentProfile(null);
+                                            }}
                                             variant="outline"
                                             className="border-green-600 text-green-700 hover:bg-green-100"
                                         >
@@ -91,15 +96,20 @@ export default function Membership() {
                                     </div>
                                 </CardContent>
                             </Card>
+                        ) : (appConfig.region === 'AP' && !assessmentProfile) ? (
+                            <PreRegistrationQuestionnaire onComplete={setAssessmentProfile} />
                         ) : (
-                            <RegistrationForm onSuccess={() => {
-                                setIsSuccess(true);
-                                toast({
-                                    title: "Registration Successful",
-                                    description: "Welcome to HRDA! Please check your email for confirmation.",
-                                    duration: 5000,
-                                });
-                            }} />
+                            <RegistrationForm 
+                                assessmentProfile={assessmentProfile || undefined}
+                                onSuccess={() => {
+                                    setIsSuccess(true);
+                                    toast({
+                                        title: "Registration Successful",
+                                        description: "Welcome to HRDA! Please check your email for confirmation.",
+                                        duration: 5000,
+                                    });
+                                }} 
+                            />
                         )}
                     </div>
                 </div>

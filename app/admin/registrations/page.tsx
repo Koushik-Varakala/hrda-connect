@@ -67,7 +67,7 @@ export default function ManageRegistrations() {
     const downloadCSV = () => {
         if (!filteredRegistrations || filteredRegistrations.length === 0) return;
 
-        const headers = ["First Name", "Last Name", "Email", "Phone", "TGMC ID", "HRDA ID", "District", "Status", "Address"];
+        const headers = ["First Name", "Last Name", "Email", "Phone", "TGMC ID", "HRDA ID", "District", "Status", "Assessment Profile", "Address"];
         const csvRows = filteredRegistrations.map(reg => {
             return [
                 `"${(reg.firstName || '').replace(/"/g, '""')}"`,
@@ -78,6 +78,7 @@ export default function ManageRegistrations() {
                 `"${(reg.hrdaId || '').replace(/"/g, '""')}"`,
                 `"${(reg.district || '').replace(/"/g, '""')}"`,
                 `"${(reg.status || '').replace(/"/g, '""')}"`,
+                `"${(reg.assessmentProfile || '').replace(/"/g, '""')}"`,
                 `"${(reg.address || '').replace(/"/g, '""')}"`
             ].join(',');
         });
@@ -247,6 +248,11 @@ export default function ManageRegistrations() {
                                         }`}>
                                         {item.status?.replace('_', ' ')}
                                     </span>
+                                    {item.assessmentProfile && (
+                                        <div className="mt-1 text-[10px] bg-slate-100 text-slate-600 px-1 py-0.5 rounded inline-block">
+                                            {item.assessmentProfile}
+                                        </div>
+                                    )}
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2">

@@ -117,7 +117,10 @@ export class GoogleSheetsService {
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
             const sequenceStr = String(newSNo).padStart(4, '0');
-            const hrdaId = `HRDA${month}${year}-${sequenceStr}`;
+            
+            const isAP = process.env.NEXT_PUBLIC_REGION === 'AP';
+            const prefix = isAP ? 'APHRDA' : 'HRDA';
+            const hrdaId = `${prefix}${month}${year}-${sequenceStr}`;
 
             await sheet.addRow({
                 "S.No": newSNo,

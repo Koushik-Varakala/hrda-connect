@@ -106,6 +106,7 @@ export async function POST(request: Request) {
             address: (userData.address || "").slice(0, 254),
             membershipType: userData.membershipType || "single",
             pendingRegId: pendingRegId ? String(pendingRegId) : "",
+            assessmentProfile: userData.assessmentProfile || "",
         } : {};
 
         const orderOptions: Parameters<typeof razorpay.orders.create>[0] = {

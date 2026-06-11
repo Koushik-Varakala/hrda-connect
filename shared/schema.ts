@@ -86,6 +86,8 @@ export const registrations = pgTable("registrations", {
   otpAttempts: integer("otp_attempts").default(0),
   // Security Hardening
   verificationToken: text("verification_token"), // UUID for secure QR codes
+  // Pre-registration assessment profile
+  assessmentProfile: text("assessment_profile"),
 });
 
 // === SCHEMAS ===

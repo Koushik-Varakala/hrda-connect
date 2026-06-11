@@ -36,6 +36,7 @@ type RegistrationFormValues = z.infer<typeof registrationSchema>;
 
 interface RegistrationFormProps {
     onSuccess: () => void;
+    assessmentProfile?: string;
 }
 
 declare global {
@@ -44,7 +45,7 @@ declare global {
     }
 }
 
-export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
+export function RegistrationForm({ onSuccess, assessmentProfile }: RegistrationFormProps) {
     const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const { toast } = useToast();
@@ -138,7 +139,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 amount,
                 currency: "INR",
                 receipt: `rcpt_${Date.now()}`,
-                userData: { ...data, membershipType: 'single' }
+                userData: { ...data, membershipType: 'single', assessmentProfile }
             });
             const order = await orderRes.json();
             const pendingRegId = order.pendingRegId ?? null;
