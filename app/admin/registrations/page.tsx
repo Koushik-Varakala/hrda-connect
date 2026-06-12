@@ -67,7 +67,7 @@ export default function ManageRegistrations() {
     const downloadCSV = () => {
         if (!filteredRegistrations || filteredRegistrations.length === 0) return;
 
-        const headers = ["First Name", "Last Name", "Email", "Phone", "TGMC ID", "HRDA ID", "District", "Status", "Assessment Profile", "Address"];
+        const headers = ["First Name", "Last Name", "Email", "Phone", "TGMC ID", "HRDA ID", "District", "Status", "Membership Category", "Assessment Profile", "Address"];
         const csvRows = filteredRegistrations.map(reg => {
             return [
                 `"${(reg.firstName || '').replace(/"/g, '""')}"`,
@@ -78,6 +78,7 @@ export default function ManageRegistrations() {
                 `"${(reg.hrdaId || '').replace(/"/g, '""')}"`,
                 `"${(reg.district || '').replace(/"/g, '""')}"`,
                 `"${(reg.status || '').replace(/"/g, '""')}"`,
+                `"${(reg.membershipType || '').replace(/"/g, '""')}"`,
                 `"${(reg.assessmentProfile || '').replace(/"/g, '""')}"`,
                 `"${(reg.address || '').replace(/"/g, '""')}"`
             ].join(',');
@@ -248,8 +249,13 @@ export default function ManageRegistrations() {
                                         }`}>
                                         {item.status?.replace('_', ' ')}
                                     </span>
+                                    {item.membershipType && (
+                                        <div className="mt-1 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-semibold capitalize block w-fit">
+                                            {item.membershipType} Membership
+                                        </div>
+                                    )}
                                     {item.assessmentProfile && (
-                                        <div className="mt-1 text-[10px] bg-slate-100 text-slate-600 px-1 py-0.5 rounded inline-block">
+                                        <div className="mt-1 text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded block w-fit">
                                             {item.assessmentProfile}
                                         </div>
                                     )}

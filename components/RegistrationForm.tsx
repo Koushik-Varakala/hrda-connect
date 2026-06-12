@@ -51,6 +51,63 @@ const QUESTIONS = [
     { id: 10, section: "Guidance", text: "I value studying how successful leaders approach systemic challenges." }
 ];
 
+const MEMBERSHIP_CATEGORIES = [
+    {
+        id: "Student",
+        name: "Student Membership",
+        price: 0,
+        badge: "Free",
+        description: "Valid until completion of the course.",
+        bullets: [
+            "Eligible to participate in all organizational activities.",
+            "Not eligible to vote or contest elections."
+        ]
+    },
+    {
+        id: "General",
+        name: "General Membership",
+        price: 500,
+        badge: "₹500 / year",
+        description: "Valid for one year (annual renewal is mandatory).",
+        bullets: [
+            "Eligible to participate in all organizational activities, including voting.",
+            "Continuous membership for 3 consecutive years automatically qualifies for Lifetime Membership."
+        ]
+    },
+    {
+        id: "Lifetime",
+        name: "Lifetime Membership",
+        price: 1500,
+        badge: "₹1,500",
+        description: "Valid for life.",
+        bullets: [
+            "Eligible to participate in all organizational activities, including voting and contesting elections."
+        ]
+    },
+    {
+        id: "Contributory",
+        name: "Contributory Membership",
+        price: 0,
+        badge: "Free",
+        description: "Reserved exclusively for past contributors to the organization.",
+        bullets: [
+            "Membership subject to approval by the Founders.",
+            "Eligible to participate in all organizational activities, including voting and contesting elections."
+        ]
+    },
+    {
+        id: "Founders",
+        name: "Founders Membership",
+        price: 0,
+        badge: "Free",
+        description: "Reserved exclusively for the Founders of the organization.",
+        bullets: [
+            "Eligible to participate in all organizational activities, including voting and contesting elections.",
+            "Special privileges and key decision-making powers regarding strategic organizational matters."
+        ]
+    }
+];
+
 declare global {
     interface Window {
         Razorpay: any;
@@ -61,6 +118,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
     const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [assessmentAnswers, setAssessmentAnswers] = useState<Record<number, number>>({});
+    const [membershipType, setMembershipType] = useState<string>("General");
     const { toast } = useToast();
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -184,18 +242,45 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 else if (leadership >= 12 && independence >= 8) archetype = "Strategist";
 
                 finalAssessmentProfile = archetype;
+
+                // Handle direct free registration
+                const isFree = ["Student", "Contributory", "Founders"].includes(membershipType);
+                if (isFree) {
+                    const res = await apiRequest("POST", "/api/registrations/free", {
+                        ...data,
+                        membershipType,
+                        assessmentProfile: finalAssessmentProfile
+                    });
+                    
+                    if (!res.ok) {
+                        const err = await res.json();
+                        throw new Error(err.message || "Failed to complete free registration");
+                    }
+                    
+                    onSuccess();
+                    return;
+                }
             }
 
-            const amount = appConfig.registrationFee;
+            const amount = appConfig.region === 'AP' 
+                ? (membershipType === 'General' ? 500 : 1500) 
+                : appConfig.registrationFee;
 
             // 1. Create Order + pre-save pending registration
             const orderRes = await apiRequest("POST", "/api/registrations/order", {
                 amount,
                 currency: "INR",
                 receipt: `rcpt_${Date.now()}`,
-                userData: { ...data, membershipType: 'single', assessmentProfile: finalAssessmentProfile }
+                userData: { 
+                    ...data, 
+                    membershipType: appConfig.region === 'AP' ? membershipType : 'single', 
+                    assessmentProfile: finalAssessmentProfile 
+                }
             });
             const order = await orderRes.json();
+            if (!orderRes.ok) {
+                throw new Error(order.message || "Failed to create order");
+            }
             const pendingRegId = order.pendingRegId ?? null;
 
             // 2. Open Razorpay
@@ -204,7 +289,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 amount: order.amount,
                 currency: order.currency,
                 name: appConfig.organizationName,
-                description: "Lifetime Membership",
+                description: appConfig.region === 'AP' ? `${membershipType} Membership` : "Lifetime Membership",
                 order_id: order.id,
                 handler: async function (response: any) {
                     // 3. Verify & update pending registration to success
@@ -214,7 +299,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_signature: response.razorpay_signature,
-                            userData: { ...data, membershipType: 'single' },
+                            userData: { ...data, membershipType: appConfig.region === 'AP' ? membershipType : 'single' },
                             pendingRegId,
                         });
                         window.location.href = "/thank-you";
@@ -312,8 +397,55 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 <CardContent>
                     <div className="w-full">
 
+                        {appConfig.region === 'AP' && (
+                            <div className="mb-8 space-y-4">
+                                <label className="text-sm font-semibold text-slate-700 block">Select Membership Category</label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {MEMBERSHIP_CATEGORIES.map((cat) => {
+                                        const isSelected = membershipType === cat.id;
+                                        return (
+                                            <div
+                                                key={cat.id}
+                                                onClick={() => setMembershipType(cat.id)}
+                                                className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
+                                                    isSelected
+                                                        ? "border-primary bg-primary/5 shadow-md scale-[1.01]"
+                                                        : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/50"
+                                                }`}
+                                            >
+                                                <div>
+                                                    <div className="flex justify-between items-center mb-1">
+                                                        <span className="font-bold text-sm text-slate-900">{cat.name}</span>
+                                                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${cat.price === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}>
+                                                            {cat.badge}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs text-slate-500 mb-2 leading-relaxed">{cat.description}</p>
+                                                    <ul className="space-y-1">
+                                                        {cat.bullets.map((b, idx) => (
+                                                            <li key={idx} className="flex items-start gap-1 text-[11px] text-slate-600 leading-normal">
+                                                                <span className="text-primary flex-shrink-0 mt-0.5">•</span>
+                                                                <span>{b}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="bg-primary/5 p-4 rounded-lg mb-8 text-center border border-primary/20">
-                            <p className="font-semibold text-primary">Lifetime Membership: ₹{appConfig.registrationFee}</p>
+                            {appConfig.region === 'AP' ? (
+                                <p className="font-semibold text-primary">
+                                    Selected Category: <span className="font-bold">{MEMBERSHIP_CATEGORIES.find(c => c.id === membershipType)?.name}</span> — 
+                                    {membershipType === 'General' ? ' ₹500' : membershipType === 'Lifetime' ? ' ₹1,500' : ' Free'}
+                                </p>
+                            ) : (
+                                <p className="font-semibold text-primary">Lifetime Membership: ₹{appConfig.registrationFee}</p>
+                            )}
                         </div>
 
                         <Form {...form}>
@@ -535,11 +667,22 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                                     {isProcessing ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Processing Payment...
+                                            {appConfig.region === 'AP' && (membershipType === 'Student' || membershipType === 'Contributory' || membershipType === 'Founders') 
+                                                ? "Submitting Registration..." 
+                                                : "Processing Payment..."
+                                            }
                                         </>
                                     ) : (
                                         <>
-                                            Pay & Register ₹{appConfig.registrationFee}
+                                            {appConfig.region === 'AP' ? (
+                                                (membershipType === 'Student' || membershipType === 'Contributory' || membershipType === 'Founders') ? (
+                                                    "Register Membership (Free)"
+                                                ) : (
+                                                    `Pay & Register ₹${membershipType === 'General' ? '500' : '1,500'}`
+                                                )
+                                            ) : (
+                                                `Pay & Register ₹${appConfig.registrationFee}`
+                                            )}
                                         </>
                                     )}
                                 </Button>

@@ -245,3 +245,28 @@ export type Nomination = typeof nominations.$inferSelect;
 export type InsertNomination = z.infer<typeof insertNominationSchema>;
 export type UpdateNominationRequest = Partial<InsertNomination>;
 
+// === DONATIONS ===
+export const donations = pgTable("donations", {
+    id: serial("id").primaryKey(),
+    fullName: text("full_name").notNull(),
+    email: text("email"),
+    phone: text("phone").notNull(),
+    amount: integer("amount").notNull(), // in INR
+    paymentStatus: text("payment_status").default("pending").notNull(), // pending / success / failed
+    razorpayOrderId: text("razorpay_order_id").unique(),
+    razorpayPaymentId: text("razorpay_payment_id").unique(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertDonationSchema = createInsertSchema(donations).omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+});
+
+export type Donation = typeof donations.$inferSelect;
+export type InsertDonation = z.infer<typeof insertDonationSchema>;
+export type UpdateDonationRequest = Partial<InsertDonation>;
+
+

@@ -9,7 +9,8 @@ import {
     type Registration, type InsertRegistration, type UpdateRegistrationRequest, type SearchRegistrationParams,
     electionDocuments, type ElectionDocument, type InsertElectionDocument,
     galleryPhotos, type GalleryPhoto, type InsertGalleryPhoto,
-    nominations, type Nomination, type InsertNomination, type UpdateNominationRequest as UpdateNomination
+    nominations, type Nomination, type InsertNomination, type UpdateNominationRequest as UpdateNomination,
+    donations, type Donation, type InsertDonation, type UpdateDonationRequest
 } from "@shared/schema";
 import { eq, desc, and, ilike } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
@@ -78,6 +79,11 @@ export interface IStorage {
     updateNomination(id: number, updates: UpdateNomination): Promise<Nomination | undefined>;
     deleteNomination(id: number): Promise<void>;
     checkDuplicateNomination(tgmcNumber: string, district: string, post: string): Promise<boolean>;
+
+    // Donations
+    createDonation(data: InsertDonation): Promise<Donation>;
+    getDonationByOrderId(orderId: string): Promise<Donation | undefined>;
+    updateDonation(id: number, updates: UpdateDonationRequest): Promise<Donation | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -346,6 +352,25 @@ export class DatabaseStorage implements IStorage {
             )
         );
         return existing.length > 0;
+    }
+
+    // Donations
+    async createDonation(data: InsertDonation): Promise<Donation> {
+        const [result] = await db.insert(donations).values(data).returning();
+        return result;
+    }
+
+    async getDonationByOrderId(orderId: string): Promise<Donation | undefined> {
+        const [result] = await db.select().from(donations).where(eq(donations.razorpayOrderId, orderId));
+        return result;
+    }
+
+    async updateDonation(id: number, updates: UpdateDonationRequest): Promise<Donation | undefined> {
+        const [result] = await db.update(donations)
+            .set({ ...updates, updatedAt: new Date() })
+            .where(eq(donations.id, id))
+            .returning();
+        return result;
     }
 }
 

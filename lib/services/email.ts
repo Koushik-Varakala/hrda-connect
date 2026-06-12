@@ -133,6 +133,55 @@ ${appConfig.organizationName}`
         });
     }
 
+    async sendDonationConfirmation(to: string, name: string, amount: number) {
+        const siteUrl = "https://" + appConfig.domain;
+        return this.sendEmail({
+            to,
+            subject: "Thank You for Your Donation - Healthcare Reforms Doctors Association",
+            text: `Dear ${name},
+
+Thank you very much for your donation of ₹${amount} to the Healthcare Reforms Doctors Association (HRDA).
+
+Your contribution directly supports our advocacy for doctor welfare, healthcare reforms, and medical student rights.
+
+Regards,
+${appConfig.organizationName}
+${appConfig.domain}`,
+            html: `<!DOCTYPE html><html><body style="font-family:sans-serif;line-height:1.6;color:#333;margin:0;padding:0;background-color:#f8fafc;">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;background-color:#f8fafc;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.05);border:1px solid #e2e8f0;">
+<tr><td style="background-color:#059669;padding:32px;text-align:center;color:#ffffff;">
+  <h1 style="margin:0;font-size:24px;font-weight:700;">Thank You for Your Support!</h1>
+</td></tr>
+<tr><td style="padding:32px;">
+  <p style="font-size:16px;margin:0 0 16px 0;">Dear <strong>${name}</strong>,</p>
+  <p style="font-size:14px;color:#475569;margin:0 0 24px 0;line-height:1.7;">On behalf of the Healthcare Reforms Doctors Association (HRDA), we express our deepest gratitude for your contribution of <strong>₹${amount}</strong>.</p>
+  
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;overflow:hidden;margin-bottom:24px;">
+    <tr><td style="padding:16px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:#065f46;">
+        <tr><td style="padding:4px 0;font-weight:700;color:#047857;font-size:14px;" colspan="2">Contribution Summary</td></tr>
+        <tr><td style="padding:6px 0;width:120px;color:#047857;">Contributor</td><td style="padding:6px 0;font-weight:700;">${name}</td></tr>
+        <tr><td style="padding:6px 0;color:#047857;">Amount</td><td style="padding:6px 0;font-weight:700;font-size:15px;">₹${amount}</td></tr>
+        <tr><td style="padding:6px 0;color:#047857;">Date</td><td style="padding:6px 0;">${new Date().toLocaleDateString("en-IN", { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
+      </table>
+    </td></tr>
+  </table>
+
+  <p style="font-size:14px;color:#475569;line-height:1.7;margin:0 0 24px 0;">Your donation directly powers our movements, legal advocacy, and healthcare reform efforts to protect the interests of doctors and improve medical education.</p>
+  <p style="font-size:14px;color:#475569;margin:0;">If you have any questions or require additional details, feel free to contact us at <a href="mailto:${appConfig.email}" style="color:#059669;text-decoration:none;font-weight:600;">${appConfig.email}</a>.</p>
+</td></tr>
+<tr><td style="background-color:#f8fafc;padding:24px 32px;border-top:1px solid #e2e8f0;text-align:center;">
+  <p style="margin:0;font-size:12px;color:#94a3b8;">Healthcare Reforms Doctors Association (HRDA)<br/><a href="${siteUrl}" style="color:#059669;text-decoration:none;">${appConfig.domain}</a></p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`
+        });
+    }
+
     async sendOtp(to: string, otp: string) {
         return this.sendEmail({
             to,

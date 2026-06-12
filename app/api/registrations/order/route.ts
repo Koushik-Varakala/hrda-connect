@@ -7,6 +7,35 @@ export async function POST(request: Request) {
     try {
         const { amount, currency, userData } = await request.json();
 
+        // 0. Validate amount to prevent client-side tampering
+        let verifiedAmount = amount;
+        const isAP = process.env.NEXT_PUBLIC_REGION === 'AP';
+        if (isAP) {
+            const expectedAmount = 
+                userData?.membershipType === 'General' ? 500 :
+                userData?.membershipType === 'Lifetime' ? 1500 :
+                null;
+            
+            if (expectedAmount === null || amount !== expectedAmount) {
+                console.error(`[Order API] Invalid amount for AP membership ${userData?.membershipType}: requested ${amount}, expected ${expectedAmount}`);
+                return NextResponse.json(
+                    { message: "Invalid payment amount for requested membership type." },
+                    { status: 400 }
+                );
+            }
+            verifiedAmount = expectedAmount;
+        } else {
+            // For TG
+            if (amount !== 1015) {
+                console.error(`[Order API] Invalid amount for TG: requested ${amount}, expected 1015`);
+                return NextResponse.json(
+                    { message: "Invalid payment amount." },
+                    { status: 400 }
+                );
+            }
+            verifiedAmount = 1015;
+        }
+
         // 0. Pre-check: Ensure phone number doesn't already have a SUCCESSFUL registration
         if (userData && userData.phone) {
             // Strip any spaces, dashes, or +91 from the input phone for a safer match
@@ -82,7 +111,7 @@ export async function POST(request: Request) {
             console.warn("Razorpay keys missing. Using mock order.");
             return NextResponse.json({
                 id: `order_mock_${Date.now()}`,
-                amount: amount * 100,
+                amount: verifiedAmount * 100,
                 currency: currency,
                 key_id: "rzp_test_mock_key",
                 pendingRegId,
@@ -110,7 +139,7 @@ export async function POST(request: Request) {
         } : {};
 
         const orderOptions: Parameters<typeof razorpay.orders.create>[0] = {
-            amount: amount * 100,
+            amount: verifiedAmount * 100,
             currency: currency,
             receipt: `receipt_${Date.now()}`,
             payment_capture: true,

@@ -35,8 +35,8 @@ export default function Panels() {
                 {/* Elected Panel Section */}
                 <div className="mb-16">
                     <div className="text-center mb-10">
-                        <h2 className="text-3xl font-serif font-bold text-slate-900 mb-2">Elected State Panel (2026)</h2>
-                        <p className="text-slate-600">The core leadership team elected to represent the fraternity.</p>
+                        <h2 className="text-3xl font-serif font-bold text-slate-900 mb-2">State Panel</h2>
+                        <p className="text-slate-600">The core leadership team</p>
                     </div>
 
                     {isLoading ? (

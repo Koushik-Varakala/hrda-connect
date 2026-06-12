@@ -19,14 +19,29 @@ import { FloatingInstagram } from "@/components/FloatingInstagram";
 import { appConfig } from "@/lib/app-config";
 import { RegionSelectionModal } from "@/components/RegionSelectionModal";
 import { DevelopmentBanner } from "@/components/DevelopmentBanner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { Loader2 } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isInsightsOpen, setIsInsightsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isDonationOpen, setIsDonationOpen] = useState(false);
   const pathname = usePathname();
   const { user } = useAuth();
+
+  useEffect(() => {
+    (window as any).triggerDonationModal = () => {
+      setIsDonationOpen(true);
+    };
+    return () => {
+      delete (window as any).triggerDonationModal;
+    };
+  }, []);
 
   // Handle scroll effect
   useEffect(() => {
@@ -226,8 +241,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <span className="text-xs font-semibold">{appConfig.region === 'TG' ? 'AP' : 'TG'}</span>
             </Button>
 
+            {appConfig.region === 'AP' && (
+              <Button
+                onClick={() => setIsDonationOpen(true)}
+                variant="outline"
+                className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 rounded-lg px-4 font-semibold shadow-sm"
+              >
+                Donate
+              </Button>
+            )}
+
             <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 shadow-md transition-all hover:shadow-lg font-medium">
-              <Link href="/index.php/new-registration-2/">
+              <Link href="/register">
                 Join HRDA
               </Link>
             </Button>
@@ -352,8 +377,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </Button>
             )}
 
+            {appConfig.region === 'AP' && (
+              <Button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsDonationOpen(true);
+                }}
+                className="w-full justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold mt-1"
+              >
+                Donate to HRDA AP
+              </Button>
+            )}
+
             <Button asChild className="w-full justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm mt-2">
-              <Link href="/index.php/new-registration-2/">
+              <Link href="/register">
                 Join HRDA
               </Link>
             </Button>
@@ -451,6 +488,237 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </footer>
       <FloatingInstagram />
+      
+      {/* Donation Modal */}
+      <DonationModal open={isDonationOpen} onOpenChange={setIsDonationOpen} />
     </div>
+  );
+}
+
+function DonationModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
+  const { toast } = useToast();
+  const [amount, setAmount] = useState<string>("500");
+  const [customAmount, setCustomAmount] = useState<string>("");
+  const [fullName, setFullName] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fullName || !phone) {
+      toast({ title: "Required Fields", description: "Please enter your name and phone number.", variant: "destructive" });
+      return;
+    }
+    const finalAmount = amount === "custom" ? customAmount : amount;
+    if (!finalAmount || isNaN(Number(finalAmount)) || Number(finalAmount) <= 0) {
+      toast({ title: "Invalid Amount", description: "Please enter a valid donation amount.", variant: "destructive" });
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      // 1. Create order
+      const orderRes = await apiRequest("POST", "/api/donations/order", {
+        amount: Number(finalAmount),
+        userData: { fullName, phone, email }
+      });
+      const order = await orderRes.json();
+      if (!orderRes.ok) throw new Error(order.message || "Failed to create order");
+
+      const pendingDonationId = order.pendingDonationId ?? null;
+
+      // 2. Open Razorpay options
+      const options = {
+        key: order.key_id,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Healthcare Reforms Doctors Association",
+        description: "Support HRDA Reforms",
+        order_id: order.id,
+        handler: async function (response: any) {
+          setIsProcessing(true);
+          try {
+            await apiRequest("POST", "/api/donations/verify", {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              pendingDonationId,
+            });
+            setIsSuccess(true);
+            toast({
+              title: "Thank You!",
+              description: "Your donation was received successfully. We appreciate your support!",
+            });
+          } catch (err) {
+            toast({
+              title: "Verification Failed",
+              description: "Donation processed but verification failed. Please contact support.",
+              variant: "destructive"
+            });
+          } finally {
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: fullName,
+          email: email,
+          contact: phone
+        },
+        theme: { color: "#10b981" }
+      };
+
+      if (order.key_id === "rzp_test_mock_key") {
+        options.handler({
+          razorpay_payment_id: `pay_mock_${Date.now()}`,
+          razorpay_order_id: order.id,
+          razorpay_signature: "mock_signature"
+        });
+        return;
+      }
+
+      const rzp1 = new (window as any).Razorpay(options);
+      rzp1.open();
+    } catch (error: any) {
+      toast({
+        title: "Donation Failed",
+        description: error.message || "Could not process donation. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleClose = () => {
+    onOpenChange(false);
+    setTimeout(() => {
+      setIsSuccess(false);
+      setFullName("");
+      setPhone("");
+      setEmail("");
+      setAmount("500");
+      setCustomAmount("");
+    }, 200);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md shadow-2xl rounded-2xl border border-emerald-100" onInteractOutside={(e) => isProcessing && e.preventDefault()}>
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-center text-emerald-800 flex items-center justify-center gap-2">
+            <span>💝</span> Support HRDA AP
+          </DialogTitle>
+          <DialogDescription className="text-center text-slate-500 text-xs">
+            Your contributions help fund legal support, public reforms, and doctors' rights advocacy.
+          </DialogDescription>
+        </DialogHeader>
+
+        {isSuccess ? (
+          <div className="py-6 text-center space-y-4">
+            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 text-3xl">
+              ✓
+            </div>
+            <h3 className="text-lg font-bold text-emerald-950">Donation Successful!</h3>
+            <p className="text-sm text-emerald-800 max-w-xs mx-auto">
+              Thank you so much for your support. A confirmation has been sent to your email.
+            </p>
+            <Button onClick={handleClose} className="bg-emerald-600 hover:bg-emerald-700 text-white w-full mt-4">
+              Close
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-slate-600">Select Donation Amount (₹)</label>
+              <div className="grid grid-cols-4 gap-2">
+                {["250", "500", "1000", "custom"].map((val) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => setAmount(val)}
+                    className={`py-2 rounded-lg text-xs font-bold border-2 transition-all ${
+                      amount === val
+                        ? "border-emerald-600 bg-emerald-50 text-emerald-800"
+                        : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {val === "custom" ? "Custom" : `₹${val}`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {amount === "custom" && (
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-500">Enter Amount (₹)</label>
+                <Input
+                  type="number"
+                  placeholder="e.g. 5000"
+                  value={customAmount}
+                  onChange={(e) => setCustomAmount(e.target.value)}
+                  className="border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 text-sm"
+                  min="1"
+                  required
+                />
+              </div>
+            )}
+
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-500">Full Name</label>
+              <Input
+                type="text"
+                placeholder="Dr. Rajesh Kumar"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="border-slate-200 text-sm"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-500">Phone Number</label>
+                <Input
+                  type="tel"
+                  placeholder="9876543210"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="border-slate-200 text-sm"
+                  pattern="[0-9]{10}"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-500">Email Address</label>
+                <Input
+                  type="email"
+                  placeholder="rajesh@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="border-slate-200 text-sm"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isProcessing}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white w-full font-bold mt-4 h-11"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Processing...
+                </>
+              ) : (
+                `Donate ₹${amount === "custom" ? (customAmount || "0") : amount}`
+              )}
+            </Button>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

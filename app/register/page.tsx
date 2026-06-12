@@ -64,10 +64,24 @@ export default function Membership() {
                                     </li>
                                 ))}
                             </ul>
-                            <p className="text-sm font-bold text-slate-800">
-                                💪 ALONE WE ARE VULNERABLE — TOGETHER AS HRDA, WE ARE STRONGER!
-                            </p>
                         </div>
+
+                        {/* Donation Promo Box (AP Only) */}
+                        {appConfig.region === 'AP' && (
+                            <div className="mt-8 bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center">
+                                <span className="text-3xl mb-2 block">💝</span>
+                                <h3 className="text-base font-bold text-emerald-950 mb-1">Support the HRDA Movement</h3>
+                                <p className="text-xs text-emerald-800 mb-4 leading-relaxed">
+                                    Your contributions power our legal battles, healthcare reform advocacy, and campaigns for doctors' rights across Andhra Pradesh.
+                                </p>
+                                <Button 
+                                    onClick={() => (window as any).triggerDonationModal?.()} 
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-6 py-2 rounded-lg"
+                                >
+                                    Donate Here
+                                </Button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right column: Form */}
