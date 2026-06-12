@@ -122,7 +122,10 @@ export class GoogleSheetsService {
             const prefix = isAP ? 'APHRDA' : 'HRDA';
             const hrdaId = `${prefix}${month}${year}-${sequenceStr}`;
 
-            await sheet.addRow({
+            await sheet.loadHeaderRow();
+            const headers = sheet.headerValues;
+
+            const rowData: Record<string, any> = {
                 "S.No": newSNo,
                 "Name": `${data.firstName} ${data.lastName}`,
                 "DateofRegistration": this.formatDate(data.registrationDate),
@@ -132,9 +135,20 @@ export class GoogleSheetsService {
                 "HRDAREGISTRATIONNUMBER": hrdaId,
                 "PaymentStatus": data.paymentStatus,
                 "Address": data.address,
-                "District": data.district || "",
-                "AnotherMobileNumber": data.anotherMobile || ""
-            });
+            };
+
+            if (headers.includes("District")) rowData["District"] = data.district || "";
+            if (headers.includes("AnotherMobileNumber")) rowData["AnotherMobileNumber"] = data.anotherMobile || "";
+            if (headers.includes("MembershipType")) rowData["MembershipType"] = data.membershipType || "General";
+            
+            // Student specific columns (if they add them to sheets)
+            if (headers.includes("MBBS/PG Year")) rowData["MBBS/PG Year"] = (data as any).mbbsOrPgYear || "";
+            if (headers.includes("Year of Admission")) rowData["Year of Admission"] = (data as any).yearOfAdmission || "";
+            if (headers.includes("University Reg Number")) rowData["University Reg Number"] = (data as any).universityRegNumber || "";
+            if (headers.includes("College Name")) rowData["College Name"] = (data as any).collegeName || "";
+            if (headers.includes("University Name")) rowData["University Name"] = (data as any).universityName || "";
+
+            await sheet.addRow(rowData);
             console.log(`Successfully appended row for ${data.firstName} with ID ${hrdaId}`);
 
             return hrdaId;

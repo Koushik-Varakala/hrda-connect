@@ -20,7 +20,7 @@ import { appConfig } from "@/lib/app-config";
 const registrationSchema = z.object({
     firstName: z.string().min(2, "Name is required"),
     lastName: z.string().min(1, "Last name is required"),
-    tgmcId: z.string().min(3, `${appConfig.medicalCouncilShort} ID is required`),
+    tgmcId: z.string().optional(),
     email: z.string().email("Invalid email address"),
     phone: z.string().min(10, "Valid phone number required"),
     address: z.string().min(5, "Address is required"),
@@ -28,6 +28,13 @@ const registrationSchema = z.object({
     // Couple specific
     spouseName: z.string().optional(),
     spouseTgmcId: z.string().optional(),
+    
+    // Student specific
+    mbbsOrPgYear: z.string().optional(),
+    yearOfAdmission: z.string().optional(),
+    universityRegNumber: z.string().optional(),
+    collegeName: z.string().optional(),
+    universityName: z.string().optional(),
 });
 
 const districts = appConfig.districts;
@@ -197,10 +204,32 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             district: "",
             spouseName: "",
             spouseTgmcId: "",
+            mbbsOrPgYear: "",
+            yearOfAdmission: "",
+            universityRegNumber: "",
+            collegeName: "",
+            universityName: "",
         },
     });
 
     const onSubmit = async (data: RegistrationFormValues) => {
+        if (membershipType !== 'Student' && membershipType !== 'Contributory' && membershipType !== 'Founders' && (!data.tgmcId || data.tgmcId.length < 3)) {
+            form.setError('tgmcId', { type: "manual", message: `${appConfig.medicalCouncilShort} ID is required` });
+            return;
+        }
+        if (membershipType === 'Student') {
+            let hasError = false;
+            if (!data.mbbsOrPgYear) { form.setError('mbbsOrPgYear', { type: "manual", message: 'Required' }); hasError = true; }
+            if (!data.yearOfAdmission) { form.setError('yearOfAdmission', { type: "manual", message: 'Required' }); hasError = true; }
+            if (!data.universityRegNumber) { form.setError('universityRegNumber', { type: "manual", message: 'Required' }); hasError = true; }
+            if (!data.collegeName) { form.setError('collegeName', { type: "manual", message: 'Required' }); hasError = true; }
+            if (!data.universityName) { form.setError('universityName', { type: "manual", message: 'Required' }); hasError = true; }
+            if (hasError) {
+                toast({ title: "Incomplete Form", description: "Please fill all required student details", variant: "destructive" });
+                return;
+            }
+        }
+
         setIsProcessing(true);
         try {
             let finalAssessmentProfile: string | undefined = undefined;
@@ -505,17 +534,64 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
 
                                 {/* Main Form Fields */}
                                 <div className="space-y-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="tgmcId"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>{appConfig.medicalCouncilId}</FormLabel>
-                                                <FormControl><Input placeholder={`Confirmation of your ${appConfig.medicalCouncilShort} ID`} {...field} /></FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                    {membershipType !== 'Student' && (
+                                        <FormField
+                                            control={form.control}
+                                            name="tgmcId"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{appConfig.medicalCouncilId}</FormLabel>
+                                                    <FormControl><Input placeholder={`Confirmation of your ${appConfig.medicalCouncilShort} ID`} {...field} /></FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
+
+                                    {membershipType === 'Student' && (
+                                        <div className="space-y-4 border p-4 rounded-lg bg-blue-50/50">
+                                            <h3 className="font-semibold text-sm text-blue-800">Student Details</h3>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="mbbsOrPgYear" render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>MBBS or PG Year</FormLabel>
+                                                        <FormControl><Input placeholder="e.g. 2nd Year MBBS" {...field} /></FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                                <FormField control={form.control} name="yearOfAdmission" render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Year of Admission</FormLabel>
+                                                        <FormControl><Input placeholder="e.g. 2022" {...field} /></FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                            </div>
+                                            <FormField control={form.control} name="universityRegNumber" render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>University Reg Number for Exams</FormLabel>
+                                                    <FormControl><Input placeholder="Registration Number" {...field} /></FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField control={form.control} name="collegeName" render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>College Name</FormLabel>
+                                                        <FormControl><Input placeholder="Medical College" {...field} /></FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                                <FormField control={form.control} name="universityName" render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>University Name</FormLabel>
+                                                        <FormControl><Input placeholder="University" {...field} /></FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormField

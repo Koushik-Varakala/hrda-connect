@@ -88,6 +88,13 @@ export const registrations = pgTable("registrations", {
   verificationToken: text("verification_token"), // UUID for secure QR codes
   // Pre-registration assessment profile
   assessmentProfile: text("assessment_profile"),
+  
+  // Student Membership specific fields
+  mbbsOrPgYear: text("mbbs_or_pg_year"),
+  yearOfAdmission: text("year_of_admission"),
+  universityRegNumber: text("university_reg_number"),
+  collegeName: text("college_name"),
+  universityName: text("university_name"),
 });
 
 // === SCHEMAS ===
