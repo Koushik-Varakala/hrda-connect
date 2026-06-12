@@ -60,16 +60,30 @@ export async function POST(request: Request) {
             }
         }
 
-        // 3. Send donation thank you email
-        if (donation && donation.email) {
+        // 3. Send donation thank you email and admin notification
+        if (donation) {
+            if (donation.email) {
+                try {
+                    await emailService.sendDonationConfirmation(
+                        donation.email,
+                        donation.fullName,
+                        donation.amount
+                    );
+                } catch (e) {
+                    console.error("[Donation Verify API] Email send failed:", e);
+                }
+            }
+
+            // Notify Admin
             try {
-                await emailService.sendDonationConfirmation(
-                    donation.email,
+                await emailService.sendAdminDonationNotification(
                     donation.fullName,
+                    donation.email || '',
+                    donation.phone,
                     donation.amount
                 );
             } catch (e) {
-                console.error("[Donation Verify API] Email send failed:", e);
+                console.error("[Donation Verify API] Admin email send failed:", e);
             }
         }
 

@@ -84,6 +84,8 @@ export interface IStorage {
     createDonation(data: InsertDonation): Promise<Donation>;
     getDonationByOrderId(orderId: string): Promise<Donation | undefined>;
     updateDonation(id: number, updates: UpdateDonationRequest): Promise<Donation | undefined>;
+    getDonations(): Promise<Donation[]>;
+    deleteDonation(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -371,6 +373,14 @@ export class DatabaseStorage implements IStorage {
             .where(eq(donations.id, id))
             .returning();
         return result;
+    }
+
+    async getDonations(): Promise<Donation[]> {
+        return await db.select().from(donations).orderBy(desc(donations.createdAt));
+    }
+
+    async deleteDonation(id: number): Promise<void> {
+        await db.delete(donations).where(eq(donations.id, id));
     }
 }
 

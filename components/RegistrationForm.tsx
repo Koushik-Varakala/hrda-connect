@@ -414,9 +414,9 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                                                 }`}
                                             >
                                                 <div>
-                                                    <div className="flex justify-between items-center mb-1">
-                                                        <span className="font-bold text-sm text-slate-900">{cat.name}</span>
-                                                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${cat.price === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}>
+                                                    <div className="flex justify-between items-start mb-2 gap-2">
+                                                        <span className="font-bold text-sm text-slate-900 leading-tight">{cat.name}</span>
+                                                        <span className={`whitespace-nowrap flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${cat.price === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}>
                                                             {cat.badge}
                                                         </span>
                                                     </div>

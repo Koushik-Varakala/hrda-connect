@@ -182,6 +182,24 @@ ${appConfig.domain}`,
         });
     }
 
+    async sendAdminDonationNotification(name: string, email: string, phone: string, amount: number) {
+        const adminEmail = process.env.CONTACT_EMAIL || appConfig.email;
+        return this.sendEmail({
+            to: adminEmail,
+            subject: `[New Donation] ₹${amount} received from ${name}`,
+            text: `A new donation has been successfully processed on HRDA Connect.
+
+Donor Details:
+Name: ${name}
+Email: ${email || 'N/A'}
+Phone: ${phone}
+Amount: ₹${amount}
+Date: ${new Date().toLocaleString("en-IN")}
+
+You can view more details in the Admin Dashboard under the Donations section.`
+        });
+    }
+
     async sendOtp(to: string, otp: string) {
         return this.sendEmail({
             to,
