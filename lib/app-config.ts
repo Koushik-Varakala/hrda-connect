@@ -122,7 +122,7 @@ const AP_CONFIG: RegionConfig = {
     heroDescription: 'HRDA works tirelessly with governments and regulators to improve medical education, strengthen primary healthcare, and protect the interests of doctors across Andhra Pradesh.',
     aboutUsDescription: 'The Healthcare Reforms Doctors Association (HRDA) was established with a singular vision: to create a transparent, efficient, and equitable healthcare system in Andhra Pradesh.',
     registrationTagline: 'Join the strongest voice for doctors in Andhra Pradesh. Your support strengthens our cause.',
-    phone: '+91 77992 88889',
+    phone: '9182212341',
     email: 'hrdareforms@gmail.com',
     whatsappOnly: true,
     registrationFee: 1015,
