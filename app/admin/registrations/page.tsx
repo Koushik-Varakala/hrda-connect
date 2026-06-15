@@ -21,6 +21,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { appConfig } from "@/lib/app-config";
 
 export default function ManageRegistrations() {
     const { data: registrations, isLoading } = useRegistrationsList();
@@ -67,7 +68,7 @@ export default function ManageRegistrations() {
     const downloadCSV = () => {
         if (!filteredRegistrations || filteredRegistrations.length === 0) return;
 
-        const headers = ["First Name", "Last Name", "Email", "Phone", "TGMC ID", "HRDA ID", "District", "Status", "Membership Category", "Assessment Profile", "Address"];
+        const headers = ["First Name", "Last Name", "Email", "Phone", appConfig.medicalCouncilId, "HRDA ID", "District", "Status", "Membership Category", "Assessment Profile", "Address"];
         const csvRows = filteredRegistrations.map(reg => {
             return [
                 `"${(reg.firstName || '').replace(/"/g, '""')}"`,
@@ -128,7 +129,7 @@ export default function ManageRegistrations() {
                     <div className="relative w-72">
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder="Search by name, phone, HRDA/TGMC ID..."
+                            placeholder={`Search by name, phone, HRDA/${appConfig.medicalCouncilShort} ID...`}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-8"
@@ -164,8 +165,8 @@ export default function ManageRegistrations() {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">TGMC ID</label>
-                                        <Input {...form.register("tgmcId")} placeholder="TGMC ID" />
+                                        <label className="text-sm font-medium">{appConfig.medicalCouncilId}</label>
+                                        <Input {...form.register("tgmcId")} placeholder={appConfig.medicalCouncilId} />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">HRDA ID</label>
@@ -219,7 +220,7 @@ export default function ManageRegistrations() {
                         <TableRow>
                             <TableHead>Name</TableHead>
                             <TableHead>HRDA ID</TableHead>
-                            <TableHead>TGMC ID</TableHead>
+                            <TableHead>{appConfig.medicalCouncilId}</TableHead>
                             <TableHead>Contact</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Actions</TableHead>

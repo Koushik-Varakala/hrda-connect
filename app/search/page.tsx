@@ -262,7 +262,7 @@ function ResultCard({ registration }: { registration: any }) {
                                     <span className="font-medium text-sm text-slate-700 truncate block" title={regData.email || ""}>{regData.email || "-"}</span>
                                 </div>
                                 <div>
-                                    <Label className="text-xs text-slate-500 block mb-1">TGMC ID</Label>
+                                    <Label className="text-xs text-slate-500 block mb-1">{appConfig.medicalCouncilId}</Label>
                                     <span className="font-medium text-sm text-slate-700">{regData.tgmcId}</span>
                                 </div>
                                 {regData.hrdaId && (
@@ -309,7 +309,7 @@ function ResultCard({ registration }: { registration: any }) {
                                     </span>
                                 </div>
                                 <div className="flex flex-col gap-1 mb-2">
-                                    <p className="text-sm text-muted-foreground">TGMC ID: <span className="text-foreground font-medium">{regData.tgmcId}</span></p>
+                                    <p className="text-sm text-muted-foreground">{appConfig.medicalCouncilId}: <span className="text-foreground font-medium">{regData.tgmcId}</span></p>
                                     {regData.hrdaId && (
                                         <p className="text-sm text-muted-foreground">HRDA ID: <span className="text-primary font-bold">{regData.hrdaId}</span></p>
                                     )}

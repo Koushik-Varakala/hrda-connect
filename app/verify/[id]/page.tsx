@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, ShieldCheck, MapPin, Calendar, CheckCircle2, XCircle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import type { Registration } from "@shared/schema";
+import { appConfig } from "@/lib/app-config";
 import { format } from "date-fns";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -137,7 +138,7 @@ export default function VerifyPage(props: { params: Promise<{ id: string }> }) {
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-[100px_1fr] gap-4 py-3">
-                                    <span className="text-sm font-medium text-slate-500">TGMC ID</span>
+                                    <span className="text-sm font-medium text-slate-500">{appConfig.medicalCouncilId}</span>
                                     <span className="text-sm font-medium text-slate-900">{registration.tgmcId}</span>
                                 </div>
                                 <div className="grid grid-cols-[100px_1fr] gap-4 py-3">
