@@ -90,8 +90,15 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
                         <div className="flex flex-col gap-[14px] flex-1 min-w-0">
                             <Row label="Name">
                                 <div
-                                    className="font-bold whitespace-nowrap overflow-hidden text-ellipsis text-slate-900"
-                                    style={{ fontSize: getNameSize(fullName) }}
+                                    className="font-bold text-slate-900 leading-[1.1]"
+                                    style={{ 
+                                        fontSize: getNameSize(fullName),
+                                        wordBreak: 'break-word',
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical',
+                                        overflow: 'hidden'
+                                    }}
                                     title={fullName}
                                 >
                                     {fullName}
