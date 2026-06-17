@@ -116,7 +116,7 @@ const AP_CONFIG: RegionConfig = {
         "Vizianagaram", "West Godavari", "YSR Kadapa",
         "Alluri Sitharama Raju", "Anakapalli", "Annamayya", "Bapatla",
         "Eluru", "Kakinada", "Konaseema", "Nandyal", "NTR", "Palnadu",
-        "Parvathipuram Manyam", "Tirupati"
+        "Parvathipuram Manyam", "Sri Sathya Sai", "Tirupati"
     ],
     capital: 'Amaravati',
     heroDescription: 'HRDA works tirelessly with governments and regulators to improve medical education, strengthen primary healthcare, and protect the interests of doctors across Andhra Pradesh.',

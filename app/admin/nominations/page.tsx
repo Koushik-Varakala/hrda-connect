@@ -249,7 +249,11 @@ export default function ManageNominations() {
                                 {appConfig.districts.map(d => (
                                     <SelectItem key={d} value={d}>{d}</SelectItem>
                                 ))}
-                                {/* Assuming Zones will be searched here, we can add them manually or keep generic search */}
+                                {appConfig.capitalZones && appConfig.capitalZones.length > 0 && (
+                                    appConfig.capitalZones.map(z => (
+                                        <SelectItem key={z} value={z}>{z}</SelectItem>
+                                    ))
+                                )}
                             </SelectContent>
                         </Select>
                     </div>
