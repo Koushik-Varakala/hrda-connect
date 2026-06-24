@@ -30,6 +30,7 @@ export default function ManageRegistrations() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState("");
+    const [filterPaymentStatus, setFilterPaymentStatus] = useState<string>("all");
 
     const form = useForm({
         defaultValues: {
@@ -42,16 +43,18 @@ export default function ManageRegistrations() {
             address: "",
             district: "",
             status: "",
+            paymentStatus: "",
         }
     });
 
     const filteredRegistrations = registrations?.filter(reg =>
-        reg.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (reg.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         reg.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         reg.phone?.includes(searchTerm) ||
         reg.hrdaId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        reg.tgmcId?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        reg.tgmcId?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (filterPaymentStatus === "all" || reg.paymentStatus === filterPaymentStatus)
+    ).sort((a, b) => b.id - a.id);
 
     const onSubmit = (data: any) => {
         if (editingItem) {
@@ -79,6 +82,7 @@ export default function ManageRegistrations() {
                 `"${(reg.hrdaId || '').replace(/"/g, '""')}"`,
                 `"${(reg.district || '').replace(/"/g, '""')}"`,
                 `"${(reg.status || '').replace(/"/g, '""')}"`,
+                `"${(reg.paymentStatus || '').replace(/"/g, '""')}"`,
                 `"${(reg.membershipType || '').replace(/"/g, '""')}"`,
                 `"${(reg.assessmentProfile || '').replace(/"/g, '""')}"`,
                 `"${(reg.address || '').replace(/"/g, '""')}"`
@@ -108,6 +112,7 @@ export default function ManageRegistrations() {
             address: item.address,
             district: item.district,
             status: item.status,
+            paymentStatus: item.paymentStatus || "pending",
         });
         setIsDialogOpen(true);
     };
@@ -126,14 +131,27 @@ export default function ManageRegistrations() {
                         <Download className="w-4 h-4" />
                         Export to CSV
                     </Button>
-                    <div className="relative w-72">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder={`Search by name, phone, HRDA/${appConfig.medicalCouncilShort} ID...`}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-8"
-                        />
+                    <div className="flex gap-2">
+                        <Select value={filterPaymentStatus} onValueChange={setFilterPaymentStatus}>
+                            <SelectTrigger className="w-40">
+                                <SelectValue placeholder="Payment Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Payments</SelectItem>
+                                <SelectItem value="success">Paid / Success</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="failed">Failed</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <div className="relative w-72">
+                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder={`Search by name, phone, HRDA/${appConfig.medicalCouncilShort} ID...`}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-8"
+                            />
+                        </div>
                     </div>
                     <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setEditingItem(null); }}>
                         <DialogContent className="max-w-2xl">
@@ -198,6 +216,25 @@ export default function ManageRegistrations() {
                                             )}
                                         />
                                     </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Payment Status</label>
+                                        <Controller
+                                            control={form.control}
+                                            name="paymentStatus"
+                                            render={({ field }) => (
+                                                <Select value={field.value} onValueChange={field.onChange}>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select Payment Status" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="success">Paid / Success</SelectItem>
+                                                        <SelectItem value="pending">Pending</SelectItem>
+                                                        <SelectItem value="failed">Failed</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">
@@ -244,12 +281,22 @@ export default function ManageRegistrations() {
                                     <div className="text-xs text-muted-foreground">{item.email}</div>
                                 </TableCell>
                                 <TableCell>
-                                    <span className={`px-2 py-1 rounded text-xs capitalize ${item.status === 'verified' ? 'bg-green-100 text-green-700' :
-                                        item.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                                            'bg-yellow-100 text-yellow-700'
-                                        }`}>
-                                        {item.status?.replace('_', ' ')}
-                                    </span>
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        <span className={`px-2 py-1 rounded text-xs capitalize ${item.status === 'verified' ? 'bg-green-100 text-green-700' :
+                                            item.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                                'bg-yellow-100 text-yellow-700'
+                                            }`}>
+                                            {item.status?.replace('_', ' ')}
+                                        </span>
+                                        {item.paymentStatus && (
+                                            <span className={`px-2 py-1 rounded text-xs capitalize border ${item.paymentStatus === 'success' ? 'bg-green-50 text-green-700 border-green-200' :
+                                                item.paymentStatus === 'failed' ? 'bg-red-50 text-red-700 border-red-200' :
+                                                    'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                                }`}>
+                                                {item.paymentStatus === 'success' ? 'Paid' : item.paymentStatus}
+                                            </span>
+                                        )}
+                                    </div>
                                     {item.membershipType && (
                                         <div className="mt-1 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-semibold capitalize block w-fit">
                                             {item.membershipType} Membership
