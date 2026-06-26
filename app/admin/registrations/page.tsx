@@ -31,6 +31,7 @@ export default function ManageRegistrations() {
     const [editingItem, setEditingItem] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterPaymentStatus, setFilterPaymentStatus] = useState<string>("all");
+    const [filterMembershipType, setFilterMembershipType] = useState<string>("all");
     const [sortBy, setSortBy] = useState<string>("newest");
 
     const form = useForm({
@@ -54,7 +55,8 @@ export default function ManageRegistrations() {
         reg.phone?.includes(searchTerm) ||
         reg.hrdaId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         reg.tgmcId?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (filterPaymentStatus === "all" || reg.paymentStatus === filterPaymentStatus)
+        (filterPaymentStatus === "all" || reg.paymentStatus === filterPaymentStatus) &&
+        (filterMembershipType === "all" || reg.membershipType === filterMembershipType)
     ).sort((a, b) => {
         if (sortBy === "newest") return b.id - a.id;
         if (sortBy === "oldest") return a.id - b.id;
@@ -126,21 +128,21 @@ export default function ManageRegistrations() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold">Manage Registrations</h1>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col md:flex-row flex-wrap items-stretch md:items-center gap-3 w-full xl:w-auto">
                     <Button 
                         variant="outline" 
                         onClick={downloadCSV}
                         disabled={!filteredRegistrations || filteredRegistrations.length === 0}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 whitespace-nowrap"
                     >
                         <Download className="w-4 h-4" />
                         Export to CSV
                     </Button>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full md:w-auto">
                         <Select value={filterPaymentStatus} onValueChange={setFilterPaymentStatus}>
-                            <SelectTrigger className="w-40">
+                            <SelectTrigger className="w-full sm:w-40">
                                 <SelectValue placeholder="Payment Status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -150,8 +152,21 @@ export default function ManageRegistrations() {
                                 <SelectItem value="failed">Failed</SelectItem>
                             </SelectContent>
                         </Select>
+                        <Select value={filterMembershipType} onValueChange={setFilterMembershipType}>
+                            <SelectTrigger className="w-full sm:w-44">
+                                <SelectValue placeholder="Membership Type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Memberships</SelectItem>
+                                <SelectItem value="Student">Student</SelectItem>
+                                <SelectItem value="General">General</SelectItem>
+                                <SelectItem value="Lifetime">Lifetime</SelectItem>
+                                <SelectItem value="Contributory">Contributory</SelectItem>
+                                <SelectItem value="Founders">Founders</SelectItem>
+                            </SelectContent>
+                        </Select>
                         <Select value={sortBy} onValueChange={setSortBy}>
-                            <SelectTrigger className="w-40">
+                            <SelectTrigger className="w-full sm:w-40">
                                 <SelectValue placeholder="Sort By" />
                             </SelectTrigger>
                             <SelectContent>
@@ -161,7 +176,7 @@ export default function ManageRegistrations() {
                                 <SelectItem value="hrda_desc">HRDA ID (Z-A)</SelectItem>
                             </SelectContent>
                         </Select>
-                        <div className="relative w-72">
+                        <div className="relative w-full col-span-2 sm:col-span-1 sm:w-72">
                             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={`Search by name, phone, HRDA/${appConfig.medicalCouncilShort} ID...`}
