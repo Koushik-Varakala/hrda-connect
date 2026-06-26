@@ -31,6 +31,7 @@ export default function ManageRegistrations() {
     const [editingItem, setEditingItem] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterPaymentStatus, setFilterPaymentStatus] = useState<string>("all");
+    const [sortBy, setSortBy] = useState<string>("newest");
 
     const form = useForm({
         defaultValues: {
@@ -54,7 +55,13 @@ export default function ManageRegistrations() {
         reg.hrdaId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         reg.tgmcId?.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (filterPaymentStatus === "all" || reg.paymentStatus === filterPaymentStatus)
-    ).sort((a, b) => b.id - a.id);
+    ).sort((a, b) => {
+        if (sortBy === "newest") return b.id - a.id;
+        if (sortBy === "oldest") return a.id - b.id;
+        if (sortBy === "hrda_asc") return (a.hrdaId || "").localeCompare(b.hrdaId || "");
+        if (sortBy === "hrda_desc") return (b.hrdaId || "").localeCompare(a.hrdaId || "");
+        return b.id - a.id;
+    });
 
     const onSubmit = (data: any) => {
         if (editingItem) {
@@ -141,6 +148,17 @@ export default function ManageRegistrations() {
                                 <SelectItem value="success">Paid / Success</SelectItem>
                                 <SelectItem value="pending">Pending</SelectItem>
                                 <SelectItem value="failed">Failed</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Select value={sortBy} onValueChange={setSortBy}>
+                            <SelectTrigger className="w-40">
+                                <SelectValue placeholder="Sort By" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="newest">Newest First</SelectItem>
+                                <SelectItem value="oldest">Oldest First</SelectItem>
+                                <SelectItem value="hrda_asc">HRDA ID (A-Z)</SelectItem>
+                                <SelectItem value="hrda_desc">HRDA ID (Z-A)</SelectItem>
                             </SelectContent>
                         </Select>
                         <div className="relative w-72">
