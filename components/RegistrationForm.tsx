@@ -430,7 +430,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                             <div className="mb-8 space-y-4">
                                 <label className="text-sm font-semibold text-slate-700 block">Select Membership Category</label>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {MEMBERSHIP_CATEGORIES.map((cat) => {
+                                    {MEMBERSHIP_CATEGORIES.filter(cat => cat.id !== "Contributory" && cat.id !== "Founders").map((cat) => {
                                         const isSelected = membershipType === cat.id;
                                         return (
                                             <div
