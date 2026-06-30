@@ -32,9 +32,11 @@ export async function POST(request: Request) {
         }
 
         let reg: any;
+        let oldReg: any = null;
 
         // Prefer updating the existing pending record (avoids duplicates)
         if (pendingRegId) {
+            oldReg = await storage.getRegistration(Number(pendingRegId));
             reg = await storage.updateRegistration(Number(pendingRegId), {
                 paymentStatus: 'success',
                 status: 'verified',
@@ -56,9 +58,11 @@ export async function POST(request: Request) {
             console.log(`[Verify] Created new registration ID: ${reg.id}`);
         }
 
+        const newlyVerified = !oldReg || oldReg.status !== 'verified';
         let formattedHrdaId: string | number = reg.id;
 
-        // Sync to Google Sheets
+        if (newlyVerified) {
+            // Sync to Google Sheets
         try {
             const sheetId = await googleSheetsService.appendRegistration({
                 id: String(reg.id),
@@ -124,6 +128,8 @@ export async function POST(request: Request) {
                 regId: reg?.id
             }, null, 2));
         }
+
+        } // End of if (newlyVerified)
 
         return NextResponse.json({ success: true, registrationId: reg.id, hrdaId: formattedHrdaId });
 

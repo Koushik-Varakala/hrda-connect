@@ -96,35 +96,82 @@ export async function POST(request: Request) {
 
     // 4. Save to database — update pending record if it exists, otherwise create new
     let newReg: any;
+    let oldReg: any = null;
     try {
         const pendingRegId = notes.pendingRegId ? Number(notes.pendingRegId) : null;
-
         if (pendingRegId) {
+            oldReg = await storage.getRegistration(pendingRegId);
             newReg = await storage.updateRegistration(pendingRegId, {
                 paymentStatus: "success",
-                status: "pending_verification",
+                status: "verified",
                 razorpayTxnId: paymentId,
             });
-            console.log(`[Webhook] Updated pending registration ID: ${pendingRegId}`);
-        }
-
-        // Fallback: create new if no pendingRegId or update returned nothing
-        if (!newReg) {
+            console.log(`[Webhook] Updated existing pending registration ID: ${pendingRegId}`);
+        } else {
             const { insertRegistrationSchema } = await import("@shared/schema");
             const regInput = insertRegistrationSchema.parse({
                 ...userData,
                 paymentStatus: "success",
-                status: "pending_verification",
+                status: "verified",
                 razorpayTxnId: paymentId,
             });
             newReg = await storage.createRegistration(regInput);
-            console.log(`[Webhook] Created new registration ID: ${newReg.id} for ${userData.firstName}`);
+            console.log(`[Webhook] Created new registration ID: ${newReg.id}`);
         }
-    } catch (err) {
-        console.error("[Webhook] Failed to save registration to DB:", err);
-        return NextResponse.json({ error: "DB save failed" }, { status: 500 });
+    } catch (e) {
+        console.error("[Webhook] Failed to save registration to DB:", e);
+        return NextResponse.json({ error: "DB Error" }, { status: 500 });
     }
 
-    console.log(`[Webhook] ✅ Payment processed for ${userData.firstName} (${paymentId}). Pending admin verification.`);
-    return NextResponse.json({ status: "ok", hrdaId: "pending" });
+    const newlyVerified = !oldReg || oldReg.status !== "verified";
+
+    // 5. Append to Google Sheets
+    let formattedHrdaId: string | number = newReg.id;
+    if (newlyVerified) {
+        try {
+            const sheetId = await googleSheetsService.appendRegistration({
+                id: String(newReg.id),
+                tgmcId: newReg.tgmcId || "",
+                firstName: newReg.firstName,
+                lastName: newReg.lastName,
+                phone: newReg.phone,
+                email: newReg.email || "",
+                address: newReg.address || "",
+                district: newReg.district || "",
+                membershipType: newReg.membershipType || "single",
+                paymentStatus: "success",
+                status: "verified",
+                registrationDate: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                rowStatus: "Active"
+            });
+            console.log(`[Webhook] Added to sheets: ${sheetId}`);
+        } catch (e) {
+            console.error("[Webhook] Google Sheets sync failed:", e);
+        }
+
+        // 6. Send Notifications
+        if (newReg.email) {
+            await emailService.sendRegistrationConfirmation(
+                newReg.email,
+                `${newReg.firstName} ${newReg.lastName}`,
+                newReg.tgmcId || "N/A",
+                formattedHrdaId,
+                newReg.phone,
+                newReg.address || ""
+            ).catch(console.error);
+        }
+
+        if (newReg.phone) {
+            await smsService.sendRegistrationSuccess(
+                newReg.phone, 
+                newReg.firstName, 
+                formattedHrdaId, 
+                newReg.tgmcId || "N/A"
+            ).catch(console.error);
+        }
+    }
+
+    console.log(`[Webhook] ✅ Payment processed for ${newReg.firstName} (${paymentId}).`);
+    return NextResponse.json({ status: "ok", hrdaId: formattedHrdaId });
 }
