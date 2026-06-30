@@ -102,7 +102,7 @@ export async function POST(request: Request) {
         if (pendingRegId) {
             newReg = await storage.updateRegistration(pendingRegId, {
                 paymentStatus: "success",
-                status: "verified",
+                status: "pending_verification",
                 razorpayTxnId: paymentId,
             });
             console.log(`[Webhook] Updated pending registration ID: ${pendingRegId}`);
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
             const regInput = insertRegistrationSchema.parse({
                 ...userData,
                 paymentStatus: "success",
-                status: "verified",
+                status: "pending_verification",
                 razorpayTxnId: paymentId,
             });
             newReg = await storage.createRegistration(regInput);
@@ -125,62 +125,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "DB save failed" }, { status: 500 });
     }
 
-    let formattedHrdaId: string | number = newReg.id;
-
-    // 5. Sync to Google Sheets
-    try {
-        const sheetId = await googleSheetsService.appendRegistration({
-            id: String(newReg.id),
-            tgmcId: newReg.tgmcId || "",
-            firstName: newReg.firstName,
-            lastName: newReg.lastName,
-            phone: newReg.phone,
-            email: newReg.email || "",
-            address: newReg.address || "",
-            district: newReg.district || "",
-            membershipType: newReg.membershipType || "single",
-            paymentStatus: "success",
-            status: "verified",
-            registrationDate: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            rowStatus: "Active",
-        });
-
-        if (sheetId) {
-            formattedHrdaId = sheetId;
-            await storage.updateRegistration(newReg.id, { hrdaId: String(formattedHrdaId) });
-            console.log(`[Webhook] Synced to Sheets, HRDA ID: ${formattedHrdaId}`);
-        }
-    } catch (e) {
-        console.error("[Webhook] Failed to sync to Sheets:", e);
-        // Non-fatal — registration is in DB, sheets can be synced manually
-    }
-
-    // 6. Send confirmation email
-    try {
-        if (newReg.email) {
-            await emailService.sendRegistrationConfirmation(
-                newReg.email,
-                `${newReg.firstName} ${newReg.lastName}`,
-                newReg.tgmcId || "N/A",
-                formattedHrdaId,
-                newReg.phone,
-                newReg.address || ""
-            );
-        }
-    } catch (e) {
-        console.error("[Webhook] Failed to send email:", e);
-    }
-
-    // 7. Send SMS
-    try {
-        if (newReg.phone) {
-            await smsService.sendRegistrationSuccess(newReg.phone, newReg.firstName, formattedHrdaId, newReg.tgmcId || "N/A");
-        }
-    } catch (e) {
-        console.error("[Webhook] Failed to send SMS:", e);
-    }
-
-    console.log(`[Webhook] ✅ Registration complete for ${userData.firstName} (${paymentId})`);
-    return NextResponse.json({ status: "ok", hrdaId: formattedHrdaId });
+    console.log(`[Webhook] ✅ Payment processed for ${userData.firstName} (${paymentId}). Pending admin verification.`);
+    return NextResponse.json({ status: "ok", hrdaId: "pending" });
 }

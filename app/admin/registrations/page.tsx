@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useRegistrationsList, useUpdateRegistration, useDeleteRegistration } from "@/hooks/use-registrations";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
-import { Pencil, Search, Trash2, Download } from "lucide-react";
+import { Pencil, Search, Trash2, Download, RefreshCw, CheckCircle, Loader2 } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -22,6 +22,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { appConfig } from "@/lib/app-config";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ManageRegistrations() {
     const { data: registrations, isLoading } = useRegistrationsList();
@@ -33,6 +34,9 @@ export default function ManageRegistrations() {
     const [filterPaymentStatus, setFilterPaymentStatus] = useState<string>("all");
     const [filterMembershipType, setFilterMembershipType] = useState<string>("all");
     const [sortBy, setSortBy] = useState<string>("newest");
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [verifyingIds, setVerifyingIds] = useState<Record<number, boolean>>({});
+    const { toast } = useToast();
 
     const form = useForm({
         defaultValues: {
@@ -109,6 +113,63 @@ export default function ManageRegistrations() {
         document.body.removeChild(link);
     };
 
+    const handleSyncPayments = async () => {
+        setIsSyncing(true);
+        try {
+            const res = await fetch("/api/admin/sync-payments", { method: "POST" });
+            const data = await res.json();
+            if (res.ok) {
+                toast({ title: "Sync Complete", description: `Successfully synced ${data.syncedCount} payments.` });
+            } else {
+                toast({ title: "Sync Failed", description: data.message, variant: "destructive" });
+            }
+        } catch (e) {
+            toast({ title: "Sync Failed", description: "An error occurred.", variant: "destructive" });
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
+    const handleVerifyTGMC = async (item: any) => {
+        if (!item.tgmcId) return;
+        setVerifyingIds(prev => ({ ...prev, [item.id]: true }));
+        try {
+            const res = await fetch(`/api/external/tsmc-doctor/${encodeURIComponent(item.tgmcId)}?name=${encodeURIComponent(item.firstName || '')}`);
+            if (res.ok) {
+                const data = await res.json();
+                const externalDoctors = data.data || [];
+                const matches = externalDoctors.some((doc: any) => {
+                    const councilName = (doc.fullname || "").toLowerCase();
+                    const fName = (item.firstName || "").toLowerCase();
+                    const lName = (item.lastName || "").toLowerCase();
+                    
+                    const matchesFirst = fName ? councilName.includes(fName) : false;
+                    const matchesLast = lName ? councilName.includes(lName) : false;
+                    
+                    return matchesFirst || matchesLast;
+                });
+
+                if (externalDoctors.length === 0) {
+                    toast({ title: "Not Found", description: "No doctor found with this exact ID in the Council database. Check if a prefix is needed (e.g., TSMC/FMR/).", variant: "destructive" });
+                } else if (matches) {
+                    updateMutation.mutate({ id: item.id, status: "verified" }, {
+                        onSuccess: () => {
+                            toast({ title: "Verified", description: `Doctor ${item.tgmcId} verified successfully via Council DB.` });
+                        }
+                    });
+                } else {
+                    toast({ title: "No Match", description: "Names did not match exactly, manual verification needed.", variant: "destructive" });
+                }
+            } else {
+                toast({ title: "Verification Failed", description: "Could not fetch details from Council DB.", variant: "destructive" });
+            }
+        } catch (e) {
+            toast({ title: "Verification Error", description: "An error occurred during verification.", variant: "destructive" });
+        } finally {
+            setVerifyingIds(prev => ({ ...prev, [item.id]: false }));
+        }
+    };
+
     const openEdit = (item: any) => {
         setEditingItem(item);
         form.reset({
@@ -131,6 +192,15 @@ export default function ManageRegistrations() {
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold">Manage Registrations</h1>
                 <div className="flex flex-col md:flex-row flex-wrap items-stretch md:items-center gap-3 w-full xl:w-auto">
+                    <Button 
+                        variant="outline" 
+                        onClick={handleSyncPayments}
+                        disabled={isSyncing}
+                        className="flex items-center gap-2 whitespace-nowrap"
+                    >
+                        {isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                        Sync Payments
+                    </Button>
                     <Button 
                         variant="outline" 
                         onClick={downloadCSV}
@@ -308,7 +378,23 @@ export default function ManageRegistrations() {
                                     {item.district && <div className="text-xs text-muted-foreground">{item.district}</div>}
                                 </TableCell>
                                 <TableCell>{item.hrdaId || '-'}</TableCell>
-                                <TableCell>{item.tgmcId || '-'}</TableCell>
+                                <TableCell>
+                                    <div className="flex items-center gap-2">
+                                        <span>{item.tgmcId || '-'}</span>
+                                        {item.tgmcId && item.status !== 'verified' && (
+                                            <Button 
+                                                variant="outline" 
+                                                size="sm" 
+                                                className="h-6 text-xs px-2"
+                                                onClick={() => handleVerifyTGMC(item)}
+                                                disabled={verifyingIds[item.id]}
+                                            >
+                                                {verifyingIds[item.id] ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <CheckCircle className="w-3 h-3 mr-1 text-green-600" />}
+                                                Auto-Verify
+                                            </Button>
+                                        )}
+                                    </div>
+                                </TableCell>
                                 <TableCell>
                                     <div className="text-sm">{item.phone}</div>
                                     <div className="text-xs text-muted-foreground">{item.email}</div>

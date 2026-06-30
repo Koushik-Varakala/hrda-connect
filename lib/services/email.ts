@@ -126,6 +126,9 @@ Email Address: ${to}
 Address: ${address}
 ------------------------------------------------
 
+Please join our official WhatsApp community group here:
+${appConfig.whatsappGroupLink}
+
 Thank you for strengthening our voice. We look forward to your active participation.
 
 Regards,

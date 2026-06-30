@@ -49,19 +49,13 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
             return NextResponse.json({ message: "Not found" }, { status: 404 });
         }
 
-        const wasNotSuccess = oldRegistration.paymentStatus !== "success";
-        const isNowSuccess = body.paymentStatus === "success";
-
-        // If it's becoming successful now, also mark it verified automatically
-        if (wasNotSuccess && isNowSuccess) {
-            body.status = "verified";
-        }
+        const newlyVerified = oldRegistration.status !== "verified" && body.status === "verified";
 
         const result = await storage.updateRegistration(id, body);
         if (!result) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
-        // If newly successful -> Append to Sheets + Generate HRDA ID + Email + SMS
-        if (wasNotSuccess && isNowSuccess) {
+        // If newly verified -> Append to Sheets + Generate HRDA ID + Email + SMS
+        if (newlyVerified) {
             let formattedHrdaId: string | number = result.id;
 
             try {
@@ -109,8 +103,8 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
                 console.error("Failed to send communications for manual approval:", e);
             }
 
-        } else if (isNowSuccess && !wasNotSuccess) {
-            // Was already success, but admin might be updating other details via edit
+        } else if (result.status === "verified" && !newlyVerified) {
+            // Was already verified, but admin might be updating other details via edit
             try {
                 if (result.tgmcId) {
                     await googleSheetsService.updateRegistration(result.tgmcId, {

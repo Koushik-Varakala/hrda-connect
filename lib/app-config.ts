@@ -32,6 +32,7 @@ export interface RegionConfig {
     registrationFee: number;
     instagramUrl: string;
     capitalZones: string[];
+    whatsappGroupLink: string;
 }
 
 const TG_CONFIG: RegionConfig = {
@@ -98,6 +99,7 @@ const TG_CONFIG: RegionConfig = {
         "Hyderabad – Gachibowli & Kokapet Zone",
         "Hyderabad – Mehdipatnam Zone",
     ],
+    whatsappGroupLink: "https://chat.whatsapp.com/ReplaceWithRealLink",
 };
 
 const AP_CONFIG: RegionConfig = {
@@ -128,6 +130,7 @@ const AP_CONFIG: RegionConfig = {
     registrationFee: 1015,
     instagramUrl: 'https://www.instagram.com/hrda.ap/',
     capitalZones: [], // AP doesn't have capital zones for elections currently
+    whatsappGroupLink: "https://chat.whatsapp.com/ReplaceWithRealLink",
 };
 
 /**
