@@ -12,7 +12,7 @@ import {
     nominations, type Nomination, type InsertNomination, type UpdateNominationRequest as UpdateNomination,
     donations, type Donation, type InsertDonation, type UpdateDonationRequest
 } from "@shared/schema";
-import { eq, desc, and, ilike } from "drizzle-orm";
+import { eq, desc, and, ilike, inArray } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 
 export interface IStorage {
@@ -118,8 +118,18 @@ export class DatabaseStorage implements IStorage {
             // @ts-ignore
             query.where(eq(panels.isStateLevel, false));
             if (district) {
+                const distCond = (district.includes("Kukatpally") || district.includes("Serilingampally"))
+                    ? inArray(panels.district, [
+                        "Hyderabad – Kukatpally & Serilingampally Zone",
+                        "Hyderabad - Kukatpally & Serilingampally Zone",
+                        "Hyderabad – Kukatpally Zone",
+                        "Hyderabad - Kukatpally Zone",
+                        "Hyderabad – Serilingampally Zone",
+                        "Hyderabad - Serilingampally Zone"
+                    ])
+                    : eq(panels.district, district);
                 // @ts-ignore
-                query.where(and(eq(panels.isStateLevel, false), eq(panels.district, district)));
+                query.where(and(eq(panels.isStateLevel, false), distCond));
             }
         }
         return await query.orderBy(panels.priority);
@@ -309,7 +319,20 @@ export class DatabaseStorage implements IStorage {
 
     async getNominations(filters?: { district?: string; post?: string; status?: string }): Promise<Nomination[]> {
         const conditions = [];
-        if (filters?.district) conditions.push(eq(nominations.district, filters.district));
+        if (filters?.district) {
+            if (filters.district.includes("Kukatpally") || filters.district.includes("Serilingampally")) {
+                conditions.push(inArray(nominations.district, [
+                    "Hyderabad – Kukatpally & Serilingampally Zone",
+                    "Hyderabad - Kukatpally & Serilingampally Zone",
+                    "Hyderabad – Kukatpally Zone",
+                    "Hyderabad - Kukatpally Zone",
+                    "Hyderabad – Serilingampally Zone",
+                    "Hyderabad - Serilingampally Zone"
+                ]));
+            } else {
+                conditions.push(eq(nominations.district, filters.district));
+            }
+        }
         if (filters?.post) conditions.push(eq(nominations.postApplied, filters.post));
         if (filters?.status) conditions.push(eq(nominations.status, filters.status));
         let query: any = db.select().from(nominations);
@@ -345,10 +368,21 @@ export class DatabaseStorage implements IStorage {
     }
 
     async checkDuplicateNomination(tgmcNumber: string, district: string, post: string): Promise<boolean> {
+        const districtCondition = (district.includes("Kukatpally") || district.includes("Serilingampally"))
+            ? inArray(nominations.district, [
+                "Hyderabad – Kukatpally & Serilingampally Zone",
+                "Hyderabad - Kukatpally & Serilingampally Zone",
+                "Hyderabad – Kukatpally Zone",
+                "Hyderabad - Kukatpally Zone",
+                "Hyderabad – Serilingampally Zone",
+                "Hyderabad - Serilingampally Zone"
+            ])
+            : eq(nominations.district, district);
+
         const existing = await db.select().from(nominations).where(
             and(
                 eq(nominations.tgmcNumber, tgmcNumber),
-                eq(nominations.district, district),
+                districtCondition,
                 eq(nominations.postApplied, post),
                 eq(nominations.paymentStatus, "success")
             )

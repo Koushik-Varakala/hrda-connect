@@ -95,7 +95,7 @@ const TG_CONFIG: RegionConfig = {
         "Hyderabad – Secunderabad & Malkajgiri Zone",
         "Hyderabad – Khairatabad Zone",
         "Hyderabad – Kompally Zone",
-        "Hyderabad – Kukatpally Zone",
+        "Hyderabad – Kukatpally & Serilingampally Zone",
         "Hyderabad – Gachibowli & Kokapet Zone",
         "Hyderabad – Mehdipatnam Zone",
     ],
