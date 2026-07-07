@@ -3,13 +3,15 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRegistrationsList, useUpdateRegistration, useDeleteRegistration } from "@/hooks/use-registrations";
 import { useForm, Controller } from "react-hook-form";
-import { useState } from "react";
-import { Pencil, Search, Trash2, Download, RefreshCw, CheckCircle, Loader2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import * as XLSX from "xlsx";
+import { Pencil, Search, Trash2, Download, RefreshCw, CheckCircle, Loader2, Upload, FileSpreadsheet, AlertCircle } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -36,6 +38,11 @@ export default function ManageRegistrations() {
     const [sortBy, setSortBy] = useState<string>("newest");
     const [isSyncing, setIsSyncing] = useState(false);
     const [verifyingIds, setVerifyingIds] = useState<Record<number, boolean>>({});
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isImporting, setIsImporting] = useState(false);
+    const [previewData, setPreviewData] = useState<{ toAdd: any[]; toSkip: any[]; summary: any } | null>(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const queryClient = useQueryClient();
     const { toast } = useToast();
 
     const form = useForm({
@@ -111,6 +118,73 @@ export default function ManageRegistrations() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setIsImporting(true);
+        try {
+            const data = new Uint8Array(await file.arrayBuffer());
+            const workbook = XLSX.read(data, { type: "array" });
+            const firstSheetName = workbook.SheetNames[0];
+            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+
+            if (!rows || rows.length === 0) {
+                toast({ title: "Empty File", description: "No data rows found in spreadsheet.", variant: "destructive" });
+                return;
+            }
+
+            const res = await fetch("/api/admin/registrations/import", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "preview", rows })
+            });
+
+            if (res.ok) {
+                const result = await res.json();
+                setPreviewData(result);
+                setIsPreviewOpen(true);
+            } else {
+                const err = await res.json();
+                toast({ title: "Preview Error", description: err.message || "Failed to process spreadsheet.", variant: "destructive" });
+            }
+        } catch (err: any) {
+            toast({ title: "Import Error", description: err.message || "Failed to read Excel file.", variant: "destructive" });
+        } finally {
+            setIsImporting(false);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+    };
+
+    const handleConfirmImport = async () => {
+        if (!previewData?.toAdd || previewData.toAdd.length === 0) {
+            toast({ title: "Nothing to import", description: "All rows already exist in database." });
+            setIsPreviewOpen(false);
+            return;
+        }
+        setIsImporting(true);
+        try {
+            const res = await fetch("/api/admin/registrations/import", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "execute", rows: previewData.toAdd })
+            });
+            if (res.ok) {
+                const result = await res.json();
+                toast({ title: "Import Success", description: `Successfully imported ${result.count} missing registrations!` });
+                setIsPreviewOpen(false);
+                setPreviewData(null);
+                queryClient.invalidateQueries();
+            } else {
+                const err = await res.json();
+                toast({ title: "Import Failed", description: err.message || "Could not save registrations.", variant: "destructive" });
+            }
+        } catch (err: any) {
+            toast({ title: "Error", description: "An error occurred during database save.", variant: "destructive" });
+        } finally {
+            setIsImporting(false);
+        }
     };
 
     const handleSyncPayments = async () => {
@@ -210,6 +284,22 @@ export default function ManageRegistrations() {
                         <Download className="w-4 h-4" />
                         Export to CSV
                     </Button>
+                    <Button 
+                        variant="outline" 
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isImporting || isSyncing}
+                        className="flex items-center gap-2 whitespace-nowrap bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800"
+                    >
+                        {isImporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        Import Excel
+                    </Button>
+                    <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        onChange={handleFileSelect} 
+                        accept=".xlsx,.xls,.csv" 
+                        className="hidden" 
+                    />
                     <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full md:w-auto">
                         <Select value={filterPaymentStatus} onValueChange={setFilterPaymentStatus}>
                             <SelectTrigger className="w-full sm:w-40">
@@ -456,6 +546,120 @@ export default function ManageRegistrations() {
                     </TableBody>
                 </Table>
             </div>
+            <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+                <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-xl">
+                            <FileSpreadsheet className="w-5 h-5 text-purple-600" />
+                            Excel Import Preview & Deduplication
+                        </DialogTitle>
+                        <DialogDescription>
+                            Review the data before importing into the production database. Existing records have been safely skipped.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {previewData && (
+                        <div className="flex-1 overflow-y-auto space-y-6 my-2 pr-1">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                    <div className="text-xs text-slate-500 font-medium">TOTAL ROWS IN SHEET</div>
+                                    <div className="text-2xl font-bold mt-1 text-slate-800">{previewData.summary.totalRows}</div>
+                                </div>
+                                <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                                    <div className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                                        <CheckCircle className="w-3.5 h-3.5" /> NEW TO ADD
+                                    </div>
+                                    <div className="text-2xl font-bold mt-1 text-emerald-700">{previewData.summary.newCount}</div>
+                                </div>
+                                <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                                    <div className="text-xs text-amber-600 font-medium flex items-center gap-1">
+                                        <AlertCircle className="w-3.5 h-3.5" /> ALREADY EXIST (SKIPPED)
+                                    </div>
+                                    <div className="text-2xl font-bold mt-1 text-amber-700">{previewData.summary.skipCount}</div>
+                                </div>
+                            </div>
+
+                            {previewData.toAdd.length > 0 && (
+                                <div>
+                                    <h3 className="font-semibold text-sm mb-2 text-emerald-700">
+                                        New Registrations Ready to Import ({previewData.toAdd.length})
+                                    </h3>
+                                    <div className="border rounded-md overflow-hidden max-h-60 overflow-y-auto">
+                                        <Table>
+                                            <TableHeader className="bg-slate-50">
+                                                <TableRow>
+                                                    <TableHead className="text-xs">Name</TableHead>
+                                                    <TableHead className="text-xs">HRDA ID</TableHead>
+                                                    <TableHead className="text-xs">Medical Council</TableHead>
+                                                    <TableHead className="text-xs">Phone</TableHead>
+                                                    <TableHead className="text-xs">Email</TableHead>
+                                                    <TableHead className="text-xs">District</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {previewData.toAdd.map((row: any, idx: number) => (
+                                                    <TableRow key={idx} className="text-xs">
+                                                        <TableCell className="font-medium">{row.firstName} {row.lastName}</TableCell>
+                                                        <TableCell>{row.hrdaId || "-"}</TableCell>
+                                                        <TableCell>{row.tgmcId || "-"}</TableCell>
+                                                        <TableCell>{row.phone}</TableCell>
+                                                        <TableCell>{row.email || "-"}</TableCell>
+                                                        <TableCell>{row.district || "-"}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            )}
+
+                            {previewData.toSkip.length > 0 && (
+                                <div>
+                                    <h3 className="font-semibold text-sm mb-2 text-amber-700">
+                                        Existing Registrations Skipped ({previewData.toSkip.length})
+                                    </h3>
+                                    <div className="border rounded-md overflow-hidden max-h-48 overflow-y-auto">
+                                        <Table>
+                                            <TableHeader className="bg-slate-50">
+                                                <TableRow>
+                                                    <TableHead className="text-xs w-16">Row #</TableHead>
+                                                    <TableHead className="text-xs">Name</TableHead>
+                                                    <TableHead className="text-xs">HRDA ID</TableHead>
+                                                    <TableHead className="text-xs">Skip Reason</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {previewData.toSkip.slice(0, 50).map((row: any, idx: number) => (
+                                                    <TableRow key={idx} className="text-xs">
+                                                        <TableCell className="font-mono">{row.rowNumber}</TableCell>
+                                                        <TableCell className="font-medium">{row.name}</TableCell>
+                                                        <TableCell>{row.hrdaId || "-"}</TableCell>
+                                                        <TableCell className="text-amber-600">{row.reason}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <DialogFooter className="mt-4 pt-2 border-t">
+                        <Button variant="outline" onClick={() => setIsPreviewOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button 
+                            onClick={handleConfirmImport} 
+                            disabled={!previewData || previewData.toAdd.length === 0 || isImporting}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                            {isImporting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <CheckCircle className="w-4 h-4 mr-2" />}
+                            Confirm & Save {previewData?.toAdd.length || 0} Registrations
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
