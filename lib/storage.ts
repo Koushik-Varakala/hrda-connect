@@ -47,7 +47,7 @@ export interface IStorage {
     getRegistrationByHrdaId(hrdaId: string): Promise<Registration | undefined>;
     getRegistrationByToken(token: string): Promise<Registration | undefined>;
     getRegistrationByTxnId(txnId: string): Promise<Registration | undefined>;
-    createRegistration(registration: InsertRegistration): Promise<Registration>;
+    createRegistration(registration: InsertRegistration | any): Promise<Registration>;
     updateRegistration(id: number, updates: UpdateRegistrationRequest): Promise<Registration | undefined>;
     deleteRegistration(id: number): Promise<void>;
     getRegistrations(): Promise<Registration[]>;
@@ -228,7 +228,7 @@ export class DatabaseStorage implements IStorage {
         return registration;
     }
 
-    async createRegistration(insert: InsertRegistration): Promise<Registration> {
+    async createRegistration(insert: InsertRegistration | any): Promise<Registration> {
         const [result] = await db.insert(registrations).values({
             ...insert,
             verificationToken: randomUUID()

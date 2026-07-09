@@ -11,7 +11,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import * as XLSX from "xlsx";
-import { Pencil, Search, Trash2, Download, RefreshCw, CheckCircle, Loader2, Upload, FileSpreadsheet, AlertCircle } from "lucide-react";
+import { Pencil, Search, Trash2, Download, RefreshCw, CheckCircle, Loader2, Upload, FileSpreadsheet, AlertCircle, UserPlus, Calendar } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -42,8 +42,27 @@ export default function ManageRegistrations() {
     const [isImporting, setIsImporting] = useState(false);
     const [previewData, setPreviewData] = useState<{ toAdd: any[]; toSkip: any[]; summary: any } | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
     const queryClient = useQueryClient();
     const { toast } = useToast();
+
+    const createForm = useForm({
+        defaultValues: {
+            firstName: "",
+            lastName: "",
+            email: "",
+            phone: "",
+            tgmcId: "",
+            hrdaId: "",
+            address: "",
+            district: "",
+            status: "verified",
+            paymentStatus: "success",
+            membershipType: "single",
+            createdAt: new Date().toISOString().slice(0, 16),
+        }
+    });
 
     const form = useForm({
         defaultValues: {
@@ -57,6 +76,7 @@ export default function ManageRegistrations() {
             district: "",
             status: "",
             paymentStatus: "",
+            createdAt: "",
         }
     });
 
@@ -81,6 +101,30 @@ export default function ManageRegistrations() {
             updateMutation.mutate({ id: editingItem.id, ...data }, {
                 onSuccess: () => { setIsDialogOpen(false); setEditingItem(null); form.reset(); }
             });
+        }
+    };
+
+    const onCreateSubmit = async (data: any) => {
+        setIsCreating(true);
+        try {
+            const res = await fetch("/api/admin/registrations", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            const result = await res.json();
+            if (res.ok) {
+                toast({ title: "Registration Created", description: `Successfully added ${data.firstName} ${data.lastName}.` });
+                setIsCreateOpen(false);
+                createForm.reset();
+                queryClient.invalidateQueries();
+            } else {
+                toast({ title: "Failed to create", description: result.message || "An error occurred", variant: "destructive" });
+            }
+        } catch (err: any) {
+            toast({ title: "Error", description: err.message || "Failed to create registration", variant: "destructive" });
+        } finally {
+            setIsCreating(false);
         }
     };
 
@@ -257,6 +301,7 @@ export default function ManageRegistrations() {
             district: item.district,
             status: item.status,
             paymentStatus: item.paymentStatus || "pending",
+            createdAt: item.createdAt ? new Date(item.createdAt).toISOString().slice(0, 16) : "",
         });
         setIsDialogOpen(true);
     };
@@ -292,6 +337,13 @@ export default function ManageRegistrations() {
                     >
                         {isImporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                         Import Excel
+                    </Button>
+                    <Button 
+                        onClick={() => setIsCreateOpen(true)}
+                        className="flex items-center gap-2 whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                    >
+                        <UserPlus className="w-4 h-4" />
+                        Add Registration
                     </Button>
                     <input 
                         type="file" 
@@ -435,8 +487,128 @@ export default function ManageRegistrations() {
                                     <Input {...form.register("address")} placeholder="Address" />
                                 </div>
 
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium flex items-center gap-1.5 text-purple-700 dark:text-purple-300">
+                                        <Calendar className="w-4 h-4" />
+                                        Registration Date & Time (created_at)
+                                    </label>
+                                    <Input type="datetime-local" {...form.register("createdAt")} className="border-purple-200 dark:border-purple-800" />
+                                </div>
+
                                 <Button type="submit" className="w-full" disabled={updateMutation.isPending}>
                                     Update Registration
+                                </Button>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                            <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2 text-xl">
+                                    <UserPlus className="w-5 h-5 text-blue-600" />
+                                    Add New Member Registration ({appConfig.region})
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Manually insert a verified registration into the secure production database.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <form onSubmit={createForm.handleSubmit(onCreateSubmit)} className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">First Name *</label>
+                                        <Input {...createForm.register("firstName", { required: true })} placeholder="Dr. First Name" required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Last Name *</label>
+                                        <Input {...createForm.register("lastName", { required: true })} placeholder="Last Name" required />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Phone Number</label>
+                                        <Input {...createForm.register("phone")} placeholder="9876543210 (or auto-generated if blank)" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Email Address</label>
+                                        <Input {...createForm.register("email")} placeholder="doctor@example.com" />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">HRDA Registration Number</label>
+                                        <Input {...createForm.register("hrdaId")} placeholder="e.g. 1042" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">{appConfig.medicalCouncilId}</label>
+                                        <Input {...createForm.register("tgmcId")} placeholder={appConfig.medicalCouncilId} />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-3">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">District</label>
+                                        <Input {...createForm.register("district")} placeholder="District Name" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Verification Status</label>
+                                        <Controller
+                                            control={createForm.control}
+                                            name="status"
+                                            render={({ field }) => (
+                                                <Select value={field.value} onValueChange={field.onChange}>
+                                                    <SelectTrigger>
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="verified">Verified</SelectItem>
+                                                        <SelectItem value="pending_verification">Pending Verification</SelectItem>
+                                                        <SelectItem value="rejected">Rejected</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Payment Status</label>
+                                        <Controller
+                                            control={createForm.control}
+                                            name="paymentStatus"
+                                            render={({ field }) => (
+                                                <Select value={field.value} onValueChange={field.onChange}>
+                                                    <SelectTrigger>
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="success">Paid / Success</SelectItem>
+                                                        <SelectItem value="pending">Pending</SelectItem>
+                                                        <SelectItem value="failed">Failed</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Address</label>
+                                    <Input {...createForm.register("address")} placeholder="Clinic or Residential Address" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium flex items-center gap-1.5 text-purple-700 dark:text-purple-300">
+                                        <Calendar className="w-4 h-4" />
+                                        Registration Date & Time (created_at)
+                                    </label>
+                                    <Input type="datetime-local" {...createForm.register("createdAt")} className="border-purple-200 dark:border-purple-800" />
+                                    <p className="text-xs text-muted-foreground">Allows setting backdated or custom registration timestamps.</p>
+                                </div>
+
+                                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={isCreating}>
+                                    {isCreating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
+                                    Create Member Registration
                                 </Button>
                             </form>
                         </DialogContent>
