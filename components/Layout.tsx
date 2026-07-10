@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Menu, X, Facebook, Twitter, Instagram, Youtube, ChevronDown } from "lucide-react";
+import { Menu, X, Facebook, Twitter, Instagram, Youtube, ChevronDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -39,27 +39,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   const mainLinks = [
     { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
-    { name: "Panels", href: "/panels" },
+    { name: "About Us", href: "/about" },
+    { name: appConfig.region === 'AP' ? "Leadership" : "Panels", href: "/panels" },
   ];
 
-  const notificationLinks = [
-    { name: "Announcements", href: "/announcements", description: "Latest updates and news." },
-    { name: "Elections", href: "/election-panel", description: "Election updates and candidate info." },
-    { name: "District Elections", href: "/district-elections", description: "Nomination portal & official documents." },
+  const rmpLinks = [
+    { name: "Who is an RMP?", href: "/rmp", description: "Statutory legal definition under NMC Act 2019." },
+    { name: "Anti-Quackery Policy", href: "/rmp", description: "Legal provisions prohibiting unqualified allopathic practice." },
+    { name: "Anti-Quackery Enforcement", href: "/rmp", description: "APMC Section 8 Inspection Committee powers & procedures." },
+  ];
+
+  const updateLinks = [
+    ...(appConfig.region === 'AP' ? [{ name: "Reform Agenda", href: "/manifesto", description: "HRDA's 18-point APMC reform manifesto." }] : []),
+    { name: "Announcements & Events", href: "/announcements", description: "Latest updates, notices and news." },
+    { name: "Elections Portal", href: "/election-panel", description: "Election updates and candidate info." },
+    ...(appConfig.region === 'TG' ? [{ name: "District Elections", href: "/district-elections", description: "Nomination portal & official documents." }] : []),
   ];
 
   const resourceLinks = [
     { name: "Achievements", href: "/achievements", description: "Our milestones and success stories." },
-    { name: "Gallery", href: "/gallery", description: "View our photo gallery." },
+    { name: "Photo Gallery", href: "/gallery", description: "View our photo & event gallery." },
     { name: "Media Coverage", href: "/media", description: "News articles and press releases." },
     { name: "Departments", href: "/departments", description: "Various functional committees." },
-    ...(appConfig.region === 'AP' ? [{ name: "Commitment Charter", href: "/manifesto", description: "HRDA's full vision and reform manifesto." }] : []),
-  ];
-
-  const secondaryLinks = [
-    { name: "Search", href: "/search" },
-    { name: "Contact", href: "/contact" },
+    { name: "Contact Us", href: "/contact", description: "Get in touch with state leadership." },
   ];
 
   const isActive = (path: string) => pathname === path;
@@ -114,19 +116,54 @@ export function Layout({ children }: { children: React.ReactNode }) {
               ))}
             </div>
 
-            {/* Notifications Dropdown (Isolated for Alignment) */}
+            {/* RMP Legal Portal Dropdown - AP Only or Always Accessible */}
+            {appConfig.region === 'AP' && (
+              <NavigationMenu className="mx-1">
+                <NavigationMenuList>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:!bg-transparent data-[state=open]:text-primary text-slate-700 shadow-none border-none">
+                      <span className="relative">
+                        RMP
+                        <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
+                      </span>
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid w-[270px] gap-2 p-3 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                        {rmpLinks.map((link) => (
+                          <li key={link.name}>
+                            <NavigationMenuLink asChild>
+                              <Link
+                                href={link.href}
+                                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50"
+                              >
+                                <div className="text-sm font-semibold leading-none text-slate-800">{link.name}</div>
+                                <p className="line-clamp-2 text-xs leading-snug text-slate-500 mt-1">
+                                  {link.description}
+                                </p>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+            )}
+
+            {/* Updates Dropdown */}
             <NavigationMenu className="mx-1">
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:!bg-transparent data-[state=open]:text-primary text-slate-700 shadow-none border-none">
+                  <NavigationMenuTrigger className="group inline-flex h-10 w-max items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:!bg-transparent data-[state=open]:text-primary text-slate-700 shadow-none border-none">
                     <span className="relative">
-                      Notifications
+                      Updates
                       <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
                     </span>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[250px] gap-2 p-3 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                      {notificationLinks.map((link) => (
+                    <ul className="grid w-[260px] gap-2 p-3 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                      {updateLinks.map((link) => (
                         <li key={link.href}>
                           <NavigationMenuLink asChild>
                             <Link
@@ -134,7 +171,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                               className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50"
                             >
                               <div className="text-sm font-semibold leading-none text-slate-800">{link.name}</div>
-                              <p className="line-clamp-2 text-sm leading-snug text-slate-500 mt-1">
+                              <p className="line-clamp-2 text-xs leading-snug text-slate-500 mt-1">
                                 {link.description}
                               </p>
                             </Link>
@@ -147,18 +184,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </NavigationMenuList>
             </NavigationMenu>
 
-            {/* Insights Dropdown (Isolated for Alignment) */}
+            {/* Resources Dropdown */}
             <NavigationMenu className="mx-1">
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:!bg-transparent data-[state=open]:text-primary text-slate-700 shadow-none border-none">
+                  <NavigationMenuTrigger className="group inline-flex h-10 w-max items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:!bg-transparent data-[state=open]:text-primary text-slate-700 shadow-none border-none">
                     <span className="relative">
-                      Insights
+                      Resources
                       <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
                     </span>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[250px] gap-2 p-3 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                    <ul className="grid w-[260px] gap-2 p-3 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                       {resourceLinks.map((link) => (
                         <li key={link.href}>
                           <NavigationMenuLink asChild>
@@ -167,7 +204,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                               className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50"
                             >
                               <div className="text-sm font-semibold leading-none text-slate-800">{link.name}</div>
-                              <p className="line-clamp-2 text-sm leading-snug text-slate-500 mt-1">
+                              <p className="line-clamp-2 text-xs leading-snug text-slate-500 mt-1">
                                 {link.description}
                               </p>
                             </Link>
@@ -179,31 +216,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
-
-            {/* Secondary Links */}
-            <div className="flex items-center gap-1">
-              {secondaryLinks.map((link) => (
-                <Link key={link.href} href={link.href}
-                  className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer ${isActive(link.href) ? "text-primary font-semibold" : "text-slate-700"
-                    }`}
-                >
-                  <span className="relative">
-                    {link.name}
-                    <span className={`absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100 ${isActive(link.href) ? "scale-x-100" : ""}`} />
-                  </span>
-                </Link>
-              ))}
-            </div>
           </nav>
 
           {/* Action Buttons */}
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-3">
+            <Link
+              href="/search"
+              className="p-2 text-slate-600 hover:text-primary hover:bg-slate-100 rounded-full transition-colors"
+              title="Search"
+            >
+              <Search className="w-4 h-4" />
+            </Link>
+
             {user ? (
-              <Link href="/admin/dashboard" className="text-sm font-medium text-slate-700 hover:text-primary transition-colors">
-                Admin Dashboard
+              <Link href="/admin/dashboard" className="text-xs font-semibold text-slate-700 hover:text-primary transition-colors px-2 py-1 rounded hover:bg-slate-50">
+                Admin
               </Link>
             ) : (
-              <Link href="/login" className="text-sm font-medium text-slate-700 hover:text-primary transition-colors">
+              <Link href="/login" className="text-xs font-semibold text-slate-700 hover:text-primary transition-colors px-2 py-1 rounded hover:bg-slate-50">
                 Login
               </Link>
             )}
@@ -257,18 +287,31 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
 
-            {/* Mobile Notifications Dropdown */}
+            {appConfig.region === 'AP' && (
+              <Link href="/rmp">
+                <div
+                  className={`p-3 rounded-lg font-medium transition-colors flex items-center justify-between ${isActive("/rmp") ? "bg-blue-50 text-blue-700 font-bold" : "text-slate-700 hover:bg-slate-50"
+                    }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span>RMP &amp; Anti-Quackery</span>
+                  <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700">Legal Portal</span>
+                </div>
+              </Link>
+            )}
+
+            {/* Mobile Updates Dropdown */}
             <div className="border border-slate-100 rounded-lg overflow-hidden">
               <button
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
                 className="w-full flex items-center justify-between p-3 font-medium text-slate-700 hover:bg-slate-50 transition-colors"
               >
-                Notifications
+                Updates
                 <ChevronDown className={`w-4 h-4 transition-transform ${isNotificationsOpen ? "rotate-180" : ""}`} />
               </button>
               {isNotificationsOpen && (
                 <div className="bg-slate-50 p-2 space-y-1">
-                  {notificationLinks.map((link) => (
+                  {updateLinks.map((link) => (
                     <Link key={link.href} href={link.href}>
                       <div
                         className={`px-3 py-2 rounded-lg text-sm transition-colors ${isActive(link.href) ? "bg-white text-blue-700 font-medium shadow-sm" : "text-slate-600 hover:bg-white hover:shadow-sm"
@@ -283,13 +326,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
               )}
             </div>
 
-            {/* Mobile Insights Dropdown */}
+            {/* Mobile Resources Dropdown */}
             <div className="border border-slate-100 rounded-lg overflow-hidden">
               <button
                 onClick={() => setIsInsightsOpen(!isInsightsOpen)}
                 className="w-full flex items-center justify-between p-3 font-medium text-slate-700 hover:bg-slate-50 transition-colors"
               >
-                Insights
+                Resources
                 <ChevronDown className={`w-4 h-4 transition-transform ${isInsightsOpen ? "rotate-180" : ""}`} />
               </button>
               {isInsightsOpen && (
@@ -309,17 +352,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
               )}
             </div>
 
-            {secondaryLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
-                <div
-                  className={`p-3 rounded-lg font-medium transition-colors ${isActive(link.href) ? "bg-blue-50 text-blue-700" : "text-slate-700 hover:bg-slate-50"
-                    }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.name}
-                </div>
-              </Link>
-            ))}
+            <Link href="/search">
+              <div
+                className={`p-3 rounded-lg font-medium transition-colors ${isActive("/search") ? "bg-blue-50 text-blue-700" : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Search
+              </div>
+            </Link>
 
             <div className="h-px bg-gray-100 my-4" />
 
