@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -105,6 +105,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 bg-slate-900 border-r-slate-800 p-0 text-slate-300">
+            <SheetTitle className="sr-only">Admin Navigation Menu</SheetTitle>
             <div className="h-16 flex items-center px-6 border-b border-slate-800">
               <span className="font-serif font-bold text-white text-lg">HRDA Admin</span>
             </div>

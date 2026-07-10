@@ -171,16 +171,15 @@ export default function Manifesto() {
     return (
         <Layout>
             {/* Hero */}
-            <div className="bg-slate-900 text-white py-16 md:py-24 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/60 to-slate-900" />
+            <div className="bg-gradient-to-r from-[#1a237e] via-[#0d47a1] to-[#1565c0] text-white py-14 md:py-20 shadow-md">
                 <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10 text-center max-w-4xl">
-                    <span className="inline-block bg-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
+                    <span className="inline-block bg-white/15 border border-white/20 text-white text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full mb-4">
                         HRDA Andhra Pradesh
                     </span>
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 leading-tight">
+                    <h1 className="text-3xl md:text-5xl font-serif font-bold mb-4 leading-tight text-white drop-shadow-sm">
                         HRDA Commitment Charter
                     </h1>
-                    <p className="text-lg text-slate-300 mb-2 italic">
+                    <p className="text-lg text-blue-100 mb-2 italic">
                         A Charter of Advocacy, Protection, and Professional Excellence
                     </p>
                     <p className="text-sm text-slate-400">— Team HRDA</p>

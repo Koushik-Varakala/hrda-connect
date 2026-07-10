@@ -83,7 +83,8 @@
   h5,
   h6 {
     font-family: var(--font-serif);
-    @apply font-bold tracking-tight text-slate-900 dark:text-slate-100;
+    @apply font-bold tracking-tight;
+    color: inherit;
   }
 }
 
