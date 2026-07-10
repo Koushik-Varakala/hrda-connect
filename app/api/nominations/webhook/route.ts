@@ -91,7 +91,7 @@ export async function POST(request: Request) {
                         district: updatedNomination.district,
                         postApplied: updatedNomination.postApplied,
                         fee: updatedNomination.nominationFee,
-                        paymentRef: paymentId,
+                        paymentRef: paymentId || "N/A",
                         photoUrl: updatedNomination.photoUrl || undefined,
                         signatureUrl: updatedNomination.signatureUrl || undefined,
                     });
