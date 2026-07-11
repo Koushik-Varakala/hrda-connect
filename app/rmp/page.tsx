@@ -57,49 +57,62 @@ export default function RMPLegalPortal() {
                         </TabsTrigger>
                     </TabsList>
 
-                    {/* TAB 1: WHO IS RMP? */}
+                    {/* TAB 1: WHO IS RMP? - OFFICIAL CORRECTED LEGAL TEXT */}
                     <TabsContent value="who-is-rmp" className="space-y-8 animate-in fade-in-50 duration-300">
-                        {/* Myth vs Reality Header Banner */}
+                        {/* SECTION 1: RMP is a DOCTOR */}
                         <Card className="border-l-4 border-l-blue-600 bg-gradient-to-r from-blue-50/60 to-white dark:from-slate-900 dark:to-slate-900 shadow-sm">
                             <CardContent className="p-6 md:p-8 space-y-4">
                                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
                                     <div>
-                                        <div className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Statutory Reality Check</div>
+                                        <div className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Statutory Legal Overview</div>
                                         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-                                            Is every person using "RMP" a doctor?
+                                            RMP is a DOCTOR
                                         </h2>
                                     </div>
-                                    <div className="px-4 py-2 rounded-lg bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300 font-bold text-sm flex items-center gap-2">
-                                        <XCircle className="w-5 h-5" />
-                                        Popular Assumption is Legally INCORRECT
+                                    <div className="px-4 py-2 rounded-lg bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 font-bold text-sm flex items-center gap-2">
+                                        <AlertTriangle className="w-5 h-5 text-amber-600" />
+                                        Important Legal Clarification
                                     </div>
                                 </div>
                                 <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                                    Every day, millions of patients visit signboards displaying <span className="font-semibold text-slate-900 dark:text-white">Dr. XXXXXXX RMP</span>. 
-                                    Most members of the public—and even many public authorities—incorrectly assume that the abbreviation "RMP" denotes a rural or informal practitioner. 
-                                    In Indian law, <span className="font-bold text-blue-700 dark:text-blue-400">RMP (Registered Medical Practitioner)</span> is <span className="underline decoration-blue-500 font-semibold">not merely a title or abbreviation</span>; it denotes a <span className="font-bold">statutory legal status</span> recognized under parliamentary enactments.
+                                    Every day, millions of patients visit persons displaying signboards such as:
+                                </p>
+                                <div className="p-4 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl max-w-xs mx-auto text-center shadow-inner my-2">
+                                    <div className="font-bold text-lg text-slate-900 dark:text-white">Dr. XXXXXXX</div>
+                                    <div className="font-extrabold text-blue-700 dark:text-blue-400 text-xl tracking-wider">RMP</div>
+                                </div>
+                                <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    Most people assume that anyone using the designation <span className="font-bold text-slate-900 dark:text-white">RMP</span> is legally entitled to practise Modern Scientific Medicine (Allopathy). Many Government officials also make the same assumption.
+                                </p>
+                                <p className="font-bold text-slate-900 dark:text-white text-base">
+                                    But is that assumption legally correct?
+                                </p>
+                                <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    To answer this, we must first understand a few basic legal concepts.
                                 </p>
                             </CardContent>
                         </Card>
 
-                        {/* Step 1: What is Medicine */}
+                        {/* SECTION 2 & 3: WHAT IS MEDICINE & WHO IS A MEDICAL PRACTITIONER */}
                         <div className="grid md:grid-cols-2 gap-6">
                             <Card className="shadow-sm border border-slate-200 dark:border-slate-800">
                                 <CardHeader className="bg-slate-50 dark:bg-slate-800/50 pb-4">
                                     <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
                                         <FileText className="w-5 h-5 text-blue-600" />
-                                        Legal Definition of "Medicine"
+                                        WHAT IS &ldquo;MEDICINE&rdquo;?
                                     </CardTitle>
                                     <CardDescription>Section 2(j) of the National Medical Commission Act, 2019</CardDescription>
                                 </CardHeader>
                                 <CardContent className="pt-6 space-y-4 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                                    <p>Many believe medicine simply means tablets, injections, or treatment. Legally, that understanding is incorrect.</p>
+                                    <p>Many people think medicine simply means tablets, injections, or treatment. Legally, however, the word has a specific meaning.</p>
+                                    <p>Under <span className="font-semibold text-slate-900 dark:text-white">Section 2(j) of the National Medical Commission Act, 2019</span>:</p>
                                     <blockquote className="p-4 rounded-lg bg-blue-50/70 dark:bg-blue-950/40 border-l-4 border-blue-600 text-slate-900 dark:text-slate-100 font-medium italic">
                                         &ldquo;Medicine means Modern Scientific Medicine in all its branches and includes Surgery and Obstetrics, but does not include Veterinary Medicine and Surgery.&rdquo;
                                     </blockquote>
-                                    <p className="text-xs text-muted-foreground">
-                                        Therefore, whenever parliamentary or state laws refer to the practice of medicine, it refers exclusively to <span className="font-semibold">Modern Scientific Medicine (Allopathy)</span>.
+                                    <p>
+                                        Therefore, under the <span className="font-semibold text-slate-900 dark:text-white">National Medical Commission Act, 2019</span>, the practice of <span className="font-bold">Medicine</span> refers exclusively to <span className="font-bold">Modern Scientific Medicine (Allopathy).</span>
                                     </p>
+                                    <p className="text-xs text-muted-foreground font-medium">This leads to the next question.</p>
                                 </CardContent>
                             </Card>
 
@@ -107,77 +120,94 @@ export default function RMPLegalPortal() {
                                 <CardHeader className="bg-slate-50 dark:bg-slate-800/50 pb-4">
                                     <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
                                         <Award className="w-5 h-5 text-indigo-600" />
-                                        Degree vs. Statutory Licence
+                                        WHO IS A MEDICAL PRACTITIONER?
                                     </CardTitle>
-                                    <CardDescription>Academic Qualification vs. Legal Entitlement</CardDescription>
+                                    <CardDescription>In Modern Scientific Medicine</CardDescription>
                                 </CardHeader>
                                 <CardContent className="pt-6 space-y-4 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
                                     <p>
-                                        A <span className="font-semibold">Medical Practitioner</span> is a person possessing a recognized undergraduate medical qualification (such as <span className="font-bold">MBBS</span>) under the NMC Act, 2019.
+                                        A <span className="font-bold text-slate-900 dark:text-white">Medical Practitioner</span> is a person who possesses a <span className="font-semibold text-slate-900 dark:text-white">recognised medical qualification</span> in <span className="font-semibold text-slate-900 dark:text-white">Modern Scientific Medicine (Allopathy)</span> recognised under the <span className="font-semibold text-slate-900 dark:text-white">National Medical Commission Act, 2019</span>, and is trained and competent to diagnose diseases, prescribe medicines, treat illnesses, perform medical procedures, and provide healthcare in accordance with law.
                                     </p>
-                                    <div className="p-3.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 font-medium">
-                                        A recognized medical degree is an academic qualification. It is not, by itself, the statutory authority or licence to practise Modern Scientific Medicine independently.
+                                    <div className="p-3.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 text-indigo-950 dark:text-indigo-200 font-medium">
+                                        In India, the primary recognised undergraduate medical qualification is <span className="font-bold">MBBS</span>.
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* SECTION 4: WHO IS A REGISTERED MEDICAL PRACTITIONER (RMP)? */}
+                        <Card className="border-t-4 border-t-emerald-600 shadow-sm bg-white dark:bg-slate-900">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-xl">
+                                    <CheckCircle2 className="w-6 h-6" />
+                                    WHO IS A REGISTERED MEDICAL PRACTITIONER (RMP)?
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4 text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <p>
+                                    A <span className="font-bold text-slate-900 dark:text-white">Registered Medical Practitioner (RMP)</span> is a medical practitioner who is duly registered in the <span className="font-bold text-slate-900 dark:text-white">State Medical Register</span> and/or the <span className="font-bold text-slate-900 dark:text-white">National Medical Register</span> in accordance with the applicable law.
+                                </p>
+                                <p>
+                                    Only after possessing a recognised medical qualification and obtaining such statutory registration does a person become legally entitled to practise Modern Scientific Medicine.
+                                </p>
+                                <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100 font-bold text-base">
+                                    Thus, RMP is not merely a title or abbreviation—it is a statutory legal status.
+                                </div>
+                                <p>Accordingly, persons such as:</p>
+                                <div className="grid sm:grid-cols-2 gap-4 my-2">
+                                    <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold text-slate-900 dark:text-white text-center">
+                                        Dr. XXXXXXX, MBBS
+                                    </div>
+                                    <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold text-slate-900 dark:text-white text-center">
+                                        Dr. XXXXXXX, MBBS, MD/MS, DM, MCh, etc.
+                                    </div>
+                                </div>
+                                <p className="font-semibold text-slate-900 dark:text-white">
+                                    holding valid statutory registration, are legally Registered Medical Practitioners, provided they possess a recognised medical qualification and hold valid statutory registration.
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        {/* SECTION 5: WHY IS THERE CONFUSION? */}
+                        <Card className="bg-amber-50/80 dark:bg-amber-950/30 border-l-4 border-l-amber-600 border-amber-200 dark:border-amber-900 shadow-sm">
+                            <CardContent className="p-6 md:p-8 space-y-4">
+                                <h3 className="text-xl font-bold text-amber-950 dark:text-amber-200 flex items-center gap-2">
+                                    <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0" />
+                                    WHY IS THERE CONFUSION?
+                                </h3>
+                                <div className="text-slate-800 dark:text-slate-200 text-sm md:text-base leading-relaxed space-y-4">
+                                    <p>
+                                        Some unqualified persons describe themselves as <span className="font-bold">&ldquo;RMP&rdquo;</span>, claiming it means <span className="font-bold">&ldquo;Rural Medical Practitioner&rdquo;</span> or similar expressions.
+                                    </p>
+                                    <p>
+                                        This has created widespread confusion among patients and even public authorities.
+                                    </p>
+                                    <p>
+                                        However, the abbreviation <span className="font-bold">RMP (Registered Medical Practitioner)</span> already has a recognised legal meaning in medical law. Merely expanding it as <span className="font-bold">&ldquo;Rural Medical Practitioner&rdquo;</span> or any similar expression does <span className="font-bold text-red-700 dark:text-red-400">not</span> create the legal status of a <span className="font-bold">Registered Medical Practitioner</span>.
+                                    </p>
+                                    <p>Therefore, when a signboard reads:</p>
+                                    <div className="p-3 bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-800 rounded-lg max-w-xs mx-auto text-center font-bold text-slate-900 dark:text-white">
+                                        Dr. XXXXXXX, RMP
                                     </div>
                                     <p>
-                                        Independent practice requires valid statutory enrollment in the State Medical Register or the National Medical Register.
+                                        the letters <span className="font-bold">&ldquo;RMP&rdquo;</span> alone do <span className="font-bold text-red-700 dark:text-red-400">not</span> establish that the person is legally entitled to practise Modern Scientific Medicine.
                                     </p>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        {/* Who IS vs Who is NOT an RMP */}
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <Card className="border-t-4 border-t-emerald-600 shadow-sm bg-white dark:bg-slate-900">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold">
-                                        <CheckCircle2 className="w-5 h-5" />
-                                        An RMP IS Strictly a Person Who:
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
-                                    <ul className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
-                                        <li className="flex items-start gap-2.5">
-                                            <div className="w-2 h-2 rounded-full bg-emerald-600 mt-1.5 shrink-0" />
-                                            <span>Possesses a recognized medical qualification in <span className="font-semibold">Modern Scientific Medicine (Allopathy)</span>; and</span>
-                                        </li>
-                                        <li className="flex items-start gap-2.5">
-                                            <div className="w-2 h-2 rounded-full bg-emerald-600 mt-1.5 shrink-0" />
-                                            <span>Is duly enrolled in the <span className="font-bold">State Medical Register</span> or <span className="font-bold">National Medical Register</span> under Section 31 of the NMC Act, 2019.</span>
-                                        </li>
-                                    </ul>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-t-4 border-t-red-600 shadow-sm bg-white dark:bg-slate-900">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400 font-bold">
-                                        <XCircle className="w-5 h-5" />
-                                        An RMP is NEVER:
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
-                                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                        <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500 shrink-0" /> A generic title</li>
-                                        <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500 shrink-0" /> A private certificate</li>
-                                        <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500 shrink-0" /> A "Village Doctor"</li>
-                                        <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500 shrink-0" /> A "Rural Practitioner"</li>
-                                        <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500 shrink-0" /> Experience without degree</li>
-                                        <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500 shrink-0" /> Self-assumed designation</li>
-                                    </ul>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        {/* Clarification Box */}
-                        <Card className="bg-amber-50/80 border-l-4 border-l-amber-600 border-amber-200 shadow-sm">
-                            <CardContent className="p-6 md:p-8 space-y-3">
-                                <h3 className="text-xl font-bold text-amber-900 flex items-center gap-2">
-                                    <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
-                                    Legal Verdict: Is &ldquo;Dr. XXXXX RMP&rdquo; Legally Valid?
-                                </h3>
-                                <p className="text-slate-800 text-sm md:text-base leading-relaxed">
-                                    The expression <span className="text-slate-900 font-mono font-bold bg-white px-2 py-0.5 rounded border border-amber-300">Dr. XXXXX RMP</span> does <span className="text-red-700 font-bold underline">NOT</span>, by itself, establish that the person is legally entitled to practise Modern Scientific Medicine. Neither private certificates, village practice, experience, nor self-assumed designations can substitute statutory enrollment under Section 31 of the NMC Act, 2019.
-                                </p>
+                                    <p>
+                                        Neither First Aid certificates, private certificates, village medical practice, experience, nor self-assumed designations can substitute the statutory requirements of recognised medical qualifications and valid statutory registration.
+                                    </p>
+                                    <p>
+                                        Patients should never assume that the mere use of the abbreviation <span className="font-bold">&ldquo;RMP&rdquo;</span> signifies legal entitlement to practise Modern Scientific Medicine.
+                                    </p>
+                                    <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border-2 border-amber-500/60 font-bold text-slate-900 dark:text-white">
+                                        The legal status of an RMP depends entirely upon recognised medical qualifications and statutory registration—not upon the letters &ldquo;RMP&rdquo; displayed on a signboard.
+                                    </div>
+                                    <div className="p-4 rounded-xl bg-red-100/80 dark:bg-red-950/50 border border-red-300 dark:border-red-800 text-red-950 dark:text-red-200 font-semibold">
+                                        A person who practises Modern Scientific Medicine without a recognised medical qualification and valid statutory registration is commonly referred to as a quack, illegal medical practitioner, unqualified medical practitioner, or fake medical practitioner.
+                                    </div>
+                                    <div className="p-4 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold text-base shadow-md">
+                                        Therefore, a person merely describing himself or herself as a &ldquo;Rural Medical Practitioner (RMP)&rdquo; without possessing a recognised medical qualification and valid statutory registration is not a Registered Medical Practitioner and is not legally entitled to practise Modern Scientific Medicine. Such a RMP is not a doctor.
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
                     </TabsContent>
