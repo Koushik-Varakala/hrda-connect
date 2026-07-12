@@ -236,8 +236,28 @@ export class DatabaseStorage implements IStorage {
         return result;
     }
 
-    async updateRegistration(id: number, updates: UpdateRegistrationRequest): Promise<Registration | undefined> {
-        const [result] = await db.update(registrations).set(updates).where(eq(registrations.id, id)).returning();
+    async updateRegistration(id: number, updates: any): Promise<Registration | undefined> {
+        const payload: any = { ...updates };
+        delete payload.id;
+
+        ['createdAt', 'updatedAt', 'otpExpiresAt'].forEach((key) => {
+            if (key in payload) {
+                if (!payload[key] || payload[key] === "") {
+                    delete payload[key];
+                } else if (typeof payload[key] === 'string') {
+                    const parsed = new Date(payload[key]);
+                    if (!isNaN(parsed.getTime())) {
+                        payload[key] = parsed;
+                    } else {
+                        delete payload[key];
+                    }
+                }
+            }
+        });
+
+        payload.updatedAt = new Date();
+
+        const [result] = await db.update(registrations).set(payload).where(eq(registrations.id, id)).returning();
         return result;
     }
 

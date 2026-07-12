@@ -124,9 +124,9 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
         }
 
         return NextResponse.json(result);
-    } catch (err) {
+    } catch (err: any) {
         console.error("Update error:", err);
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ message: err?.message || "Internal Server Error" }, { status: 500 });
     }
 }
 

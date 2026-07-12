@@ -74,7 +74,7 @@ export default function About() {
 
             <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16 space-y-16 md:space-y-20">
                 {/* History Section */}
-                <section>
+                <section id="history">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div>
                             <h2 className="text-3xl font-bold mb-6 text-primary">Our History</h2>
@@ -122,14 +122,14 @@ export default function About() {
                         </div>
                     </div>
                 </section>
-
+ 
                 {/* AP Vision, Mission & Core Values */}
                 {appConfig.region === 'AP' && (
                     <>
                         <Separator />
                         <section className="space-y-12">
                             <div className="grid md:grid-cols-2 gap-8">
-                                <Card className="border-t-4 border-t-blue-600 shadow-sm bg-white dark:bg-slate-900">
+                                <Card id="vision" className="border-t-4 border-t-blue-600 shadow-sm bg-white dark:bg-slate-900">
                                     <CardContent className="pt-6 space-y-3">
                                         <h3 className="text-xl font-bold text-blue-700 dark:text-blue-400 flex items-center gap-2">
                                             <Compass className="w-5 h-5" />
@@ -140,8 +140,8 @@ export default function About() {
                                         </p>
                                     </CardContent>
                                 </Card>
-
-                                <Card className="border-t-4 border-t-indigo-600 shadow-sm bg-white dark:bg-slate-900">
+ 
+                                <Card id="mission" className="border-t-4 border-t-indigo-600 shadow-sm bg-white dark:bg-slate-900">
                                     <CardContent className="pt-6 space-y-3">
                                         <h3 className="text-xl font-bold text-indigo-700 dark:text-indigo-400 flex items-center gap-2">
                                             <Shield className="w-5 h-5" />
@@ -168,8 +168,8 @@ export default function About() {
                                     </CardContent>
                                 </Card>
                             </div>
-
-                            <div className="space-y-6">
+ 
+                            <div id="values" className="space-y-6">
                                 <div className="text-center">
                                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Our Core Values</h3>
                                     <p className="text-sm text-muted-foreground mt-1">

@@ -98,7 +98,11 @@ export default function ManageRegistrations() {
 
     const onSubmit = (data: any) => {
         if (editingItem) {
-            updateMutation.mutate({ id: editingItem.id, ...data }, {
+            const cleanData = { ...data };
+            if (!cleanData.createdAt || cleanData.createdAt === "") {
+                delete cleanData.createdAt;
+            }
+            updateMutation.mutate({ id: editingItem.id, ...cleanData }, {
                 onSuccess: () => { setIsDialogOpen(false); setEditingItem(null); form.reset(); }
             });
         }
