@@ -30,6 +30,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [isInsightsOpen, setIsInsightsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDonationOpen, setIsDonationOpen] = useState(false);
+  const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
   const pathname = usePathname();
   const { user } = useAuth();
 
@@ -58,9 +59,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
   ];
 
   const rmpLinks = [
-    { name: "Who is an RMP?", href: "/rmp", description: "Statutory legal definition under NMC Act 2019." },
-    { name: "Anti-Quackery Policy", href: "/rmp", description: "Legal provisions prohibiting unqualified allopathic practice." },
-    { name: "Anti-Quackery Enforcement", href: "/rmp", description: "APMC Section 8 Inspection Committee powers & procedures." },
+    { name: "Who is an RMP?", href: "/rmp?tab=who-is-rmp", description: "Statutory legal definition under NMC Act 2019." },
+    { name: "Anti-Quackery Policy", href: "/rmp?tab=policy", description: "Legal provisions prohibiting unqualified allopathic practice." },
+    { name: "Anti-Quackery Enforcement", href: "/rmp?tab=enforcement", description: "APMC Section 8 Inspection Committee powers & procedures." },
   ];
 
   const updateLinks = [
@@ -249,23 +250,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             )}
 
-            {/* Region Switcher Button */}
-            <Button
-              onClick={() => {
-                const targetUrl = appConfig.region === 'TG'
-                  ? (process.env.NODE_ENV === 'production' ? 'https://ap.hrda-india.org' : 'http://localhost:3000')
-                  : (process.env.NODE_ENV === 'production' ? 'https://hrda-india.org' : 'http://localhost:3000');
-                const currentPath = window.location.pathname;
-                window.location.href = `${targetUrl}${currentPath}`;
-              }}
-              variant="outline"
-              size="sm"
-              className="border-primary text-primary hover:bg-primary hover:text-white transition-colors px-3"
+            {/* Clean State Portal Badge / Switcher (Mobile & Desktop Friendly) */}
+            <button
+              onClick={() => setIsRegionModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all shadow-xs bg-slate-900 text-white border-slate-700 hover:bg-slate-800"
+              title="Click to switch between Andhra Pradesh and Telangana portals"
             >
-              <span className="text-xs font-semibold">{appConfig.region}</span>
-              <span className="mx-1">↔</span>
-              <span className="text-xs font-semibold">{appConfig.region === 'TG' ? 'AP' : 'TG'}</span>
-            </Button>
+              <span className="text-amber-400">📍</span>
+              <span className="hidden sm:inline">HRDA {appConfig.stateName}</span>
+              <span className="sm:hidden">{appConfig.region === 'TG' ? 'TS Portal' : 'AP Portal'}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+            </button>
 
             {appConfig.region === 'AP' && (
               <Button
@@ -445,7 +440,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4 md:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <img src="/hrda_logo.png" alt="HRDA Logo" className="h-10 w-10 object-contain rounded-full bg-white p-1" />
+              <img src={appConfig.region === 'AP' ? "/hrda_ap_logo.png" : "/hrda_logo.png"} alt="HRDA Logo" className="h-10 w-10 object-contain rounded-full bg-white p-1" />
               <div className="flex flex-col">
                 <span className="font-serif font-bold text-lg text-white leading-tight">HRDA</span>
                 <span className="text-[10px] text-slate-400 uppercase tracking-wide">Healthcare Reforms Doctors Association</span>
@@ -528,7 +523,81 @@ export function Layout({ children }: { children: React.ReactNode }) {
       
       {/* Donation Modal */}
       <DonationModal open={isDonationOpen} onOpenChange={setIsDonationOpen} />
+
+      {/* State Switcher Modal */}
+      <StateSwitcherModal open={isRegionModalOpen} onOpenChange={setIsRegionModalOpen} />
     </div>
+  );
+}
+
+function StateSwitcherModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
+  const switchRegion = (targetRegion: 'AP' | 'TG') => {
+    const targetUrl = targetRegion === 'AP'
+      ? (process.env.NODE_ENV === 'production' ? 'https://ap.hrda-india.org' : 'http://localhost:3000')
+      : (process.env.NODE_ENV === 'production' ? 'https://hrda-india.org' : 'http://localhost:3000');
+    window.location.href = `${targetUrl}${window.location.pathname}`;
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md shadow-2xl rounded-2xl border border-slate-200">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-center text-slate-900 flex items-center justify-center gap-2">
+            <span>🏛️</span> Select HRDA State Council Portal
+          </DialogTitle>
+          <DialogDescription className="text-center text-slate-500 text-xs">
+            Choose your state medical association portal to access official legal guidelines, leadership panels, and registrations.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-1 gap-3 py-4">
+          {/* AP Option */}
+          <button
+            onClick={() => switchRegion('AP')}
+            className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
+              appConfig.region === 'AP'
+                ? 'border-blue-600 bg-blue-50/70 shadow-sm'
+                : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50'
+            }`}
+          >
+            <img src="/hrda_ap_logo.png" alt="AP Emblem" className="w-12 h-12 object-contain shrink-0 rounded-full bg-white p-0.5 border" />
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <h4 className="font-bold text-slate-900 text-base">Andhra Pradesh Portal</h4>
+                {appConfig.region === 'AP' && (
+                  <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-blue-600 text-white">
+                    Active
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">APMC Section 8 Inspection Committee &amp; AP Reform Agenda</p>
+            </div>
+          </button>
+
+          {/* TS Option */}
+          <button
+            onClick={() => switchRegion('TG')}
+            className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
+              appConfig.region === 'TG'
+                ? 'border-emerald-600 bg-emerald-50/70 shadow-sm'
+                : 'border-slate-200 hover:border-emerald-300 hover:bg-slate-50'
+            }`}
+          >
+            <img src="/hrda_logo.png" alt="TS Emblem" className="w-12 h-12 object-contain shrink-0 rounded-full bg-white p-0.5 border" />
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <h4 className="font-bold text-slate-900 text-base">Telangana State Portal</h4>
+                {appConfig.region === 'TG' && (
+                  <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-emerald-600 text-white">
+                    Active
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">TSMC Registration, District Elections &amp; Leadership Panels</p>
+            </div>
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

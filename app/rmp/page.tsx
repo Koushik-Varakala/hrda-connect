@@ -1,14 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShieldAlert, Scale, AlertTriangle, CheckCircle2, XCircle, FileText, Award, Gavel, Search, Users, Siren, Building2, HelpCircle } from "lucide-react";
 import { appConfig } from "@/lib/app-config";
 
-export default function RMPLegalPortal() {
+function RMPPortalInner() {
+    const searchParams = useSearchParams();
+    const tabParam = searchParams.get("tab");
     const [activeTab, setActiveTab] = useState("who-is-rmp");
+
+    useEffect(() => {
+        if (tabParam && ["who-is-rmp", "policy", "enforcement"].includes(tabParam)) {
+            setActiveTab(tabParam);
+        }
+    }, [tabParam]);
 
     return (
         <Layout>
@@ -444,5 +453,13 @@ export default function RMPLegalPortal() {
                 </Tabs>
             </div>
         </Layout>
+    );
+}
+
+export default function RMPLegalPortal() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+            <RMPPortalInner />
+        </Suspense>
     );
 }
