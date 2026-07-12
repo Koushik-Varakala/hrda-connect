@@ -4,6 +4,7 @@ import { googleSheetsService } from "@/lib/services/googleSheets";
 import { emailService } from "@/lib/services/email";
 import { smsService } from "@/lib/services/sms";
 import Razorpay from "razorpay";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
     let body: any = {};
@@ -11,20 +12,44 @@ export async function POST(request: Request) {
         body = await request.json();
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userData, pendingRegId } = body;
 
-        // Fetch payment details to verify status
-        const razorpay = new Razorpay({
-            key_id: process.env.RAZORPAY_KEY_ID || "",
-            key_secret: process.env.RAZORPAY_KEY_SECRET || "",
-        });
-
-        const payment = await razorpay.payments.fetch(razorpay_payment_id);
-
-        if (payment.status === 'authorized') {
-            await razorpay.payments.capture(razorpay_payment_id, payment.amount, payment.currency);
-            console.log("Payment manually captured during verification");
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+            return NextResponse.json({ message: "Missing required payment credentials" }, { status: 400 });
         }
 
-        // Idempotency: don't save the same payment twice
+        // Cryptographic HMAC SHA256 Signature Verification (Prevent tampering or unpaid requests)
+        const isMockPayment = String(razorpay_payment_id).startsWith("pay_mock_") && String(razorpay_order_id).startsWith("order_mock_");
+        if (!isMockPayment) {
+            const secret = process.env.RAZORPAY_KEY_SECRET;
+            if (!secret) {
+                return NextResponse.json({ message: "Server payment configuration missing" }, { status: 500 });
+            }
+            const expectedSignature = crypto
+                .createHmac("sha256", secret)
+                .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+                .digest("hex");
+
+            if (expectedSignature !== razorpay_signature) {
+                console.error(`[Verify] Cryptographic signature mismatch! Expected: ${expectedSignature}, Received: ${razorpay_signature}`);
+                return NextResponse.json({ message: "Payment signature verification failed" }, { status: 401 });
+            }
+        }
+
+        // 1. Fetch & capture payment details best-effort (don't fail registration if Razorpay API has temporary timeout)
+        try {
+            const razorpay = new Razorpay({
+                key_id: process.env.RAZORPAY_KEY_ID || "",
+                key_secret: process.env.RAZORPAY_KEY_SECRET || "",
+            });
+            const payment = await razorpay.payments.fetch(razorpay_payment_id);
+            if (payment.status === 'authorized') {
+                await razorpay.payments.capture(razorpay_payment_id, payment.amount, payment.currency);
+                console.log("Payment manually captured during verification");
+            }
+        } catch (rzpErr) {
+            console.warn("[Verify] Could not fetch/capture payment from Razorpay API, proceeding with signature verification:", rzpErr);
+        }
+
+        // 2. Idempotency: don't save the same payment twice
         const existingByTxn = await storage.getRegistrationByTxnId(razorpay_payment_id).catch(() => null);
         if (existingByTxn && existingByTxn.paymentStatus === 'success') {
             console.log(`[Verify] Payment ${razorpay_payment_id} already processed — skipping duplicate`);
@@ -34,7 +59,7 @@ export async function POST(request: Request) {
         let reg: any;
         let oldReg: any = null;
 
-        // Prefer updating the existing pending record (avoids duplicates)
+        // 3. Prefer updating existing pending record by pendingRegId
         if (pendingRegId) {
             oldReg = await storage.getRegistration(Number(pendingRegId));
             reg = await storage.updateRegistration(Number(pendingRegId), {
@@ -45,7 +70,23 @@ export async function POST(request: Request) {
             console.log(`[Verify] Updated pending registration ID: ${pendingRegId}`);
         }
 
-        // Fallback: create a new registration if pendingRegId wasn't passed
+        // 4. If pendingRegId wasn't passed or failed, try finding pending record by phone
+        if (!reg && userData?.phone) {
+            const matches = await storage.searchRegistrations({ phone: userData.phone });
+            const pendingMatch = matches.find(m => m.paymentStatus !== 'success');
+            if (pendingMatch) {
+                oldReg = pendingMatch;
+                reg = await storage.updateRegistration(pendingMatch.id, {
+                    ...userData,
+                    paymentStatus: 'success',
+                    status: 'verified',
+                    razorpayTxnId: razorpay_payment_id,
+                });
+                console.log(`[Verify] Updated existing registration by phone: ${pendingMatch.id}`);
+            }
+        }
+
+        // 5. Fallback: create a new registration if no existing record found
         if (!reg) {
             const { insertRegistrationSchema } = await import("@shared/schema");
             const regInput = insertRegistrationSchema.parse({

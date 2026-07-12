@@ -21,9 +21,11 @@ export async function GET(request: Request) {
             return NextResponse.json([], { status: 200 });
         }
 
-        // Strictly filter out any pending or failed registrations.
-        // Users should only see results that have a completed or verified registration.
-        const successfulResults = results.filter(reg => reg.status?.toLowerCase() === "verified");
+        // Users should see results that have a verified registration OR successful payment.
+        const successfulResults = results.filter(reg =>
+            reg.status?.toLowerCase() === "verified" ||
+            reg.paymentStatus?.toLowerCase() === "success"
+        );
 
         // Mask data if not verified
         const maskedResults = successfulResults.map(reg => {

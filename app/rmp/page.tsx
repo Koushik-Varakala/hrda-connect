@@ -48,7 +48,7 @@ function RMPPortalInner() {
                             className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-sm transition-all data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-md dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-blue-400"
                         >
                             <HelpCircle className="w-4 h-4" />
-                            Who is an RMP?
+                            Is RMP a Doctor?
                         </TabsTrigger>
                         <TabsTrigger
                             value="policy"
@@ -75,7 +75,7 @@ function RMPPortalInner() {
                                     <div>
                                         <div className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Statutory Legal Overview</div>
                                         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-                                            RMP is a DOCTOR
+                                            Is RMP a Doctor?
                                         </h2>
                                     </div>
                                     <div className="px-4 py-2 rounded-lg bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 font-bold text-sm flex items-center gap-2">

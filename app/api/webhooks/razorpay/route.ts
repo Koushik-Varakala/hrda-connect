@@ -48,12 +48,13 @@ export async function POST(request: Request) {
     const eventType = event.event;
     console.log(`[Webhook] Received event: ${eventType}`);
 
-    // Only handle payment.captured
-    if (eventType !== "payment.captured") {
+    // Handle all successful payment event types
+    const validEvents = ["payment.captured", "order.paid", "payment.authorized"];
+    if (!validEvents.includes(eventType)) {
         return NextResponse.json({ status: "ignored", event: eventType });
     }
 
-    const payment = event.payload?.payment?.entity;
+    const payment = event.payload?.payment?.entity || event.payload?.order?.entity;
     if (!payment) {
         return NextResponse.json({ error: "Missing payment entity" }, { status: 400 });
     }
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ status: "no_user_data", paymentId });
     }
 
-    // 4. Save to database — update pending record if it exists, otherwise create new
+    // 4. Save to database — update pending record if it exists, otherwise match by phone or create new
     let newReg: any;
     let oldReg: any = null;
     try {
@@ -107,7 +108,24 @@ export async function POST(request: Request) {
                 razorpayTxnId: paymentId,
             });
             console.log(`[Webhook] Updated existing pending registration ID: ${pendingRegId}`);
-        } else {
+        }
+
+        if (!newReg && userData.phone) {
+            const matches = await storage.searchRegistrations({ phone: userData.phone });
+            const pendingMatch = matches.find(m => m.paymentStatus !== 'success');
+            if (pendingMatch) {
+                oldReg = pendingMatch;
+                newReg = await storage.updateRegistration(pendingMatch.id, {
+                    ...userData,
+                    paymentStatus: "success",
+                    status: "verified",
+                    razorpayTxnId: paymentId,
+                });
+                console.log(`[Webhook] Updated existing registration by phone: ${pendingMatch.id}`);
+            }
+        }
+
+        if (!newReg) {
             const { insertRegistrationSchema } = await import("@shared/schema");
             const regInput = insertRegistrationSchema.parse({
                 ...userData,

@@ -198,7 +198,9 @@ export class DatabaseStorage implements IStorage {
             return await db.select().from(registrations).where(eq(registrations.tgmcId, params.tgmcId));
         }
         if (params.phone) {
-            return await db.select().from(registrations).where(eq(registrations.phone, params.phone));
+            const cleanPhone = params.phone.replace(/\D/g, '').slice(-10);
+            if (!cleanPhone) return [];
+            return await db.select().from(registrations).where(ilike(registrations.phone, `%${cleanPhone}%`));
         }
         return [];
     }
