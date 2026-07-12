@@ -87,28 +87,53 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <RegionSelectionModal />
 
       {/* Top Announcement Bar */}
-      <div className="bg-[#1a237e] text-white py-2 text-xs md:text-sm text-center font-medium px-4 tracking-wide z-50 relative">
-        <span className="flex flex-col sm:flex-row sm:justify-center sm:gap-1">
-          <span>Healthcare Reforms Doctors Association (HRDA) -</span>
-          <span>Advocating for Doctors &amp; Public Health</span>
-        </span>
+      <div className={`text-white py-1.5 md:py-2 text-xs md:text-sm font-medium px-4 tracking-wide z-50 relative shadow-inner ${
+        appConfig.region === 'AP'
+          ? 'bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 border-b border-blue-700/50'
+          : 'bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 border-b border-emerald-700/50'
+      }`}>
+        <div className="container mx-auto flex items-center justify-between sm:justify-center gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
+            <span className="font-bold tracking-wider uppercase text-amber-300 truncate text-[11px] sm:text-xs">
+              {appConfig.region === 'AP' ? 'ANDHRA PRADESH STATE COUNCIL' : 'TELANGANA STATE COUNCIL'}
+            </span>
+            <span className="hidden md:inline text-blue-100">| Healthcare Reforms Doctors Association (HRDA)</span>
+          </div>
+          <button
+            onClick={() => setIsRegionModalOpen(true)}
+            className="text-[11px] font-bold underline underline-offset-2 hover:text-amber-200 transition-colors shrink-0 text-amber-300"
+          >
+            Switch State →
+          </button>
+        </div>
       </div>
 
       {/* Main Header */}
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ease-in-out ${isScrolled
           ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 py-2"
-          : "bg-white shadow-sm py-4"
+          : "bg-white shadow-sm py-3 sm:py-4"
           }`}
       >
         <div className="container mx-auto px-4 md:px-6 lg:px-8 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center group">
+          {/* Logo with State Chapter Tag */}
+          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
             <img
               src="/hrda_full_logo.png"
               alt="Healthcare Reforms Doctors Association Logo"
-              className={`object-contain transition-all duration-300 ${isScrolled ? "h-12" : "h-16"}`}
+              className={`object-contain transition-all duration-300 ${isScrolled ? "h-10 sm:h-12" : "h-12 sm:h-16"}`}
             />
+            <div className="flex flex-col border-l-2 border-slate-200 pl-2 sm:pl-2.5 py-0.5">
+              <span className={`text-[11px] sm:text-xs font-black tracking-widest uppercase ${
+                appConfig.region === 'AP' ? 'text-blue-700' : 'text-emerald-700'
+              }`}>
+                {appConfig.region === 'AP' ? 'ANDHRA PRADESH' : 'TELANGANA'}
+              </span>
+              <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">
+                {appConfig.region === 'AP' ? 'APMC Council' : 'TSMC Council'}
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -279,13 +304,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </Button>
           </div>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            className="lg:hidden p-2 text-slate-700 hover:text-primary transition-colors"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile Header Actions (Visible only on mobile screens < lg) */}
+          <div className="flex lg:hidden items-center gap-2">
+            <button
+              onClick={() => setIsRegionModalOpen(true)}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border shadow-xs transition-colors ${
+                appConfig.region === 'AP'
+                  ? 'bg-blue-600 text-white border-blue-700'
+                  : 'bg-emerald-600 text-white border-emerald-700'
+              }`}
+              title="Click to switch between Andhra Pradesh and Telangana portals"
+            >
+              <span>📍 {appConfig.region} Portal</span>
+              <span className="text-[10px] opacity-80">▾</span>
+            </button>
+            <button
+              className="p-2 text-slate-700 hover:text-primary transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle Navigation Menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -383,16 +423,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {/* Mobile Region Switcher */}
             <Button
               onClick={() => {
-                const targetUrl = appConfig.region === 'TG'
-                  ? (process.env.NODE_ENV === 'production' ? 'https://ap.hrda-india.org' : 'http://localhost:3000')
-                  : (process.env.NODE_ENV === 'production' ? 'https://hrda-india.org' : 'http://localhost:3000');
-                const currentPath = window.location.pathname;
-                window.location.href = `${targetUrl}${currentPath}`;
+                setIsMobileMenuOpen(false);
+                setIsRegionModalOpen(true);
               }}
               variant="outline"
-              className="w-full justify-center border-primary text-primary hover:bg-primary hover:text-white transition-colors"
+              className="w-full justify-center border-blue-600 text-blue-700 hover:bg-blue-50 font-bold"
             >
-              <span className="text-sm font-semibold">Switch to {appConfig.region === 'TG' ? 'Andhra Pradesh' : 'Telangana'}</span>
+              <span>📍 Currently: {appConfig.stateName} — Switch State</span>
             </Button>
 
             {user ? (

@@ -51,9 +51,9 @@ const getMetadata = (): Metadata => {
             images: ['/hrda_full_logo.png'],
         },
         icons: {
-            icon: '/hrda_logo.png',
-            shortcut: '/hrda_logo.png',
-            apple: '/hrda_logo.png',
+            icon: isTG ? '/hrda_logo.png' : '/hrda_ap_logo.png',
+            shortcut: isTG ? '/hrda_logo.png' : '/hrda_ap_logo.png',
+            apple: isTG ? '/hrda_logo.png' : '/hrda_ap_logo.png',
         },
         manifest: '/site.webmanifest',
     };

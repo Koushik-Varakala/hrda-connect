@@ -82,7 +82,7 @@ export default function Home() {
                                 <div className="absolute inset-0 bg-blue-500/20 blur-[100px] rounded-full"></div>
                                 <div className="relative w-full h-full rounded-full border-4 border-white/20 shadow-2xl overflow-hidden bg-white p-4 flex items-center justify-center ring-4 ring-white/10">
                                     <img
-                                        src="/hrda_logo.png"
+                                        src={appConfig.region === 'AP' ? "/hrda_ap_logo.png" : "/hrda_logo.png"}
                                         alt="HRDA Emblem"
                                         className="w-full h-full object-contain"
                                     />
