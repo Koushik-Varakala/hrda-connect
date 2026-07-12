@@ -125,13 +125,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
               className={`object-contain transition-all duration-300 ${isScrolled ? "h-10 sm:h-12" : "h-12 sm:h-16"}`}
             />
             <div className="flex flex-col border-l-2 border-slate-200 pl-2 sm:pl-2.5 py-0.5">
-              <span className={`text-[11px] sm:text-xs font-black tracking-widest uppercase ${
+              <span className={`text-xs sm:text-sm font-black tracking-widest uppercase ${
                 appConfig.region === 'AP' ? 'text-blue-700' : 'text-emerald-700'
               }`}>
                 {appConfig.region === 'AP' ? 'ANDHRA PRADESH' : 'TELANGANA'}
-              </span>
-              <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">
-                {appConfig.region === 'AP' ? 'APMC Council' : 'TSMC Council'}
               </span>
             </div>
           </Link>
