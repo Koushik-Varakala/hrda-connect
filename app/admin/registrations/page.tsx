@@ -274,9 +274,12 @@ export default function ManageRegistrations() {
                 if (externalDoctors.length === 0) {
                     toast({ title: "Not Found", description: "No doctor found with this exact ID in the Council database. Check if a prefix is needed (e.g., TSMC/FMR/).", variant: "destructive" });
                 } else if (matches) {
-                    updateMutation.mutate({ id: item.id, status: "verified" }, {
+                    const updatedNotes = item.notes?.includes("[Council Verified]")
+                        ? item.notes
+                        : `${item.notes || ''} [Council Verified]`.trim();
+                    updateMutation.mutate({ id: item.id, status: "verified", notes: updatedNotes }, {
                         onSuccess: () => {
-                            toast({ title: "Verified", description: `Doctor ${item.tgmcId} verified successfully via Council DB.` });
+                            toast({ title: "Council Verified", description: `Doctor ${item.tgmcId} verified successfully via Medical Council DB.` });
                         }
                     });
                 } else {
@@ -645,25 +648,46 @@ export default function ManageRegistrations() {
                                 </TableCell>
                                 <TableCell>{item.hrdaId || '-'}</TableCell>
                                 <TableCell>
-                                    <div className="flex items-center gap-2">
-                                        <span>{item.tgmcId || '-'}</span>
-                                        {item.tgmcId && item.status !== 'verified' && (
-                                            <Button 
-                                                variant="outline" 
-                                                size="sm" 
-                                                className="h-6 text-xs px-2"
-                                                onClick={() => handleVerifyTGMC(item)}
-                                                disabled={verifyingIds[item.id]}
-                                            >
-                                                {verifyingIds[item.id] ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <CheckCircle className="w-3 h-3 mr-1 text-green-600" />}
-                                                Auto-Verify
-                                            </Button>
+                                    <div className="flex flex-col items-start gap-1.5">
+                                        <span className="font-medium text-sm">{item.tgmcId || '-'}</span>
+                                        {item.tgmcId && (
+                                            item.notes?.includes("[Council Verified]") ? (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300/50">
+                                                    <CheckCircle className="w-3 h-3 text-emerald-600" />
+                                                    Council Verified
+                                                </span>
+                                            ) : (
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="sm" 
+                                                    className="h-6 text-[11px] px-2 border-blue-200 hover:bg-blue-50 text-blue-700 dark:border-blue-900 dark:hover:bg-blue-950 dark:text-blue-300"
+                                                    onClick={() => handleVerifyTGMC(item)}
+                                                    disabled={verifyingIds[item.id]}
+                                                >
+                                                    {verifyingIds[item.id] ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <CheckCircle className="w-3 h-3 mr-1 text-blue-600" />}
+                                                    Check Council DB
+                                                </Button>
+                                            )
                                         )}
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <div className="text-sm">{item.phone}</div>
-                                    <div className="text-xs text-muted-foreground">{item.email}</div>
+                                    <div className="flex flex-col items-start gap-1">
+                                        <div className="text-sm font-medium">{item.phone}</div>
+                                        <div className="text-xs text-muted-foreground">{item.email}</div>
+                                        {item.phone && (
+                                            <a
+                                                href={`https://wa.me/91${item.phone.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(
+                                                    `Welcome to Healthcare Reforms Doctors Association (HRDA), Dr. ${item.firstName || ''} ${item.lastName || ''}!\n\nHere is your official link to join our verified HRDA members WhatsApp group:\nhttps://chat.whatsapp.com/FP15TNSb0yzGmrZRdgpE3E?s=cl&p=i&ilr=4`
+                                                )}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 mt-0.5"
+                                            >
+                                                💬 Invite via WhatsApp
+                                            </a>
+                                        )}
+                                    </div>
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex flex-wrap gap-2 mt-1">

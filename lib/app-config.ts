@@ -99,7 +99,7 @@ const TG_CONFIG: RegionConfig = {
         "Hyderabad – Gachibowli & Kokapet Zone",
         "Hyderabad – Mehdipatnam Zone",
     ],
-    whatsappGroupLink: "https://chat.whatsapp.com/ReplaceWithRealLink",
+    whatsappGroupLink: "https://chat.whatsapp.com/FP15TNSb0yzGmrZRdgpE3E?s=cl&p=i&ilr=4",
 };
 
 const AP_CONFIG: RegionConfig = {
@@ -130,7 +130,7 @@ const AP_CONFIG: RegionConfig = {
     registrationFee: 1015,
     instagramUrl: 'https://www.instagram.com/hrda.ap/',
     capitalZones: [], // AP doesn't have capital zones for elections currently
-    whatsappGroupLink: "https://chat.whatsapp.com/ReplaceWithRealLink",
+    whatsappGroupLink: "https://chat.whatsapp.com/FP15TNSb0yzGmrZRdgpE3E?s=cl&p=i&ilr=4",
 };
 
 /**
