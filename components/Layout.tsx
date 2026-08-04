@@ -687,7 +687,31 @@ function DonationModal({ open, onOpenChange }: { open: boolean, onOpenChange: (o
           email: email,
           contact: phone
         },
-        theme: { color: "#10b981" }
+        theme: { color: "#10b981" },
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via UPI / QR Code",
+                instruments: [
+                  { method: "upi", flows: ["qr", "intent", "collect"] }
+                ]
+              },
+              other: {
+                name: "Other Payment Methods",
+                instruments: [
+                  { method: "card" },
+                  { method: "netbanking" },
+                  { method: "wallet" }
+                ]
+              }
+            },
+            sequence: ["block.upi", "block.other"],
+            preferences: {
+              show_default_blocks: true
+            }
+          }
+        }
       };
 
       if (order.key_id === "rzp_test_mock_key") {

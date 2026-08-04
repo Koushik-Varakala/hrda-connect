@@ -125,7 +125,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
     const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [assessmentAnswers, setAssessmentAnswers] = useState<Record<number, number>>({});
-    const [membershipType, setMembershipType] = useState<string>("General");
+    const [membershipType, setMembershipType] = useState<string>("Lifetime");
     const { toast } = useToast();
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -347,6 +347,30 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                     contact: data.phone
                 },
                 theme: { color: "#2563eb" },
+                config: {
+                    display: {
+                        blocks: {
+                            upi: {
+                                name: "Pay via UPI / QR Code",
+                                instruments: [
+                                    { method: "upi", flows: ["qr", "intent", "collect"] }
+                                ]
+                            },
+                            other: {
+                                name: "Other Payment Methods",
+                                instruments: [
+                                    { method: "card" },
+                                    { method: "netbanking" },
+                                    { method: "wallet" }
+                                ]
+                            }
+                        },
+                        sequence: ["block.upi", "block.other"],
+                        preferences: {
+                            show_default_blocks: true
+                        }
+                    }
+                },
                 modal: {
                     ondismiss: async function () {
                         // User closed the modal without paying
