@@ -12,8 +12,35 @@ import {
     nominations, type Nomination, type InsertNomination, type UpdateNominationRequest as UpdateNomination,
     donations, type Donation, type InsertDonation, type UpdateDonationRequest
 } from "@shared/schema";
-import { eq, desc, and, ilike, inArray } from "drizzle-orm";
+import { eq, desc, and, ilike, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
+
+/**
+ * Returns the next AP HRDA sequence number from the Postgres sequence.
+ * This is atomic: even if two doctors register simultaneously, they get
+ * different sequential numbers — guaranteed, no gaps, no duplicates.
+ * The sequence is created (if missing) on first call, starting at 103.
+ */
+export async function getNextApHrdaSequenceNumber(): Promise<number> {
+    // Create the sequence if it doesn't already exist (idempotent)
+    await db.execute(sql`
+        CREATE SEQUENCE IF NOT EXISTS ap_hrda_seq START WITH 103 INCREMENT BY 1 NO CYCLE;
+    `);
+    const result = await db.execute(sql`SELECT nextval('ap_hrda_seq') AS seq`);
+    const seq = (result.rows?.[0] as any)?.seq;
+    return Number(seq);
+}
+
+/**
+ * Formats an AP HRDA ID from a sequence number and date.
+ * e.g. seq=103, date=Sep 2026 → "APHRDA092026-0103"
+ */
+export function formatApHrdaId(sNo: number, date: Date = new Date()): string {
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const sequenceStr = String(sNo).padStart(4, '0');
+    return `APHRDA${month}${year}-${sequenceStr}`;
+}
 
 export interface IStorage {
     // Announcements

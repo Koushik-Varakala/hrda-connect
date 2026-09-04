@@ -88,11 +88,11 @@ export class GoogleSheetsService {
         }
     }
 
-    async appendRegistration(data: SheetRegistration): Promise<string | null> {
+    async appendRegistration(data: SheetRegistration & { precomputedHrdaId?: string; precomputedSNo?: number }): Promise<string | null> {
         await this.initPromise;
 
         if (!this.isConnected || !this.doc) {
-            const hrdaId = `HRDA-MOCK-${data.id}`;
+            const hrdaId = data.precomputedHrdaId || `HRDA-MOCK-${data.id}`;
             console.log(`[Mock] Appending registration to sheet: ${data.firstName} ${data.lastName} (${data.tgmcId}) - Generated ID: ${hrdaId}`);
             return hrdaId;
         }
@@ -100,27 +100,30 @@ export class GoogleSheetsService {
         try {
             const sheet = this.doc.sheetsByIndex[0];
 
-            // 1. Fetch existing rows to calculate new ID
-            const rows = await sheet.getRows();
-            let lastSNo = 0;
+            let newSNo: number;
+            let hrdaId: string;
 
-            if (rows.length > 0) {
-                const lastRow = rows[rows.length - 1];
-                const sno = parseInt(lastRow.get('S.No') || '0');
-                if (!isNaN(sno)) lastSNo = sno;
+            if (data.precomputedHrdaId && data.precomputedSNo) {
+                // ✅ SAFE PATH: Use the pre-computed ID from the Postgres sequence (AP region)
+                newSNo = data.precomputedSNo;
+                hrdaId = data.precomputedHrdaId;
+                console.log(`[GoogleSheets] Using pre-computed HRDA ID from DB sequence: ${hrdaId} (S.No ${newSNo})`);
+            } else {
+                // Fallback for TS region (still uses sheet-based S.No for backwards compatibility)
+                const rows = await sheet.getRows();
+                let lastSNo = 0;
+                if (rows.length > 0) {
+                    const lastRow = rows[rows.length - 1];
+                    const sno = parseInt(lastRow.get('S.No') || '0');
+                    if (!isNaN(sno)) lastSNo = sno;
+                }
+                newSNo = lastSNo + 1;
+                const date = new Date();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                const sequenceStr = String(newSNo).padStart(4, '0');
+                hrdaId = `HRDA${month}${year}-${sequenceStr}`;
             }
-
-            const newSNo = lastSNo + 1;
-
-            // 2. Generate HRDA ID
-            const date = new Date();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            const sequenceStr = String(newSNo).padStart(4, '0');
-            
-            const isAP = process.env.NEXT_PUBLIC_REGION === 'AP';
-            const prefix = isAP ? 'APHRDA' : 'HRDA';
-            const hrdaId = `${prefix}${month}${year}-${sequenceStr}`;
 
             await sheet.loadHeaderRow();
             const headers = sheet.headerValues;
@@ -140,8 +143,6 @@ export class GoogleSheetsService {
             if (headers.includes("District")) rowData["District"] = data.district || "";
             if (headers.includes("AnotherMobileNumber")) rowData["AnotherMobileNumber"] = data.anotherMobile || "";
             if (headers.includes("MembershipType")) rowData["MembershipType"] = data.membershipType || "General";
-            
-            // Student specific columns (if they add them to sheets)
             if (headers.includes("MBBS/PG Year")) rowData["MBBS/PG Year"] = (data as any).mbbsOrPgYear || "";
             if (headers.includes("Year of Admission")) rowData["Year of Admission"] = (data as any).yearOfAdmission || "";
             if (headers.includes("University Reg Number")) rowData["University Reg Number"] = (data as any).universityRegNumber || "";

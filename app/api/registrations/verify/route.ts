@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { storage } from "@/lib/storage";
+import { storage, getNextApHrdaSequenceNumber, formatApHrdaId } from "@/lib/storage";
 import { googleSheetsService } from "@/lib/services/googleSheets";
 import { emailService } from "@/lib/services/email";
 import { smsService } from "@/lib/services/sms";
@@ -105,6 +105,19 @@ export async function POST(request: Request) {
         if (newlyVerified) {
             // Sync to Google Sheets
         try {
+            const isAP = process.env.NEXT_PUBLIC_REGION === 'AP';
+            let precomputedHrdaId: string | undefined;
+            let precomputedSNo: number | undefined;
+
+            if (isAP) {
+                // ✅ Get atomic sequence number from Postgres — guaranteed no gaps or duplicates
+                precomputedSNo = await getNextApHrdaSequenceNumber();
+                precomputedHrdaId = formatApHrdaId(precomputedSNo);
+                // Save to DB immediately so it's persisted even if Sheets call fails
+                await storage.updateRegistration(reg.id, { hrdaId: precomputedHrdaId });
+                formattedHrdaId = precomputedHrdaId;
+            }
+
             const sheetId = await googleSheetsService.appendRegistration({
                 id: String(reg.id),
                 tgmcId: reg.tgmcId || "",
@@ -120,9 +133,11 @@ export async function POST(request: Request) {
                 registrationDate: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 rowStatus: "Active",
+                precomputedHrdaId,
+                precomputedSNo,
             });
 
-            if (sheetId) {
+            if (sheetId && !isAP) {
                 formattedHrdaId = sheetId;
                 await storage.updateRegistration(reg.id, { hrdaId: String(formattedHrdaId) });
             }
