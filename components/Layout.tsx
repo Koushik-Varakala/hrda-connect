@@ -57,7 +57,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { name: "About Us", href: "/about" },
     { name: "Agenda", href: "/manifesto" },
     { name: appConfig.region === 'AP' ? "Leadership" : "Panels", href: "/panels" },
-    ...(appConfig.region === 'AP' ? [{ name: "Blood Network", href: "/blood-donor" }] : []),
   ];
 
   const rmpLinks = [
@@ -73,6 +72,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   ];
 
   const resourceLinks = [
+    ...(appConfig.region === 'AP' ? [{ name: "Blood Donor Network", href: "/blood-donor", description: "Fraternity emergency blood matching & donor registry." }] : []),
     { name: "Achievements", href: "/achievements", description: "Our milestones and success stories." },
     { name: "Photo Gallery", href: "/gallery", description: "View our photo & event gallery." },
     { name: "Media Coverage", href: "/media", description: "News articles and press releases." },
@@ -83,7 +83,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background font-sans">
+    <div className="min-h-screen flex flex-col bg-background font-sans overflow-x-hidden w-full max-w-full">
       {/* Region Selection Modal - Shows on first visit */}
       <RegionSelectionModal />
 
@@ -136,41 +136,58 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   className={`group inline-flex h-9 items-center justify-center rounded-md px-2 xl:px-3 py-1.5 text-xs xl:text-sm font-medium whitespace-nowrap transition-colors hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer ${isActive(link.href) ? "text-primary font-semibold" : "text-slate-700"
                     }`}
                 >
-                  <span className="relative flex items-center gap-1">
-                    {link.href === "/blood-donor" && (
-                      <Droplet className="w-3.5 h-3.5 fill-rose-600 text-rose-600 inline shrink-0" />
-                    )}
-                    <span className={link.href === "/blood-donor" ? "text-rose-700 font-semibold" : ""}>
-                      {link.name}
-                    </span>
+                  <span className="relative">
+                    {link.name}
                     <span className={`absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100 ${isActive(link.href) ? "scale-x-100" : ""}`} />
                   </span>
                 </Link>
               ))}
             </div>
 
-            {/* RMP Legal Portal Dropdown - AP Only or Always Accessible */}
+            {/* Initiatives Dropdown - AP Only */}
             {appConfig.region === 'AP' && (
               <NavigationMenu className="mx-0.5">
                 <NavigationMenuList>
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className="group inline-flex h-9 items-center justify-center rounded-md px-2 xl:px-3 py-1.5 text-xs xl:text-sm font-medium whitespace-nowrap transition-colors bg-transparent hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:!bg-transparent data-[state=open]:text-primary text-slate-700 shadow-none border-none">
                       <span className="relative">
-                        RMP
+                        Initiatives
                         <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100" />
                       </span>
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <ul className="grid w-[270px] gap-2 p-3 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                      <ul className="grid w-[300px] gap-2 p-3 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                        {/* Blood Donor Network Highlight Item */}
+                        <li>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href="/blood-donor"
+                              className="block select-none space-y-1 rounded-md p-2.5 leading-none no-underline outline-none transition-colors bg-rose-50/70 hover:bg-rose-100/70 border border-rose-200/80"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-1.5 text-xs font-bold text-rose-800">
+                                  <Droplet className="w-3.5 h-3.5 fill-rose-600 text-rose-600 shrink-0" />
+                                  <span>Blood Donor Network</span>
+                                </div>
+                                <span className="text-[9px] uppercase font-black bg-rose-200 text-rose-900 px-1.5 py-0.5 rounded">Emergency</span>
+                              </div>
+                              <p className="line-clamp-2 text-[11px] leading-snug text-rose-700 mt-1">
+                                Fraternity blood matching &amp; verified donor registry.
+                              </p>
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+
+                        {/* RMP Legal Portal Items */}
                         {rmpLinks.map((link) => (
                           <li key={link.name}>
                             <NavigationMenuLink asChild>
                               <Link
                                 href={link.href}
-                                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50"
+                                className="block select-none space-y-1 rounded-md p-2.5 leading-none no-underline outline-none transition-colors hover:bg-slate-50 focus:bg-slate-50"
                               >
-                                <div className="text-sm font-semibold leading-none text-slate-800">{link.name}</div>
-                                <p className="line-clamp-2 text-xs leading-snug text-slate-500 mt-1">
+                                <div className="text-xs font-semibold leading-none text-slate-800">{link.name}</div>
+                                <p className="line-clamp-2 text-[11px] leading-snug text-slate-500 mt-1">
                                   {link.description}
                                 </p>
                               </Link>
@@ -252,21 +269,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Action Items */}
-          <div className="hidden sm:flex items-center gap-2 xl:gap-3 shrink-0">
+          <div className="hidden sm:flex items-center gap-1.5 xl:gap-2.5 shrink-0">
             <Link
               href="/search"
-              className="p-2 text-slate-600 hover:text-primary transition-colors rounded-full hover:bg-slate-100"
+              className="p-1.5 text-slate-600 hover:text-primary transition-colors rounded-full hover:bg-slate-100"
               title="Search Doctors & Members"
             >
               <Search className="w-4 h-4" />
             </Link>
 
             {user ? (
-              <Link href="/admin/dashboard" className="text-xs font-semibold text-slate-700 hover:text-primary transition-colors px-2 py-1 rounded hover:bg-slate-50 whitespace-nowrap">
+              <Link href="/admin/dashboard" className="text-xs font-semibold text-slate-700 hover:text-primary transition-colors px-1.5 py-1 rounded hover:bg-slate-50 whitespace-nowrap">
                 Admin
               </Link>
             ) : (
-              <Link href="/login" className="text-xs font-semibold text-slate-700 hover:text-primary transition-colors px-2 py-1 rounded hover:bg-slate-50 whitespace-nowrap">
+              <Link href="/login" className="hidden xl:inline-block text-xs font-semibold text-slate-700 hover:text-primary transition-colors px-1.5 py-1 rounded hover:bg-slate-50 whitespace-nowrap">
                 Login
               </Link>
             )}
@@ -274,12 +291,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {/* Clean State Portal Badge / Switcher (Mobile & Desktop Friendly) */}
             <button
               onClick={() => setIsRegionModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all shadow-xs bg-slate-900 text-white border-slate-700 hover:bg-slate-800 whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border transition-all shadow-xs bg-slate-900 text-white border-slate-700 hover:bg-slate-800 whitespace-nowrap shrink-0"
               title="Click to switch between Andhra Pradesh and Telangana portals"
             >
-              <span className="text-amber-400">📍</span>
+              <span className="text-amber-400 text-[11px]">📍</span>
               <span>HRDA {appConfig.region}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+              <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
 
             {appConfig.region === 'AP' && (
@@ -287,15 +304,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 onClick={() => setIsDonationOpen(true)}
                 variant="outline"
                 size="sm"
-                className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 rounded-lg px-2.5 xl:px-4 text-xs xl:text-sm font-semibold shadow-sm shrink-0"
+                className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 rounded-lg px-2 xl:px-3 text-xs font-semibold shadow-sm shrink-0 h-8"
               >
                 Donate
               </Button>
             )}
 
-            <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 xl:px-5 text-xs xl:text-sm shadow-md transition-all hover:shadow-lg font-medium shrink-0 whitespace-nowrap">
+            <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 xl:px-4 text-xs xl:text-sm shadow-md transition-all hover:shadow-lg font-medium shrink-0 whitespace-nowrap h-8">
               <Link href="/register">
-                Join HRDA {appConfig.region === 'TG' ? 'TS' : appConfig.region}
+                Join HRDA
               </Link>
             </Button>
           </div>
@@ -328,16 +345,32 @@ export function Layout({ children }: { children: React.ReactNode }) {
             ))}
 
             {appConfig.region === 'AP' && (
-              <Link href="/rmp">
-                <div
-                  className={`p-3 rounded-lg font-medium transition-colors flex items-center justify-between ${isActive("/rmp") ? "bg-blue-50 text-blue-700 font-bold" : "text-slate-700 hover:bg-slate-50"
-                    }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <span>RMP &amp; Anti-Quackery</span>
-                  <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700">Legal Portal</span>
-                </div>
-              </Link>
+              <>
+                <Link href="/blood-donor">
+                  <div
+                    className={`p-3 rounded-lg font-medium transition-colors flex items-center justify-between ${isActive("/blood-donor") ? "bg-rose-50 text-rose-700 font-bold" : "text-rose-700 hover:bg-rose-50"
+                      }`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Droplet className="w-4 h-4 fill-rose-600 text-rose-600" />
+                      <span>Blood Donor Network</span>
+                    </span>
+                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800">Emergency</span>
+                  </div>
+                </Link>
+
+                <Link href="/rmp">
+                  <div
+                    className={`p-3 rounded-lg font-medium transition-colors flex items-center justify-between ${isActive("/rmp") ? "bg-blue-50 text-blue-700 font-bold" : "text-slate-700 hover:bg-slate-50"
+                      }`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span>RMP &amp; Anti-Quackery</span>
+                    <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700">Legal Portal</span>
+                  </div>
+                </Link>
+              </>
             )}
 
             {/* Mobile Updates Dropdown */}

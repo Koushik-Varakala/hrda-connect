@@ -71,9 +71,12 @@
 }
 
 @layer base {
-  body {
+  html, body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
   }
 
   h1,

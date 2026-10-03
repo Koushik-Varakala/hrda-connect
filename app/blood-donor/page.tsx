@@ -183,9 +183,9 @@ export default function BloodDonorNetworkPage() {
 
     return (
         <Layout>
-            <div className="bg-gradient-to-b from-rose-50 via-slate-50 to-white min-h-screen pb-20">
+            <div className="bg-gradient-to-b from-rose-50 via-slate-50 to-white min-h-screen pb-20 overflow-x-hidden w-full max-w-full">
                 {/* Hero Header */}
-                <div className="bg-gradient-to-r from-red-700 via-rose-700 to-red-800 text-white py-12 px-4 shadow-md relative overflow-hidden">
+                <div className="bg-gradient-to-r from-red-700 via-rose-700 to-red-800 text-white py-12 px-4 shadow-md relative overflow-hidden w-full max-w-full">
                     <div className="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-12 -translate-y-8">
                         <Droplet className="w-96 h-96 fill-white" />
                     </div>
