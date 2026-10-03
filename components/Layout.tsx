@@ -312,7 +312,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 xl:px-4 text-xs xl:text-sm shadow-md transition-all hover:shadow-lg font-medium shrink-0 whitespace-nowrap h-8">
               <Link href="/register">
-                Join HRDA
+                Join HRDA {appConfig.region === 'TG' ? 'TS' : appConfig.region}
               </Link>
             </Button>
           </div>
