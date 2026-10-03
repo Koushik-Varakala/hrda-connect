@@ -11,7 +11,8 @@ import {
   Menu,
   Image,
   Vote,
-  HeartHandshake
+  HeartHandshake,
+  Droplet
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { name: "Media Coverage", icon: FileCheck, href: "/admin/media" },
     { name: "Departments", icon: Building2, href: "/admin/departments" },
     { name: "Registrations", icon: FileCheck, href: "/admin/registrations" },
+    { name: "Blood Network", icon: Droplet, href: "/admin/blood-network" },
     { name: "Donations", icon: HeartHandshake, href: "/admin/donations" },
     { name: "Nominations", icon: Vote, href: "/admin/nominations" },
     { name: "District Elections", icon: Vote, href: "/admin/district-elections" },

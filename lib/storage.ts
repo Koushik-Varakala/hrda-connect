@@ -10,7 +10,10 @@ import {
     electionDocuments, type ElectionDocument, type InsertElectionDocument,
     galleryPhotos, type GalleryPhoto, type InsertGalleryPhoto,
     nominations, type Nomination, type InsertNomination, type UpdateNominationRequest as UpdateNomination,
-    donations, type Donation, type InsertDonation, type UpdateDonationRequest
+    donations, type Donation, type InsertDonation, type UpdateDonationRequest,
+    bloodDonors, type BloodDonor, type InsertBloodDonor, type UpdateBloodDonorRequest,
+    bloodRequests, type BloodRequest, type InsertBloodRequest, type UpdateBloodRequestRequest,
+    bloodDonorResponses, type BloodDonorResponse, type InsertBloodDonorResponse
 } from "@shared/schema";
 import { eq, desc, and, ilike, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
@@ -113,6 +116,26 @@ export interface IStorage {
     updateDonation(id: number, updates: UpdateDonationRequest): Promise<Donation | undefined>;
     getDonations(): Promise<Donation[]>;
     deleteDonation(id: number): Promise<void>;
+
+    // Blood Donor Network
+    createBloodDonor(data: InsertBloodDonor): Promise<BloodDonor>;
+    getBloodDonorById(id: number): Promise<BloodDonor | undefined>;
+    getBloodDonorByPhone(phone: string): Promise<BloodDonor | undefined>;
+    getBloodDonorByToken(token: string): Promise<BloodDonor | undefined>;
+    getBloodDonors(filters?: { district?: string; bloodGroup?: string; isAvailable?: boolean; status?: string }): Promise<BloodDonor[]>;
+    updateBloodDonor(id: number, updates: UpdateBloodDonorRequest): Promise<BloodDonor | undefined>;
+    deleteBloodDonor(id: number): Promise<void>;
+
+    createBloodRequest(data: InsertBloodRequest): Promise<BloodRequest>;
+    getBloodRequestById(id: number): Promise<BloodRequest | undefined>;
+    getBloodRequestByTrackingCode(trackingCode: string): Promise<BloodRequest | undefined>;
+    getBloodRequests(filters?: { district?: string; bloodGroup?: string; status?: string }): Promise<BloodRequest[]>;
+    updateBloodRequest(id: number, updates: UpdateBloodRequestRequest): Promise<BloodRequest | undefined>;
+
+    createBloodDonorResponse(data: InsertBloodDonorResponse): Promise<BloodDonorResponse>;
+    getBloodDonorResponseByToken(token: string): Promise<BloodDonorResponse | undefined>;
+    getBloodDonorResponsesByRequestId(requestId: number): Promise<BloodDonorResponse[]>;
+    updateBloodDonorResponse(id: number, updates: Partial<InsertBloodDonorResponse>): Promise<BloodDonorResponse | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -465,6 +488,131 @@ export class DatabaseStorage implements IStorage {
     async deleteDonation(id: number): Promise<void> {
         await db.delete(donations).where(eq(donations.id, id));
     }
+
+    // Blood Donor Network
+    async createBloodDonor(data: InsertBloodDonor): Promise<BloodDonor> {
+        const token = randomUUID();
+        const [result] = await db.insert(bloodDonors).values({
+            ...data,
+            verificationToken: data.verificationToken || token,
+        }).returning();
+        return result;
+    }
+
+    async getBloodDonorById(id: number): Promise<BloodDonor | undefined> {
+        const [result] = await db.select().from(bloodDonors).where(eq(bloodDonors.id, id));
+        return result;
+    }
+
+    async getBloodDonorByPhone(phone: string): Promise<BloodDonor | undefined> {
+        const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+        const [result] = await db.select().from(bloodDonors).where(ilike(bloodDonors.phone, `%${cleanPhone}%`));
+        return result;
+    }
+
+    async getBloodDonorByToken(token: string): Promise<BloodDonor | undefined> {
+        const [result] = await db.select().from(bloodDonors).where(eq(bloodDonors.verificationToken, token));
+        return result;
+    }
+
+    async getBloodDonors(filters?: { district?: string; bloodGroup?: string; isAvailable?: boolean; status?: string }): Promise<BloodDonor[]> {
+        const conditions = [];
+        if (filters?.district) {
+            conditions.push(eq(bloodDonors.district, filters.district));
+        }
+        if (filters?.bloodGroup) {
+            conditions.push(eq(bloodDonors.bloodGroup, filters.bloodGroup));
+        }
+        if (filters?.isAvailable !== undefined) {
+            conditions.push(eq(bloodDonors.isAvailable, filters.isAvailable));
+        }
+        if (filters?.status) {
+            conditions.push(eq(bloodDonors.status, filters.status));
+        }
+
+        let query = db.select().from(bloodDonors);
+        if (conditions.length > 0) {
+            query = query.where(and(...conditions)) as any;
+        }
+        return await query.orderBy(desc(bloodDonors.createdAt));
+    }
+
+    async updateBloodDonor(id: number, updates: UpdateBloodDonorRequest): Promise<BloodDonor | undefined> {
+        const [result] = await db.update(bloodDonors)
+            .set({ ...updates, updatedAt: new Date() })
+            .where(eq(bloodDonors.id, id))
+            .returning();
+        return result;
+    }
+
+    async deleteBloodDonor(id: number): Promise<void> {
+        await db.delete(bloodDonors).where(eq(bloodDonors.id, id));
+    }
+
+    async createBloodRequest(data: InsertBloodRequest): Promise<BloodRequest> {
+        const [result] = await db.insert(bloodRequests).values(data).returning();
+        return result;
+    }
+
+    async getBloodRequestById(id: number): Promise<BloodRequest | undefined> {
+        const [result] = await db.select().from(bloodRequests).where(eq(bloodRequests.id, id));
+        return result;
+    }
+
+    async getBloodRequestByTrackingCode(trackingCode: string): Promise<BloodRequest | undefined> {
+        const [result] = await db.select().from(bloodRequests).where(eq(bloodRequests.requestTrackingCode, trackingCode.trim().toUpperCase()));
+        return result;
+    }
+
+    async getBloodRequests(filters?: { district?: string; bloodGroup?: string; status?: string }): Promise<BloodRequest[]> {
+        const conditions = [];
+        if (filters?.district) {
+            conditions.push(eq(bloodRequests.district, filters.district));
+        }
+        if (filters?.bloodGroup) {
+            conditions.push(eq(bloodRequests.bloodGroup, filters.bloodGroup));
+        }
+        if (filters?.status) {
+            conditions.push(eq(bloodRequests.status, filters.status));
+        }
+
+        let query = db.select().from(bloodRequests);
+        if (conditions.length > 0) {
+            query = query.where(and(...conditions)) as any;
+        }
+        return await query.orderBy(desc(bloodRequests.createdAt));
+    }
+
+    async updateBloodRequest(id: number, updates: UpdateBloodRequestRequest): Promise<BloodRequest | undefined> {
+        const [result] = await db.update(bloodRequests)
+            .set({ ...updates, updatedAt: new Date() })
+            .where(eq(bloodRequests.id, id))
+            .returning();
+        return result;
+    }
+
+    async createBloodDonorResponse(data: InsertBloodDonorResponse): Promise<BloodDonorResponse> {
+        const [result] = await db.insert(bloodDonorResponses).values(data).returning();
+        return result;
+    }
+
+    async getBloodDonorResponseByToken(token: string): Promise<BloodDonorResponse | undefined> {
+        const [result] = await db.select().from(bloodDonorResponses).where(eq(bloodDonorResponses.responseToken, token));
+        return result;
+    }
+
+    async getBloodDonorResponsesByRequestId(requestId: number): Promise<BloodDonorResponse[]> {
+        return await db.select().from(bloodDonorResponses).where(eq(bloodDonorResponses.requestId, requestId));
+    }
+
+    async updateBloodDonorResponse(id: number, updates: Partial<InsertBloodDonorResponse>): Promise<BloodDonorResponse | undefined> {
+        const [result] = await db.update(bloodDonorResponses)
+            .set(updates)
+            .where(eq(bloodDonorResponses.id, id))
+            .returning();
+        return result;
+    }
 }
 
 export const storage = new DatabaseStorage();
+

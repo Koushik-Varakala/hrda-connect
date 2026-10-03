@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Menu, X, Facebook, Twitter, Instagram, Youtube, ChevronDown, Search } from "lucide-react";
+import { Menu, X, Facebook, Twitter, Instagram, Youtube, ChevronDown, Search, Droplet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -57,6 +57,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { name: "About Us", href: "/about" },
     { name: "Agenda", href: "/manifesto" },
     { name: appConfig.region === 'AP' ? "Leadership" : "Panels", href: "/panels" },
+    ...(appConfig.region === 'AP' ? [{ name: "Blood Network", href: "/blood-donor" }] : []),
   ];
 
   const rmpLinks = [
@@ -135,8 +136,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   className={`group inline-flex h-9 items-center justify-center rounded-md px-2 xl:px-3 py-1.5 text-xs xl:text-sm font-medium whitespace-nowrap transition-colors hover:bg-transparent hover:text-primary focus:bg-transparent focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer ${isActive(link.href) ? "text-primary font-semibold" : "text-slate-700"
                     }`}
                 >
-                  <span className="relative">
-                    {link.name}
+                  <span className="relative flex items-center gap-1">
+                    {link.href === "/blood-donor" && (
+                      <Droplet className="w-3.5 h-3.5 fill-rose-600 text-rose-600 inline shrink-0" />
+                    )}
+                    <span className={link.href === "/blood-donor" ? "text-rose-700 font-semibold" : ""}>
+                      {link.name}
+                    </span>
                     <span className={`absolute left-0 -bottom-1 w-full h-0.5 bg-primary origin-left transform transition-transform duration-300 scale-x-0 group-hover:scale-x-100 ${isActive(link.href) ? "scale-x-100" : ""}`} />
                   </span>
                 </Link>

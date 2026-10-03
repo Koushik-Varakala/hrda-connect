@@ -276,4 +276,89 @@ export type Donation = typeof donations.$inferSelect;
 export type InsertDonation = z.infer<typeof insertDonationSchema>;
 export type UpdateDonationRequest = Partial<InsertDonation>;
 
+// === HRDA BLOOD DONOR NETWORK (AP Region) ===
+
+export const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"] as const;
+export type BloodGroup = typeof BLOOD_GROUPS[number];
+
+export const bloodDonors = pgTable("blood_donors", {
+    id: serial("id").primaryKey(),
+    fullName: text("full_name").notNull(),
+    phone: text("phone").notNull(),
+    email: text("email"),
+    bloodGroup: text("blood_group").notNull(),
+    district: text("district").notNull(),
+    cityTown: text("city_town").notNull(),
+    hospitalOrWorkplace: text("hospital_or_workplace"),
+    isAvailable: boolean("is_available").default(true).notNull(),
+    lastDonatedDate: date("last_donated_date"),
+    consentGiven: boolean("consent_given").default(true).notNull(),
+    verificationToken: text("verification_token"),
+    status: text("status").default('active').notNull(), // 'active', 'inactive', 'paused'
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertBloodDonorSchema = createInsertSchema(bloodDonors).omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+});
+
+export type BloodDonor = typeof bloodDonors.$inferSelect;
+export type InsertBloodDonor = z.infer<typeof insertBloodDonorSchema>;
+export type UpdateBloodDonorRequest = Partial<InsertBloodDonor>;
+
+export const bloodRequests = pgTable("blood_requests", {
+    id: serial("id").primaryKey(),
+    requestTrackingCode: text("request_tracking_code").unique().notNull(),
+    patientName: text("patient_name").notNull(),
+    attendantName: text("attendant_name").notNull(),
+    contactPhone: text("contact_phone").notNull(),
+    secondaryPhone: text("secondary_phone"),
+    bloodGroup: text("blood_group").notNull(),
+    unitsRequired: integer("units_required").default(1).notNull(),
+    hospitalName: text("hospital_name").notNull(),
+    hospitalAddress: text("hospital_address"),
+    district: text("district").notNull(),
+    cityTown: text("city_town").notNull(),
+    urgency: text("urgency").default('Urgent').notNull(), // 'Critical / Immediate', 'Urgent (Within 12-24 hrs)', 'Routine'
+    status: text("status").default('open').notNull(), // 'open', 'matching', 'donors_contacted', 'fulfilled', 'closed'
+    clinicalRequirement: text("clinical_requirement"),
+    adminNotes: text("admin_notes"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertBloodRequestSchema = createInsertSchema(bloodRequests).omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+});
+
+export type BloodRequest = typeof bloodRequests.$inferSelect;
+export type InsertBloodRequest = z.infer<typeof insertBloodRequestSchema>;
+export type UpdateBloodRequestRequest = Partial<InsertBloodRequest>;
+
+export const bloodDonorResponses = pgTable("blood_donor_responses", {
+    id: serial("id").primaryKey(),
+    requestId: integer("request_id").notNull(),
+    donorId: integer("donor_id").notNull(),
+    responseToken: text("response_token").unique().notNull(),
+    status: text("status").default('pending').notNull(), // 'pending', 'accepted', 'declined'
+    respondedAt: timestamp("responded_at"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertBloodDonorResponseSchema = createInsertSchema(bloodDonorResponses).omit({
+    id: true,
+    createdAt: true,
+});
+
+export type BloodDonorResponse = typeof bloodDonorResponses.$inferSelect;
+export type InsertBloodDonorResponse = z.infer<typeof insertBloodDonorResponseSchema>;
+
+
 
