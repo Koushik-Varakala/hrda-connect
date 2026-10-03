@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { storage } from "@/lib/storage";
 import { randomBytes } from "node:crypto";
 import { appConfig } from "@/lib/app-config";
+import { emailService } from "@/lib/services/email";
 
 export async function GET(request: Request) {
     try {
@@ -146,6 +147,26 @@ ${responseUrl}
 (This is a voluntary fraternity initiative. No commercial/monetary transaction).`;
 
                 const whatsappUrl = `https://wa.me/91${donor.phone.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(alertMessage)}`;
+
+                // If donor provided email, send automated email alert
+                if (donor.email) {
+                    try {
+                        emailService.sendBloodDonorAlertEmail({
+                            to: donor.email,
+                            donorName: donor.fullName,
+                            bloodGroup: bloodReq.bloodGroup,
+                            unitsRequired: bloodReq.unitsRequired,
+                            hospitalName: bloodReq.hospitalName,
+                            cityTown: bloodReq.cityTown,
+                            district: bloodReq.district,
+                            urgency: bloodReq.urgency,
+                            clinicalRequirement: bloodReq.clinicalRequirement || undefined,
+                            responseUrl,
+                        }).catch(e => console.error(`[Blood Alert] Failed to send email to ${donor.email}:`, e));
+                    } catch (e) {
+                        console.error("[Blood Alert] Email dispatch error:", e);
+                    }
+                }
 
                 dispatched.push({
                     donorId: donor.id,

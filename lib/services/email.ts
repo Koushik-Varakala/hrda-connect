@@ -214,6 +214,81 @@ This code will expire in 5 minutes. Do not share this code with anyone.
 If you did not request this code, please ignore this email.`
         });
     }
+
+    async sendBloodDonorAlertEmail(data: {
+        to: string;
+        donorName: string;
+        bloodGroup: string;
+        unitsRequired: number;
+        hospitalName: string;
+        cityTown: string;
+        district: string;
+        urgency: string;
+        clinicalRequirement?: string;
+        responseUrl: string;
+    }) {
+        const subject = `[URGENT] HRDA Blood Alert: ${data.bloodGroup} needed at ${data.hospitalName}, ${data.cityTown}`;
+        const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #fee2e2; border-radius: 12px; background-color: #ffffff;">
+            <div style="background-color: #dc2626; color: #ffffff; padding: 18px 24px; border-radius: 8px 8px 0 0; text-align: center;">
+                <h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 0.5px;">HRDA BLOOD DONOR NETWORK</h2>
+                <p style="margin: 4px 0 0 0; font-size: 13px; color: #fecaca;">Urgent Emergency Requirement • Andhra Pradesh</p>
+            </div>
+            <div style="padding: 24px; color: #1e293b;">
+                <p style="font-size: 15px; margin-top: 0;">Dear <strong>Dr. ${data.donorName}</strong>,</p>
+                <p style="font-size: 14px; line-height: 1.5; color: #334155;">
+                    An urgent requirement has been raised in our fraternity network for <strong>${data.bloodGroup}</strong> blood in your district.
+                </p>
+                <div style="background-color: #fff1f2; border-left: 4px solid #e11d48; padding: 14px 18px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                    <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 4px 0; color: #64748b;">Blood Group:</td>
+                            <td style="padding: 4px 0; font-weight: 800; color: #be123c; font-size: 15px;">${data.bloodGroup} (${data.unitsRequired} Unit${data.unitsRequired > 1 ? 's' : ''})</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 0; color: #64748b;">Facility / Hospital:</td>
+                            <td style="padding: 4px 0; font-weight: 600; color: #0f172a;">${data.hospitalName}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 0; color: #64748b;">Location:</td>
+                            <td style="padding: 4px 0; font-weight: 600; color: #0f172a;">${data.cityTown}, ${data.district}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 0; color: #64748b;">Urgency:</td>
+                            <td style="padding: 4px 0; font-weight: 700; color: #b91c1c;">${data.urgency}</td>
+                        </tr>
+                        ${data.clinicalRequirement ? `
+                        <tr>
+                            <td style="padding: 4px 0; color: #64748b;">Clinical Reason:</td>
+                            <td style="padding: 4px 0; color: #334155;">${data.clinicalRequirement}</td>
+                        </tr>` : ''}
+                    </table>
+                </div>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${data.responseUrl}" style="background-color: #059669; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        Confirm Willingness to Donate
+                    </a>
+                </div>
+                <p style="font-size: 12px; color: #64748b; line-height: 1.5; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                    <strong>Privacy Guarantee:</strong> Your contact number remains completely hidden until you explicitly click "Accept" on the link above.<br/>
+                    <em>Voluntary non-commercial fraternity support initiative by HRDA AP.</em>
+                </p>
+            </div>
+        </div>
+        `;
+        const text = `[URGENT] HRDA Blood Alert:
+Dear Dr. ${data.donorName},
+Requirement: ${data.bloodGroup} Blood (${data.unitsRequired} units)
+Facility: ${data.hospitalName}, ${data.cityTown}, ${data.district}
+Urgency: ${data.urgency}
+${data.clinicalRequirement ? `Reason: ${data.clinicalRequirement}\n` : ''}
+Please confirm your willingness to donate by clicking here:
+${data.responseUrl}
+
+(Privacy guaranteed: Your contact info is not shared unless you accept).`;
+
+        return this.sendEmail({ to: data.to, subject, html, text });
+    }
     async sendContactMessage(data: { firstName: string, lastName: string, email: string, subject: string, message: string }) {
         const adminEmail = process.env.CONTACT_EMAIL || appConfig.email;
 
