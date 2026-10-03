@@ -366,6 +366,20 @@ export default function BloodDonorNetworkPage() {
                                                 </div>
 
                                                 <div className="space-y-1.5">
+                                                    <Label htmlFor="donorEmail" className="text-xs font-semibold text-slate-700">
+                                                        Email Address (Optional — for alert notifications)
+                                                    </Label>
+                                                    <Input
+                                                        id="donorEmail"
+                                                        type="email"
+                                                        placeholder="e.g. doctor@gmail.com"
+                                                        value={donorForm.email}
+                                                        onChange={(e) => setDonorForm({ ...donorForm, email: e.target.value })}
+                                                    />
+                                                    <p className="text-[11px] text-slate-400">Receive instant emergency alerts in your inbox.</p>
+                                                </div>
+
+                                                <div className="space-y-1.5">
                                                     <Label htmlFor="donorBlood" className="text-xs font-semibold text-slate-700">
                                                         Blood Group <span className="text-rose-600">*</span>
                                                     </Label>
