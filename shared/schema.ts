@@ -286,6 +286,7 @@ export const bloodDonors = pgTable("blood_donors", {
     fullName: text("full_name").notNull(),
     phone: text("phone").notNull(),
     email: text("email"),
+    age: integer("age"),
     bloodGroup: text("blood_group").notNull(),
     district: text("district").notNull(),
     cityTown: text("city_town").notNull(),

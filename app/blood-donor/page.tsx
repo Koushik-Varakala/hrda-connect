@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,36 @@ const URGENCY_LEVELS = [
     { label: "Routine (Scheduled Procedure)", value: "Routine" },
 ];
 
+// City/Town/Mandal options mapped by district for AP
+const AP_CITIES_BY_DISTRICT: Record<string, string[]> = {
+    "Anantapur": ["Anantapur", "Dharmavaram", "Hindupur", "Guntakal", "Gooty", "Kadiri", "Kalyandurg", "Penukonda", "Tadipatri", "Rayadurg", "Uravakonda"],
+    "Chittoor": ["Chittoor", "Tirupati", "Madanapalle", "Srikalahasti", "Puttur", "Nagari", "Palamaner", "Punganur", "Kuppam", "Pileru"],
+    "East Godavari": ["Rajahmundry", "Kakinada", "Amalapuram", "Samalkot", "Peddapuram", "Tuni", "Mandapeta", "Ramachandrapuram", "Mummidivaram"],
+    "Guntur": ["Guntur", "Tenali", "Mangalagiri", "Narasaraopet", "Vinukonda", "Macherla", "Sattenapalli", "Piduguralla", "Chilakaluripet", "Ponnuru", "Repalle", "Bapatla"],
+    "Krishna": ["Vijayawada", "Machilipatnam", "Gudivada", "Nuzvid", "Jaggaiahpet", "Nandigama", "Tiruvuru", "Gannavaram", "Mylavaram", "Avanigadda"],
+    "Kurnool": ["Kurnool", "Nandyal", "Adoni", "Yemmiganur", "Dhone", "Nandikotkur", "Atmakur", "Pattikonda", "Allagadda", "Kodumur"],
+    "Nellore": ["Nellore", "Gudur", "Kavali", "Atmakur", "Sullurpeta", "Naidupeta", "Venkatagiri", "Buchireddypalem", "Kovur"],
+    "Prakasam": ["Ongole", "Chirala", "Markapur", "Kandukur", "Giddalur", "Addanki", "Darsi", "Kanigiri", "Podili"],
+    "Srikakulam": ["Srikakulam", "Amadalavalasa", "Rajam", "Narasannapeta", "Ichapuram", "Palasa", "Tekkali", "Etcherla"],
+    "Visakhapatnam": ["Visakhapatnam", "Gajuwaka", "Anakapalli", "Bheemunipatnam", "Narsipatnam", "Paderu", "Araku Valley", "Yelamanchili"],
+    "Vizianagaram": ["Vizianagaram", "Bobbili", "Parvathipuram", "Rajam", "Nellimarla", "Salur", "Cheepurupalli", "Gajapathinagaram"],
+    "West Godavari": ["Eluru", "Bhimavaram", "Tadepalligudem", "Tanuku", "Palacole", "Narsapur", "Jangareddygudem", "Kovvur", "Narasapuram"],
+    "YSR Kadapa": ["Kadapa", "Proddatur", "Rajampet", "Jammalamadugu", "Pulivendla", "Mydukur", "Badvel", "Rayachoti"],
+    "Alluri Sitharama Raju": ["Paderu", "Rampachodavaram", "Chintapalli", "Araku Valley", "Maredumilli", "Addateegala"],
+    "Anakapalli": ["Anakapalli", "Narsipatnam", "Yelamanchili", "Chodavaram", "Rambilli", "Kasimkota"],
+    "Annamayya": ["Rayachoti", "Rajampet", "Lakkireddipalle", "Kadiri", "Railway Kodur", "Mudigubba"],
+    "Bapatla": ["Bapatla", "Chirala", "Repalle", "Addanki", "Parchur"],
+    "Eluru": ["Eluru", "Jangareddygudem", "Chintalapudi", "Nuzvid", "Denduluru", "Kaikalur"],
+    "Kakinada": ["Kakinada", "Peddapuram", "Samalkot", "Gollaprolu", "Tuni", "Prathipadu"],
+    "Konaseema": ["Amalapuram", "Ramachandrapuram", "Mandapeta", "Mummidivaram", "Razole", "Kothapeta"],
+    "Nandyal": ["Nandyal", "Allagadda", "Nandikotkur", "Banaganapalle", "Atmakur", "Koilkuntla"],
+    "NTR": ["Vijayawada", "Jaggaiahpet", "Nandigama", "Tiruvuru", "Mylavaram", "Gannavaram", "Kondapalli"],
+    "Palnadu": ["Narasaraopet", "Macherla", "Vinukonda", "Piduguralla", "Sattenapalli", "Gurazala", "Dachepalli"],
+    "Parvathipuram Manyam": ["Parvathipuram", "Palakonda", "Salur", "Seethampeta", "Kurupam", "Makkuva"],
+    "Sri Sathya Sai": ["Puttaparthi", "Penukonda", "Dharmavaram", "Hindupur", "Kadiri", "Rayadurg"],
+    "Tirupati": ["Tirupati", "Srikalahasti", "Sullurpeta", "Nagari", "Puttur", "Chandragiri", "Renigunta"]
+};
+
 export default function BloodDonorNetworkPage() {
     const isAP = appConfig.region === 'AP';
 
@@ -47,6 +77,7 @@ export default function BloodDonorNetworkPage() {
         fullName: "",
         phone: "",
         email: "",
+        age: "",
         bloodGroup: "",
         district: "",
         cityTown: "",
@@ -82,6 +113,18 @@ export default function BloodDonorNetworkPage() {
     const [trackingResult, setTrackingResult] = useState<any>(null);
     const [trackingError, setTrackingError] = useState("");
 
+    // Network Stats
+    const [networkStats, setNetworkStats] = useState<{ totalDonors: number; fulfilledRequests: number } | null>(null);
+
+    useEffect(() => {
+        fetch("/api/blood-network/stats")
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) setNetworkStats(data.stats);
+            })
+            .catch(() => {});
+    }, []);
+
     // Handle Donor Submit
     const handleDonorSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -96,6 +139,14 @@ export default function BloodDonorNetworkPage() {
         if (!donorForm.fullName || !donorForm.phone || !donorForm.bloodGroup || !donorForm.district || !donorForm.cityTown) {
             setDonorError("Please fill in all required fields (Name, Phone, Blood Group, District, City/Town).");
             return;
+        }
+
+        if (donorForm.age) {
+            const ageNum = parseInt(donorForm.age);
+            if (isNaN(ageNum) || ageNum < 18 || ageNum > 45) {
+                setDonorError("Blood donors must be between 18 and 45 years of age as per medical guidelines.");
+                return;
+            }
         }
 
         setDonorSubmitting(true);
@@ -113,6 +164,7 @@ export default function BloodDonorNetworkPage() {
                 fullName: "",
                 phone: "",
                 email: "",
+                age: "",
                 bloodGroup: "",
                 district: "",
                 cityTown: "",
@@ -263,6 +315,33 @@ export default function BloodDonorNetworkPage() {
                     </div>
                 </div>
 
+                {/* Live Network Stats Banner */}
+                {networkStats && (
+                    <div className="container mx-auto max-w-5xl px-4 mt-5">
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center">
+                                    <Users className="w-5 h-5 text-rose-700" />
+                                </div>
+                                <div>
+                                    <p className="text-xl font-extrabold text-slate-900 leading-none">{networkStats.totalDonors}</p>
+                                    <p className="text-[11px] text-slate-500 font-medium">Registered Donors</p>
+                                </div>
+                            </div>
+                            <div className="hidden sm:block w-px h-10 bg-slate-200" />
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center">
+                                    <CheckCircle2 className="w-5 h-5 text-emerald-700" />
+                                </div>
+                                <div>
+                                    <p className="text-xl font-extrabold text-slate-900 leading-none">{networkStats.fulfilledRequests}</p>
+                                    <p className="text-[11px] text-slate-500 font-medium">Successful Operations</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Main Interactive Tabs Container */}
                 <div className="container mx-auto max-w-5xl px-4 mt-8">
                     <Tabs defaultValue="register" className="w-full">
@@ -380,6 +459,23 @@ export default function BloodDonorNetworkPage() {
                                                 </div>
 
                                                 <div className="space-y-1.5">
+                                                    <Label htmlFor="donorAge" className="text-xs font-semibold text-slate-700">
+                                                        Age (Years) <span className="text-rose-600">*</span>
+                                                    </Label>
+                                                    <Input
+                                                        id="donorAge"
+                                                        type="number"
+                                                        min="18"
+                                                        max="45"
+                                                        placeholder="e.g. 32"
+                                                        value={donorForm.age}
+                                                        onChange={(e) => setDonorForm({ ...donorForm, age: e.target.value })}
+                                                        required
+                                                    />
+                                                    <p className="text-[11px] text-amber-600 font-medium">⚠️ Age limit: 18 to 45 years only (as per medical donor guidelines).</p>
+                                                </div>
+
+                                                <div className="space-y-1.5">
                                                     <Label htmlFor="donorBlood" className="text-xs font-semibold text-slate-700">
                                                         Blood Group <span className="text-rose-600">*</span>
                                                     </Label>
@@ -406,7 +502,7 @@ export default function BloodDonorNetworkPage() {
                                                     </Label>
                                                     <Select
                                                         value={donorForm.district}
-                                                        onValueChange={(val) => setDonorForm({ ...donorForm, district: val })}
+                                                        onValueChange={(val) => setDonorForm({ ...donorForm, district: val, cityTown: "" })}
                                                     >
                                                         <SelectTrigger id="donorDistrict">
                                                             <SelectValue placeholder="Select your district" />
@@ -425,13 +521,22 @@ export default function BloodDonorNetworkPage() {
                                                     <Label htmlFor="donorCity" className="text-xs font-semibold text-slate-700">
                                                         City / Town / Mandal <span className="text-rose-600">*</span>
                                                     </Label>
-                                                    <Input
-                                                        id="donorCity"
-                                                        placeholder="e.g. Vijayawada, Guntur, Tirupati"
+                                                    <Select
                                                         value={donorForm.cityTown}
-                                                        onChange={(e) => setDonorForm({ ...donorForm, cityTown: e.target.value })}
-                                                        required
-                                                    />
+                                                        onValueChange={(val) => setDonorForm({ ...donorForm, cityTown: val })}
+                                                        disabled={!donorForm.district}
+                                                    >
+                                                        <SelectTrigger id="donorCity">
+                                                            <SelectValue placeholder={donorForm.district ? "Select city / town" : "Select district first"} />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {(AP_CITIES_BY_DISTRICT[donorForm.district] || []).map((city) => (
+                                                                <SelectItem key={city} value={city}>
+                                                                    {city}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
                                                 </div>
 
                                                 <div className="space-y-1.5">
@@ -669,7 +774,7 @@ export default function BloodDonorNetworkPage() {
                                                     </Label>
                                                     <Select
                                                         value={requestForm.district}
-                                                        onValueChange={(val) => setRequestForm({ ...requestForm, district: val })}
+                                                        onValueChange={(val) => setRequestForm({ ...requestForm, district: val, cityTown: "" })}
                                                     >
                                                         <SelectTrigger id="reqDistrict">
                                                             <SelectValue placeholder="Select district" />
@@ -688,13 +793,22 @@ export default function BloodDonorNetworkPage() {
                                                     <Label htmlFor="reqCity" className="text-xs font-semibold text-slate-700">
                                                         City / Town <span className="text-rose-600">*</span>
                                                     </Label>
-                                                    <Input
-                                                        id="reqCity"
-                                                        placeholder="e.g. Vijayawada, Guntur, Tirupati"
+                                                    <Select
                                                         value={requestForm.cityTown}
-                                                        onChange={(e) => setRequestForm({ ...requestForm, cityTown: e.target.value })}
-                                                        required
-                                                    />
+                                                        onValueChange={(val) => setRequestForm({ ...requestForm, cityTown: val })}
+                                                        disabled={!requestForm.district}
+                                                    >
+                                                        <SelectTrigger id="reqCity">
+                                                            <SelectValue placeholder={requestForm.district ? "Select city / town" : "Select district first"} />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {(AP_CITIES_BY_DISTRICT[requestForm.district] || []).map((city) => (
+                                                                <SelectItem key={city} value={city}>
+                                                                    {city}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
                                                 </div>
 
                                                 <div className="space-y-1.5">

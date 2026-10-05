@@ -30,6 +30,17 @@ export async function POST(request: Request) {
             );
         }
 
+        // Validate age (must be 18-45)
+        if (body.age !== undefined && body.age !== null && body.age !== '') {
+            const age = parseInt(body.age);
+            if (isNaN(age) || age < 18 || age > 45) {
+                return NextResponse.json(
+                    { message: "Blood donors must be between 18 and 45 years of age as per medical guidelines." },
+                    { status: 400 }
+                );
+            }
+        }
+
         // Check if donor already registered with this phone
         const existingDonor = await storage.getBloodDonorByPhone(cleanPhone);
         if (existingDonor) {
@@ -41,6 +52,7 @@ export async function POST(request: Request) {
                 cityTown: body.cityTown || existingDonor.cityTown,
                 hospitalOrWorkplace: body.hospitalOrWorkplace || existingDonor.hospitalOrWorkplace,
                 email: body.email || existingDonor.email,
+                age: body.age ? parseInt(body.age) : existingDonor.age,
                 isAvailable: body.isAvailable !== undefined ? body.isAvailable : true,
                 status: 'active',
             });
